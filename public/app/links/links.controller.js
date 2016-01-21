@@ -45,6 +45,23 @@
             );
         }
 
+        function showConfirm( ev, title, content, ariaLabel, ok, cancel, ok_callback, cancel_callback ) {
+            var confirm = $mdDialog.confirm()
+                        .title( title )
+                        .content( content )
+                        .ariaLabel( ariaLabel )
+                        .targetEvent( ev )
+                        .ok( ok )
+                        .cancel( cancel );
+            $mdDialog.show(confirm).then(function() {
+                ok_callback();
+            }, function() {
+                if( typeof cancel_callback != 'undefined' ) {
+                    cancel_callback();
+                }
+            });
+        };
+
         function select(page) {
             var end, start;
             start = (page - 1) * $scope.numPerPage;
@@ -99,17 +116,27 @@
         }
 
         function deleteLink( ev, id ) {
-            Links.delete( id, function() {
-                refresh();
-            }, function() {
-                showAlert( 
-                    ev,
-                    'Failed to Delete Link',
-                    'Request to delete link has failed. Please retry or contact administrator.',
-                    'Failed to Delete Link',
-                    'OK'
-                );
-            } );
+            showConfirm(
+                ev,
+                'Confirm to Delete Link',
+                'Are you sure to delete this link?',
+                'Confirm to Delete Link',
+                'Yes, I\'m sure',
+                'No, I\'m not',
+                function() {
+                    Links.delete( id, function() {
+                        refresh();
+                    }, function() {
+                        showAlert( 
+                            ev,
+                            'Failed to Delete Link',
+                            'Request to delete link has failed. Please retry or contact administrator.',
+                            'Failed to Delete Link',
+                            'OK'
+                        );
+                    } );
+                }
+            );
         }
 
         function _init() {
