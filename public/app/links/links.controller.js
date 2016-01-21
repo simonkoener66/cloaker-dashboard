@@ -119,7 +119,7 @@
             showConfirm(
                 ev,
                 'Confirm to Delete Link',
-                'Are you sure to delete this link?',
+                'Are you sure to delete this link? Once deleted, you won\'t be able to recover the link.',
                 'Confirm to Delete Link',
                 'Yes, I\'m sure',
                 'No, I\'m not',
