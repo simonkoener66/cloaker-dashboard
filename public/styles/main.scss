@@ -1,0 +1,43 @@
+
+// Shared variables and mixins
+@import 
+    "global/var"                        // global variables
+,   "global/var-extra"                  // extra global variables
+,   "bootstrap/bootstrap/mixins"        // Bootstrap mixins
+,   "bourbon/bourbon"                   // mixins
+;
+
+
+@import 
+    "global/shared"
+    
+// Plugins, overrides plugins' style
+,   "plugins/angular-bootstrap"
+,   "plugins/angular-material"
+,   "plugins/angular-ui-tree"
+,   "plugins/responsive-tables"
+,   "plugins/jquery-steps"
+
+// Pages
+,   "global/var-pages"
+,   "pages/dashboard"
+,   "pages/pages"
+,   "pages/error"
+,   "pages/auth"
+,   "pages/profile"
+,   "pages/invoice"
+,   "pages/ui"
+,   "pages/features"
+,   "pages/demo"
+,   "pages/demo-material"
+
+// sections
+,   "layout/layouts"
+,   "layout/nav"
+,   "layout/nav-off-canvas"
+,   "layout/nav-horizontal"
+,   "layout/nav-min"
+,   "layout/nav-color"
+,   "layout/header"
+,   "layout/body"
+;

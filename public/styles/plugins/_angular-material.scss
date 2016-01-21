@@ -1,0 +1,65 @@
+// Dialog
+md-backdrop.md-dialog-backdrop{
+    z-index: $zindex-modal-background;
+}
+.md-dialog-container {
+    z-index: $zindex-modal-background + 1; // higher than the backdrop
+}
+
+// md-icon
+md-icon {
+    &.zmdi {
+        font-size: 24px;
+    }
+}
+
+.ui-md-radio-group-inline {
+    md-radio-button {
+        display: inline-block;
+        margin: 0 10px 10px;
+    }
+}
+
+// Radio
+md-radio-button {
+
+    &[disabled] .md-on {
+        background-color: #ccc;
+    }
+}
+
+
+// 
+md-toast {
+    &.md-toast-primary {
+        > .md-toast-content {
+            background-color: $brand-primary;
+        }
+    }
+}
+
+
+// Datepicker
+.md-datepicker-calendar-pane .md-datepicker-input-mask {
+    width: auto;
+}
+
+// Material Toast
+md-toast {
+    z-index: 999999 !important;
+    position: fixed !important;
+}
+
+// Tab
+.md-primary {
+    md-tabs-wrapper {
+        md-prev-button,
+        md-next-button {
+            md-icon {
+                color: $gray-lighter;
+            }
+        }
+    }
+}
+
+

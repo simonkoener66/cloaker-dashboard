@@ -1,0 +1,144 @@
+// dependency: http://angular-ui.github.io/bootstrap/ 
+
+
+// Replace glyphicon with font-awesome
+// search bower_components/angular-bootstrap/ui-bootstrap-tpls.js
+.ui-datepicker,
+.ui-timepicker {
+    .glyphicon {
+        // .fa v4.5.x
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome; // shortening font declaration
+        font-size: inherit; // can't have font-size inherit on line above, so need to override
+        text-rendering: auto; // optimizelegibility throws things off #1094
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;        
+    }
+}
+.ui-datepicker {
+    .glyphicon.glyphicon-chevron-left {
+        // .fa .fa-angle-left
+        &:before {
+            content: "\f104";
+        }   
+    }
+    .glyphicon.glyphicon-chevron-right {
+        // .fa .fa-angle-right
+        &:before {
+            content: "\f105";
+        }
+    }
+}
+.ui-timepicker {
+    .glyphicon.glyphicon-chevron-up {
+        // .fa .fa-angle-up
+        &:before {
+            content: "\f106";
+        }    
+    }
+    .glyphicon-chevron-down {
+        &:before {
+            // .fa-angle-down
+            content: "\f107";
+        }
+    }
+}
+
+
+
+
+// Datepicker
+.ui-datepicker {
+    table {
+        margin: 0 5px;
+        th,
+        td {
+            padding: 1px;
+
+            .active span {
+                color: $reverse;
+            }
+        }
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .btn-group .btn,
+    li > .btn {
+        @extend .btn-flat;
+    }
+}
+
+
+// Timepicker, the class is added by angular-bootstrap
+.ui-timepicker {
+    td {
+        padding: 1px;
+    }
+    a.btn-link {
+        color: $text-color;
+    }
+    .btn {
+        &:focus {
+            outline: 0;
+        }
+    }
+}
+
+
+
+
+//
+.ui-typeahead {
+    > .dropdown-menu {
+        right: ($grid-gutter-width/2);
+    }
+}
+
+
+// Rating
+.ui-rating {
+    &:hover {
+        cursor: pointer;
+    }
+    &:focus {
+        outline: none;
+    }
+
+    .glyphicon
+    .fa {
+        margin-right: 2px;
+    }
+
+    // when active
+    .glyphicon-star,
+    .fa-star {
+        color: $brand-primary;
+    }
+    &.ui-rating-success {
+        .glyphicon-star,
+        .fa-star {
+            color: $brand-success;
+        }        
+    }
+    &.ui-rating-info {
+        .glyphicon-star,
+        .fa-star {
+            color: $brand-info;
+        }        
+    }
+    &.ui-rating-warning {
+        .glyphicon-star,
+        .fa-star {
+            color: $brand-warning;
+        }        
+    }
+    &.ui-rating-danger {
+        .glyphicon-star,
+        .fa-star {
+            color: $brand-danger;
+        }        
+    }
+}
+

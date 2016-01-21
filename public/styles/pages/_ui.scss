@@ -1,0 +1,26 @@
+
+.page-icons {
+    .page-header {
+        border-bottom: 0;
+    }
+    .icon-material {
+        .zmdi {
+            display: block;
+            height: 80px;
+            font-size: 1.5em;
+            line-height: 100px;
+            @include transition(all .3s ease-in-out);            
+        }
+
+        .col-sm-4 {
+            @include transition(all .2s ease);            
+            &:hover {
+                color: $dark;
+                .zmdi {
+                    font-size: 3em;
+                    color: $brand-primary;
+                }
+            }
+        }
+    }
+}

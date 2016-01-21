@@ -1,0 +1,38 @@
+<div class="page" data-ng-controller="EditLinkCtrl">
+
+    <div class="row ui-section">
+        <div class="col-lg-8 clearfix">
+            <h2 class="section-header">Create New Link</h2>
+        </div>
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body padding-xl">
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+
+                            <form role="form" data-ng-submit="submit( $event )">
+                                <md-input-container class="md-block">
+                                    <label>Generated Link</label>
+                                    <input ng-model="link.link_generated">
+                                </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label>Private Link</label>
+                                    <input ng-model="link.link_private">
+                                </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label>Public Link</label>
+                                    <input ng-model="link.link_public">
+                                </md-input-container>
+                                <md-button type="submit" class="md-raised md-primary btn-w-md">Submit</md-button>
+                                <div class="space"></div>
+                                <md-button class="md-raised btn-w-md" data-ng-click="gotoLinks()">Back</md-button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</div>
