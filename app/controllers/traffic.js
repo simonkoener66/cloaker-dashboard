@@ -3,7 +3,7 @@ var Traffic = mongoose.model( 'Traffic' );
 
 var trafficController = function( router ) {
 
-	router.get( '/traffics/:page/:pagesize', function( req, res, next ) {
+	this.get = function( req, res, next ) {
 		var page = req.params.page;
 		var pagesize = req.params.pagesize;
 		Traffic.paginate( {}, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
@@ -19,8 +19,8 @@ var trafficController = function( router ) {
 			}
 			res.json( return_value );
 		} );
-	} );
+	};
 
 }
 
-module.exports = trafficController;
+module.exports = new trafficController();

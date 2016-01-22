@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="/bower_components/angular-material/angular-material.min.css">
+	<link rel="stylesheet" href="/styles/bootstrap.css">
+    <link rel="stylesheet" href="/styles/ui.css">
+    <link rel="stylesheet" href="/styles/main.css">
+	<title><%= title %></title>
+</head>
+
+<body class="app ng-scope body-wide body-err">
+	<div class="page-err" style="margin: auto">
+	    <div class="err-container text-center">
+	        <div class="err">
+	            <h2>Sign In to Cloaker</h2>
+	        </div>
+
+	        <div class="err-body">
+	            <a ui-wave href="<%= googleAuthUrl %>" class="btn btn-raised btn-lg btn-default">
+	                Sign In With Google Account
+	            </a>
+	        </div>
+	    </div>
+	</div>
+</body>
+
+</html>

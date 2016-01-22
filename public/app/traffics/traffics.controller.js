@@ -2,9 +2,9 @@
     'use strict';
 
     angular.module( 'app.traffics' )
-        .controller( 'TrafficsCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'Traffics', TrafficsCtrl] )
+        .controller( 'TrafficsCtrl', ['$scope', '$filter', '$location', 'Traffics', TrafficsCtrl] )
 
-    function TrafficsCtrl( $scope, $filter, $location, $mdDialog, Traffics ) {
+    function TrafficsCtrl( $scope, $filter, $location, Traffics ) {
 
         $scope.traffics = [];
         $scope.row = '';
@@ -17,43 +17,12 @@
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
 
-        /*function showAlert( ev, title, content, ariaLabel, ok ) {
-            $mdDialog.show(
-                $mdDialog.alert()
-                    .parent( angular.element(document.querySelector('#popupContainer')) )
-                    .clickOutsideToClose( true )
-                    .title( title )
-                    .content( content )
-                    .ariaLabel( ariaLabel )
-                    .ok( ok )
-                    .targetEvent( ev )
-            );
-        }
-
-        function showConfirm( ev, title, content, ariaLabel, ok, cancel, ok_callback, cancel_callback ) {
-            var confirm = $mdDialog.confirm()
-                        .title( title )
-                        .content( content )
-                        .ariaLabel( ariaLabel )
-                        .targetEvent( ev )
-                        .ok( ok )
-                        .cancel( cancel );
-            $mdDialog.show(confirm).then(function() {
-                ok_callback();
-            }, function() {
-                if( typeof cancel_callback != 'undefined' ) {
-                    cancel_callback();
-                }
-            });
-        };*/
-
         function select( page ) {
             refresh( page );
         };
 
         function onNumPerPageChange() {
-            $scope.select(1);
-            return $scope.currentPage = 1;
+            $scope.select( 1 );
         };
 
         function order(rowName) {

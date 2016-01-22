@@ -5,19 +5,21 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var session = require('express-session');
+var crypto = require('crypto');
 
 // db init
-require('./models/init');
+require('./app/models/init');
 
 // controllers init
-var routes = require('./controllers/init');
+var routes = require('./config/routes');
 
 var app = express();
 
 var port = process.env.PORT || 3000;
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
@@ -27,6 +29,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// setup session
+app.use( session( {
+  genid: function( req ) {
+    var sha = crypto.createHash( 'sha256' );
+    sha.update( Math.random().toString() );
+    return sha.digest( 'hex' );
+  },
+  secret: 'si8gyw45ytwb45nw5',
+  resave: false,
+  saveUninitialized: false
+} ) );
 
 app.use('/', routes);
 

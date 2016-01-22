@@ -6,7 +6,7 @@ var urlFilterController = function( router ) {
 
 	var links = [];
 
-	router.get( '/*', function( req, res, next ) {
+	this.processUrl = function( req, res, next ) {
 		var path = req.originalUrl;
 		Link.findOne( { 'link_generated': path }, function( err, link ) {
 			if( err ) {
@@ -29,7 +29,7 @@ var urlFilterController = function( router ) {
 				res.json( { message: 'Link not found.' } );
 			}
 		} );
-	} );
+	};
 
 	function refreshLinks() {
 		Link.find( function( err, _links ) {
@@ -49,4 +49,4 @@ var urlFilterController = function( router ) {
 
 }
 
-module.exports = urlFilterController;
+module.exports = new urlFilterController();
