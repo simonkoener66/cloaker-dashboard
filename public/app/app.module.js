@@ -7,6 +7,7 @@
 
         // Features
         ,'app.links'
+        ,'app.traffics'
         
         // 3rd party feature modules
         ,'ui.tree'

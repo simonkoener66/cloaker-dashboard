@@ -44,8 +44,8 @@ var linkController = function( router ) {
 		if( req.body._id ) {
 			var updated_link = {
 				'link_generated': req.body.link_generated,
-				'link_private': req.body.link_private,
-				'link_public': req.body.link_public
+				'link_real': req.body.link_real,
+				'link_safe': req.body.link_safe
 			};
 			Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
 				if( err ) {

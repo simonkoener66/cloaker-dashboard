@@ -2,7 +2,8 @@
     'use strict';
 
     angular.module('app')
-    .service( 'Links', [ '$http', 'appConfig', LinksService] );
+    .service( 'Links', [ '$http', 'appConfig', LinksService] )
+    .service( 'Traffics', [ '$http', 'appConfig', TrafficsService] );
     
     function LinksService( $http, appConfig ) {
 
@@ -11,7 +12,7 @@
     	}
 
     	this.isValid = function( link ) {
-    		return ( link.link_generated != '' ) && ( link.link_private != '' ) && ( link.link_public != '' );
+    		return ( link.link_generated != '' ) && ( link.link_real != '' ) && ( link.link_safe != '' );
     	}
 
         this.all = function( callback ) {
@@ -84,6 +85,21 @@
         	}
         }
 
+    }
+
+    function TrafficsService( $http, appConfig ) {
+
+    	function apiUrl( path ) {
+    		return appConfig.dbserver + path;
+    	}
+
+    	this.getPage = function( page, limit, callback ) {
+    		$http
+    		.get( apiUrl( '/traffics/' + page + '/' + limit ) )
+    		.then( function( response ) {
+    			callback( response.data );
+    		} );
+    	}
     }
 
 })(); 

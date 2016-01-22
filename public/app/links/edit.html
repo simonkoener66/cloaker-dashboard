@@ -2,7 +2,7 @@
 
     <div class="row ui-section">
         <div class="col-lg-8 clearfix">
-            <h2 class="section-header">Create New Link</h2>
+            <h2 class="section-header">{{title}}</h2>
         </div>
         <div class="col-md-12">
             <section class="panel panel-default">
@@ -16,14 +16,14 @@
                                     <input ng-model="link.link_generated">
                                 </md-input-container>
                                 <md-input-container class="md-block">
-                                    <label>Private Link</label>
-                                    <input ng-model="link.link_private">
+                                    <label>Real Link</label>
+                                    <input ng-model="link.link_real">
                                 </md-input-container>
                                 <md-input-container class="md-block">
-                                    <label>Public Link</label>
-                                    <input ng-model="link.link_public">
+                                    <label>Safe(Public) Link</label>
+                                    <input ng-model="link.link_safe">
                                 </md-input-container>
-                                <md-button type="submit" class="md-raised md-primary btn-w-md">Submit</md-button>
+                                <md-button type="submit" class="md-raised md-primary btn-w-md">{{submitButtonTitle}}</md-button>
                                 <div class="space"></div>
                                 <md-button class="md-raised btn-w-md" data-ng-click="gotoLinks()">Back</md-button>
                             </form>

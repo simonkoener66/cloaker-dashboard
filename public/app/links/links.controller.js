@@ -7,13 +7,7 @@
 
     function LinksCtrl( $scope, $filter, $location, $mdDialog, Links ) {
 
-        $scope.links = [
-            {
-                link_generated: '/testlink',
-                link_private: 'https://www.facebook.com',
-                link_public: 'https://www.google.com'
-            }
-        ];
+        $scope.links = [];
         $scope.filteredLinks = [];
         $scope.searchKeywords = '';
         $scope.row = '';
@@ -150,9 +144,11 @@
 
         $scope.link = {
             link_generated: '',
-            link_private: '',
-            link_public: ''
+            link_real: '',
+            link_safe: ''
         };
+        $scope.title = 'Create New Link';
+        $scope.submitButtonTitle = 'Create';
 
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
@@ -199,6 +195,8 @@
 
         function _init() {
             if( $stateParams.id ) {
+                $scope.title = 'Edit Link';
+                $scope.submitButtonTitle = 'Update';
                 Links.get( $stateParams.id, function( link ) {
                     $scope.link = link;
                 } );

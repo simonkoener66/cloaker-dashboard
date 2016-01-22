@@ -20,8 +20,8 @@
                     template: 'links/edit'
                 },
                 {
-                    url: 'statistics',
-                    template: 'statistics/statistics'
+                    url: 'traffics',
+                    template: 'traffics/traffics'
                 },
                 {
                     url: 'iplist',
