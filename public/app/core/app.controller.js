@@ -2,7 +2,8 @@
     'use strict';
 
     angular.module('app')
-    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', AppCtrl]) // overall control
+    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', AppCtrl])
+    .controller('LoginCtrl', [ '$scope', '$window', '$location', '$stateParams', 'appConfig', LoginCtrl])
     
     function AppCtrl($scope, $rootScope, $state, $document, appConfig) {
 
@@ -36,10 +37,14 @@
             }
         }, true);
 
-
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
             $document.scrollTo(0, 0);
         });
+    }
+
+    function LoginCtrl( $scope, $window, $location, $stateParams, appConfig ) {
+        $window.sessionStorage.token = $stateParams.token;
+        $location.path( '/links' );
     }
 
 })(); 

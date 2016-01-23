@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module( 'app.links' )
-        .controller( 'LinksCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'Links', LinksCtrl] )
+        .controller( 'LinksCtrl', ['$scope', '$window', '$filter', '$location', '$mdDialog', 'Links', LinksCtrl] )
         .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', EditLinkCtrl] )
 
-    function LinksCtrl( $scope, $filter, $location, $mdDialog, Links ) {
+    function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links ) {
 
         $scope.links = [];
         $scope.filteredLinks = [];

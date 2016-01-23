@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module('app')
-    .service( 'Links', [ '$http', 'appConfig', LinksService] )
-    .service( 'Traffics', [ '$http', 'appConfig', TrafficsService] );
+    .service( 'Links', [ '$http', '$window', 'appConfig', LinksService] )
+    .service( 'Traffics', [ '$http', '$window', 'appConfig', TrafficsService] );
     
-    function LinksService( $http, appConfig ) {
+    function LinksService( $http, $window, appConfig ) {
 
     	function apiUrl( path ) {
     		return appConfig.dbserver + path;
@@ -16,6 +16,8 @@
     	}
 
         this.all = function( callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            console.log($window.sessionStorage.token);
         	$http
         	.get( apiUrl( '/links' ) )
         	.then( function( response ) {
@@ -27,6 +29,7 @@
         	if( !id ) {
         		callback( { id: false } );
         	}
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
         	$http
         	.get( apiUrl( '/links/' + id ) )
         	.then( function( response ) {
@@ -41,6 +44,7 @@
 	        	}
         		return;
         	}
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
         	var request = $http.post( apiUrl( '/links' ), link );
         	if( typeof success != 'undefined' ) {
         		request = request.success( success );
@@ -57,6 +61,7 @@
 	        	}
         		return;
         	}
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
         	var request = $http.post( 
         		apiUrl( '/links/delete' ),
         		{ _id: id }
@@ -76,6 +81,7 @@
 	        	}
         		return;
         	}
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
         	var request = $http.post( apiUrl( '/links/update' ), link );
         	if( typeof success != 'undefined' ) {
         		request = request.success( success );
@@ -87,13 +93,14 @@
 
     }
 
-    function TrafficsService( $http, appConfig ) {
+    function TrafficsService( $http, $window, appConfig ) {
 
     	function apiUrl( path ) {
     		return appConfig.dbserver + path;
     	}
 
     	this.getPage = function( page, limit, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
     		$http
     		.get( apiUrl( '/traffics/' + page + '/' + limit ) )
     		.then( function( response ) {

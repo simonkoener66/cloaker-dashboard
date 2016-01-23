@@ -8,6 +8,11 @@
             var routes, setRoutes;
             routes = [
                 {
+                    url: 'login/:token',
+                    template: 'layout/login',
+                    controller: 'LoginCtrl'
+                },
+                {
                     url: 'links',
                     template: 'links/links'
                 },

@@ -1,23 +1,21 @@
 var express = require('express'), app = express();
 var router = express.Router();
 
-var linkController = require( '../app/controllers/link' );
-var adminController = require( '../app/controllers/admin' );
-var trafficController =require( '../app/controllers/traffic' );
-// urlFilterController must be at the end because it tries to catch every url
+// filterController must be at the end because it tries to catch every url
+var apiController = require( '../app/controllers/api' );
 var filterController = require( '../app/controllers/filter' );
 
-router.get( '/links/:id',					linkController.get );
-router.get( '/links',						linkController.getAll );
-router.post( '/links/delete',				linkController.delete );
-router.post( '/links',						linkController.edit );
+router.get( '/links/:id',					apiController.checkApiAuth, apiController.getLink );
+router.get( '/links',						apiController.checkApiAuth, apiController.getLinks );
+router.post( '/links/delete',				apiController.checkApiAuth, apiController.deleteLink );
+router.post( '/links',						apiController.checkApiAuth, apiController.editLink );
 
-router.get( '/admin/login',					adminController.login );
-router.get( '/admin/googlelogin',			adminController.loggedInWithGoogle )
-router.get( '/admin',						adminController.checkAdminAuth, adminController.admin );
-router.get( '/',							adminController.index );
+router.get( '/traffics/:page/:pagesize',	apiController.checkApiAuth, apiController.getTraffics );
 
-router.get( '/traffics/:page/:pagesize',	trafficController.get );
+router.get( '/admin/login',					apiController.loginAdmin );
+router.get( '/admin/googlelogin',			apiController.loggedInWithGoogle )
+router.get( '/admin',						apiController.checkAdminAuth, apiController.admin );
+router.get( '/',							apiController.index );
 
 router.get( '/*', 							filterController.processUrl );
 
