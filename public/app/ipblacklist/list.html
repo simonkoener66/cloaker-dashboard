@@ -1,0 +1,99 @@
+<div class="page page-table" data-ng-controller="IPBlacklistListCtrl">
+
+    <div class="row ui-section">
+    <div class="col-lg-8 clearfix">
+        <h2 class="section-header">Manage IP Blacklist</h2>
+    </div>
+    <div class="col-md-12">
+        <section class="panel panel-default table-dynamic">
+        <div class="table-filters">
+            <div class="row">
+	            <!--<div class="col-sm-4 col-xs-6">
+	                <form>
+	                <input type="text"
+	                     placeholder="Search..."
+	                     class="form-control"
+	                     data-ng-model="searchKeywords"
+	                     data-ng-keyup="search()">
+	                </form>
+	            </div>
+	            <div class="col-sm-3 col-xs-6 filter-result-info">
+	                <span>
+	                Showing {{filteredLinks.length}}/{{links.length}} entries
+	                </span>                
+	            </div>-->
+	            <div class="col-sm-4 col-xs-12">
+	            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="gotoCreatePage()">Create New Link</md-button>
+	            </div>
+            </div>
+        </div>
+
+        <div class="table-responsive1">
+	        <table class="table table-bordered table-striped table-responsive">
+	            <thead>
+	            <tr>
+	                <th><div class="th">
+	                IP Address
+	                <span class="fa fa-angle-up"
+	                    data-ng-click=" order('ip') "
+	                    data-ng-class="{active: row == 'ip'}"></span>
+	                <span class="fa fa-angle-down"
+	                    data-ng-click=" order('-ip') "
+	                    data-ng-class="{active: row == '-ip'}"></span>
+	                </div></th>
+	                <th><div class="th">
+	                Description
+	                <span class="fa fa-angle-up"
+	                    data-ng-click=" order('description') "
+	                    data-ng-class="{active: row == 'description'}"></span>
+	                <span class="fa fa-angle-down"
+	                    data-ng-click=" order('-description') "
+	                    data-ng-class="{active: row == '-description'}"></span>
+	                </div></th>
+	                <th></th>
+	            </tr>
+	            </thead>
+	            <tbody>
+	            <tr data-ng-repeat="ip in ips">
+	                <td>{{ip.ip}}</td>
+	                <td>{{ip.description}}</td>
+	                <td>
+	                	<md-button class="md-raised btn-w-md md-primary" data-ng-click="editIP(ip._id)">Edit</md-button>
+	                	<div class="space"></div>
+	                	<md-button class="md-raised btn-w-md md-warn" data-ng-click="deleteIP($event, ip._id)">Delete</md-button>
+	                </td>
+	            </tr>
+	            </tbody>
+	        </table>
+	    </div>
+
+        <footer class="table-footer">
+            <div class="row">
+            <div class="col-md-6 page-num-info">
+                <span>
+                Show 
+                <select data-ng-model="numPerPage"
+                    data-ng-options="num for num in numPerPageOpt"
+                    data-ng-change="onNumPerPageChange()">
+                </select> 
+                entries per page
+                </span>
+            </div>
+            <div class="col-md-6 text-right pagination-container">
+                <uib-pagination class="pagination-sm"
+                    ng-model="currentPage"
+                    total-items="total"
+                    max-size="4"
+                    ng-change="select(currentPage)"
+                    items-per-page="numPerPage"
+                    rotate="false"
+                    previous-text="&lsaquo;" next-text="&rsaquo;"
+                    boundary-links="true"></uib-pagination>
+            </div>
+            </div>
+        </footer>
+        </section>
+    </div>
+    </div>
+    
+</div>

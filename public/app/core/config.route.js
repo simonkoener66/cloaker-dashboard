@@ -29,8 +29,16 @@
                     template: 'traffics/traffics'
                 },
                 {
-                    url: 'iplist',
-                    template: 'iplist/iplist'
+                    url: 'ipblacklist',
+                    template: 'ipblacklist/list'
+                },
+                {
+                    url: 'ipblacklist/new',
+                    template: 'ipblacklist/edit'
+                },
+                {
+                    url: 'ipblacklist/:id/edit',
+                    template: 'ipblacklist/edit'
                 }
             ];
             setRoutes = function(route) {

@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module( 'app.links' )
-        .controller( 'LinksCtrl', ['$scope', '$window', '$filter', '$location', '$mdDialog', 'Links', LinksCtrl] )
-        .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', EditLinkCtrl] )
+        .controller( 'LinksCtrl', ['$scope', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Dialog', LinksCtrl] )
+        .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', EditLinkCtrl] )
 
-    function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links ) {
+    function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links, Dialog ) {
 
         $scope.links = [];
         $scope.filteredLinks = [];
@@ -25,36 +25,6 @@
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.deleteLink = deleteLink;
         $scope.editLink = editLink;
-
-        function showAlert( ev, title, content, ariaLabel, ok ) {
-            $mdDialog.show(
-                $mdDialog.alert()
-                    .parent( angular.element(document.querySelector('#popupContainer')) )
-                    .clickOutsideToClose( true )
-                    .title( title )
-                    .content( content )
-                    .ariaLabel( ariaLabel )
-                    .ok( ok )
-                    .targetEvent( ev )
-            );
-        }
-
-        function showConfirm( ev, title, content, ariaLabel, ok, cancel, ok_callback, cancel_callback ) {
-            var confirm = $mdDialog.confirm()
-                        .title( title )
-                        .content( content )
-                        .ariaLabel( ariaLabel )
-                        .targetEvent( ev )
-                        .ok( ok )
-                        .cancel( cancel );
-            $mdDialog.show(confirm).then(function() {
-                ok_callback();
-            }, function() {
-                if( typeof cancel_callback != 'undefined' ) {
-                    cancel_callback();
-                }
-            });
-        };
 
         function select(page) {
             var end, start;
@@ -110,7 +80,7 @@
         }
 
         function deleteLink( ev, id ) {
-            showConfirm(
+            Dialog.showConfirm(
                 ev,
                 'Confirm to Delete Link',
                 'Are you sure to delete this link? Once deleted, you won\'t be able to recover the link.',
@@ -121,7 +91,7 @@
                     Links.delete( id, function() {
                         refresh();
                     }, function() {
-                        showAlert( 
+                        Dialog.showAlert( 
                             ev,
                             'Failed to Delete Link',
                             'Request to delete link has failed. Please retry or contact administrator.',
@@ -140,7 +110,7 @@
         _init();
     }
 
-    function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links ) {
+    function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links, Dialog ) {
 
         $scope.link = {
             link_generated: '',
@@ -153,22 +123,9 @@
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
 
-        function showAlert( ev, title, content, ariaLabel, ok ) {
-            $mdDialog.show(
-                $mdDialog.alert()
-                    .parent( angular.element(document.querySelector('#popupContainer')) )
-                    .clickOutsideToClose( true )
-                    .title( title )
-                    .content( content )
-                    .ariaLabel( ariaLabel )
-                    .ok( ok )
-                    .targetEvent( ev )
-            );
-        }
-
         function submit( ev ) {
             if( !Links.isValid( $scope.link ) ) {
-                showAlert(
+                Dialog.showAlert(
                     ev,
                     'Invalid Parameters',
                     'One of the fields are empty. Please check before submit.',
@@ -179,7 +136,7 @@
             Links.new( $scope.link, function() {
                 $location.path( '/links' );
             }, function() {
-                showAlert( 
+                Dialog.showAlert( 
                     ev,
                     'Failed to Create New Link',
                     'Request to create new link has failed. Please retry or contact administrator.',

@@ -8,6 +8,7 @@
         // Features
         ,'app.links'
         ,'app.traffics'
+        ,'app.ipblacklist'
         
         // 3rd party feature modules
         ,'ui.tree'
