@@ -21,7 +21,6 @@ var urlFilterController = function( router ) {
 					req.socket.remoteAddress ||
 					req.connection.socket.remoteAddress;
 				var geo = geoip.lookup( ip );
-				console.log(geo);
 				var geo_address = '(Unavailable)';
 				if( geo ) {
 					geo_address = geo.city + ', ' + geo.region + ', ' + geo.country;
@@ -41,6 +40,7 @@ var urlFilterController = function( router ) {
 						console.log( err );
 					}
 				} );
+				geo.ip = ip;
 				res.json( geo );
 			} else {
 				res.json( { message: 'Link not found.' } );
