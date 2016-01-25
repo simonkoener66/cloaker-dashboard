@@ -16,7 +16,7 @@ var routes = require('./config/routes');
 
 var app = express();
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 80;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'app/views'));
