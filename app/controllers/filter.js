@@ -1,4 +1,6 @@
+var geoip = require('geoip-lite');
 var mongoose = require('mongoose');
+
 var Link = mongoose.model( 'Link' );
 var Traffic = mongoose.model( 'Traffic' );
 
@@ -13,11 +15,26 @@ var urlFilterController = function( router ) {
 				res.json( { message: 'Error occurred.' } );
 			}
 			if( link ) {
+				var use_real_link = false;
+				var ip = req.headers['x-forwarded-for'] ||
+					req.connection.remoteAddress ||
+					req.socket.remoteAddress ||
+					req.connection.socket.remoteAddress;
+				var geo = geoip.lookup( ip );
+				console.log(geo);
+				var geo_address = '(Unavailable)';
+				if( geo ) {
+					geo_address = geo.city + ', ' + geo.region + ', ' + geo.country;
+					console.log(geo_address);
+					use_real_link = true;	///
+				}
 				var new_traffic = {
+					ip: req.ip,
 					link_generated: link.link_generated,
-					used_real: false,
+					used_real: use_real_link,
 					link_real: link.link_real,
-					link_safe: link.link_safe
+					link_safe: link.link_safe,
+					geo_address: geo_address
 				}
 				Traffic.create( new_traffic, function( err, traffic ){
 					if( err ) {

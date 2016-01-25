@@ -141,9 +141,13 @@ var apiController = function( router ) {
 					res.redirect( '/admin/login' );
 					return;
 				}
-				req.session.token = generateToken();	/// email comparison must be done 
-				req.session.email = profile.emails[0].value;
-				res.redirect( '/admin#/login/' + req.session.token );
+				if( profile.emails[0].value == 'hakim.jaya666@gmail.com') {
+					req.session.token = generateToken();	/// email comparison must be done 
+					req.session.email = profile.emails[0].value;
+					res.redirect( '/admin#/login/' + req.session.token );
+				} else {
+					res.status( 404 ).send( 'Invalid credential.' );
+				}
 			} );
 		}, function(err) {
 			res.send( err );

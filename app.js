@@ -80,6 +80,6 @@ app.use(function(err, req, res, next) {
 });
 
 console.log('App will listen at port ' + port);
-var server = app.listen( port );
+var server = app.listen( port, '127.0.0.1' );
 
 module.exports = app;
