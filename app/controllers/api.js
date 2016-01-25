@@ -11,7 +11,7 @@ var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
 
 var CLIENT_ID = '794547063462-klinv1to3d5fk5uatrk7g97o5lkhi17e.apps.googleusercontent.com';
 var CLIENT_SECRET = '5ZL9WC3xLmZWQRBhHJZiVq4X';
-var REDIRECT_URL = 'http://localhost:3000/admin/googlelogin';
+var REDIRECT_URL = 'https://cloaker-test.herokuapp.com/admin/googlelogin';
 
 var oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
 var q = require('q');
