@@ -3,10 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "postinstall": "bash ./post_install.sh"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
+    "bower": "^1.7.2",
     "cookie-parser": "~1.3.5",
     "crypto": "0.0.3",
     "debug": "~2.2.0",
