@@ -41,7 +41,7 @@ var urlFilterController = function( router ) {
 						console.log( err );
 					}
 				} );
-				res.json( link );
+				res.json( geo );
 			} else {
 				res.json( { message: 'Link not found.' } );
 			}
