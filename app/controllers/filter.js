@@ -53,9 +53,9 @@ var urlFilterController = function( router ) {
 				if( geo ) {
 					geolocation = geo.city + ', ' + geo.region + ', ' + geo.country;
 					link.criteria.forEach( function( criterion ) {
-						if( ( criterion.city && criterion.city != geo.city )
-							|| ( criterion.region && criterion.region != geo.region )
-							|| ( criterion.country && criterion.country != geo.country ) ) {
+						if( ( criterion.city && criterion.city.toLowerCase() != geo.city.toLowerCase() )
+							|| ( criterion.region && criterion.region.toLowerCase() != geo.region.toLowerCase() )
+							|| ( criterion.country && criterion.country.toLowerCase() != geo.country.toLowerCase() ) ) {
 							return;
 						}
 						use_real_link = true;
