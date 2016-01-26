@@ -3,7 +3,7 @@
 
     angular.module( 'app.links' )
         .controller( 'LinksCtrl', ['$scope', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Dialog', LinksCtrl] )
-        .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', EditLinkCtrl] )
+        .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
 
     function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links, Dialog ) {
 
@@ -110,7 +110,7 @@
         _init();
     }
 
-    function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links, Dialog ) {
+    function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links, Dialog, GeolocationCodes ) {
 
         $scope.link = {
             link_generated: '',
@@ -121,15 +121,16 @@
             use_ip_blacklist: false,
             criteria: [
                 { country: 'US', region: 'LA', city: 'Avalon' },
-                { country: 'US', region: 'NY', city: '' },
-                { country: 'BE', region: '', city: '' }
             ]
         };
         $scope.title = 'Create New Link';
         $scope.submitButtonTitle = 'Create';
+        $scope.countries = GeolocationCodes.getCountries();
+        $scope.regions = [ [ { code: '', longname: 'All Regions' } ] ];
 
         $scope.addNewCriteria = addNewCriteria;
         $scope.removeCriteria = removeCriteria;
+        $scope.updateRegions = updateRegions;
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
 
@@ -142,14 +143,23 @@
         }
 
         function removeCriteria( index ) {
-            console.log(index);
             if( index > -1 ) {
                 $scope.link.criteria.splice( index, 1 );
             }
         }
 
+        function updateRegions( index ) {
+            $scope.regions[index] = GeolocationCodes.getCountry( $scope.link.criteria[index].country ).regions;
+        }
+
+        function updateAllRegions() {
+            $scope.regions = [];
+            for( var i = 0; i < $scope.link.criteria.length; i++ ) {
+                updateRegions( i );
+            }
+        }
+
         function submit( ev ) {
-            console.log($scope.link);
             if( !Links.isValid( $scope.link ) ) {
                 Dialog.showAlert(
                     ev,
@@ -201,6 +211,7 @@
                         use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,
                         criteria: ( link.criteria ) ? link.criteria : []
                     };
+                    updateAllRegions();
                 } );
             }
         }

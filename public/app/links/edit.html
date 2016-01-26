@@ -38,10 +38,14 @@
                                     <tbody>
                                         <tr ng-repeat="criterion in link.criteria">
                                             <td>
-                                                <input type="text" class="form-control" ng-model="criterion.country">
+                                                <select class="form-control" ng-model="criterion.country" ng-change="updateRegions( $index )">
+                                                    <option ng-repeat="country in countries" value="{{country.code}}">{{country.longname}}</option>
+                                                </select>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control" ng-model="criterion.region">
+                                                <select class="form-control" ng-model="criterion.region">
+                                                    <option ng-repeat="region in regions[$index]" value="{{region.code}}">{{region.longname}}</option>
+                                                </select>
                                             </td>
                                             <td>
                                                 <input type="text" class="form-control" ng-model="criterion.city">
