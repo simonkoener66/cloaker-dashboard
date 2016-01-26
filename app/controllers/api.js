@@ -3,17 +3,18 @@ var crypto = require('crypto');
 var google = require('googleapis');
 var OAuth2Client = google.auth.OAuth2;
 var plus = google.plus('v1');
+var config = require('../../config/config');
 
 var mongoose = require('mongoose');
 var Link = mongoose.model( 'Link' );
 var Traffic = mongoose.model( 'Traffic' );
 var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
 
-var CLIENT_ID = '794547063462-klinv1to3d5fk5uatrk7g97o5lkhi17e.apps.googleusercontent.com';
-var CLIENT_SECRET = '5ZL9WC3xLmZWQRBhHJZiVq4X';
-var REDIRECT_URL = 'https://cloaker-test.herokuapp.com/admin/googlelogin';
-
-var oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+var oauth2Client = new OAuth2Client(
+	config.googleClientID, 
+	config.googleClientSecret, 
+	config.googleLoginRedirectUrl
+);
 var q = require('q');
 
 /**
@@ -50,7 +51,6 @@ var apiController = function( router ) {
 	}
 
 	this.checkApiAuth = function( req, res, next ) {
-		console.log( req.headers.token + ' ' + req.session.token );
 		if( req.headers.token == req.session.token && req.session.token ) {
 			next();
 		} else {
@@ -95,13 +95,29 @@ var apiController = function( router ) {
 		}
 	};
 
+	function copyLinkRegions( original_criteria ) {
+		var criteria = [];
+		original_criteria.forEach( function( criterion ) {
+			criteria.push( {
+				country: ( criterion.country ) ? criterion.country : '',
+				region: ( criterion.region ) ? criterion.region : '',
+				city: ( criterion.city ) ? criterion.city : ''
+			} );
+		} );
+		return criteria;
+	}
+
 	this.editLink = function( req, res, next ) {
+		var updated_link = {
+			link_generated: req.body.link_generated,
+			link_real: req.body.link_real,
+			link_safe: req.body.link_safe,
+			total_hits: req.body.total_hits,
+			real_hits: req.body.real_hits,
+			use_ip_blacklist: req.body.use_ip_blacklist,
+			criteria: copyLinkRegions( req.body.criteria )
+		};
 		if( req.body._id ) {
-			var updated_link = {
-				'link_generated': req.body.link_generated,
-				'link_real': req.body.link_real,
-				'link_safe': req.body.link_safe
-			};
 			Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
 				if( err ) {
 					console.log( err );
@@ -110,7 +126,7 @@ var apiController = function( router ) {
 				res.json( link );
 			} );
 		} else {
-			Link.create( req.body, function( err, link ) {
+			Link.create( updated_link, function( err, link ) {
 				if( err ) {
 					console.log( err );
 					res.json( { id: false } );
@@ -188,7 +204,6 @@ var apiController = function( router ) {
 		];
 		BlacklistedIP.count( {}, function( err, count ) {
 			if( count == 0 ) {
-				console.log('Blacklist count: '+count);
 				initialList.forEach( function( iprecord ) {
 					BlacklistedIP.create( iprecord, function( err, link ) {
 					} );

@@ -1,7 +1,6 @@
 var express = require('express'), app = express();
 var router = express.Router();
 
-// filterController must be at the end because it tries to catch every url
 var apiController = require( '../app/controllers/api' );
 var filterController = require( '../app/controllers/filter' );
 
@@ -22,6 +21,7 @@ router.get(  '/admin/googlelogin',					apiController.loggedInWithGoogle )
 router.get(  '/admin',								apiController.checkAdminAuth, apiController.admin );
 router.get(  '/',									apiController.index );
 
+// filterController must be at the end because it tries to catch every url
 router.get( '/*', 									filterController.processUrl );
 
 module.exports = router;

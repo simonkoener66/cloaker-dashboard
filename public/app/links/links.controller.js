@@ -115,15 +115,41 @@
         $scope.link = {
             link_generated: '',
             link_real: '',
-            link_safe: ''
+            link_safe: '',
+            total_hits: 0,
+            real_hits: 0,
+            use_ip_blacklist: false,
+            criteria: [
+                { country: 'US', region: 'LA', city: 'Avalon' },
+                { country: 'US', region: 'NY', city: '' },
+                { country: 'BE', region: '', city: '' }
+            ]
         };
         $scope.title = 'Create New Link';
         $scope.submitButtonTitle = 'Create';
 
+        $scope.addNewCriteria = addNewCriteria;
+        $scope.removeCriteria = removeCriteria;
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
 
+        function addNewCriteria() {
+            $scope.link.criteria.push( {
+                country: '',
+                region: '',
+                city: ''
+            } );
+        }
+
+        function removeCriteria( index ) {
+            console.log(index);
+            if( index > -1 ) {
+                $scope.link.criteria.splice( index, 1 );
+            }
+        }
+
         function submit( ev ) {
+            console.log($scope.link);
             if( !Links.isValid( $scope.link ) ) {
                 Dialog.showAlert(
                     ev,
@@ -133,16 +159,26 @@
                     'OK' );
                 return;
             }
-            Links.new( $scope.link, function() {
+            Links.newOrUpdate( $scope.link, function() {
                 $location.path( '/links' );
             }, function() {
-                Dialog.showAlert( 
-                    ev,
-                    'Failed to Create New Link',
-                    'Request to create new link has failed. Please retry or contact administrator.',
-                    'Failed to Create New Link',
-                    'OK'
-                );
+                if( $scope.link._id ) {
+                    Dialog.showAlert( 
+                        ev,
+                        'Failed to Update Link',
+                        'Request to update link has failed. Please retry or contact administrator.',
+                        'Failed to Update Link',
+                        'OK'
+                    );
+                } else {
+                    Dialog.showAlert( 
+                        ev,
+                        'Failed to Create New Link',
+                        'Request to create new link has failed. Please retry or contact administrator.',
+                        'Failed to Create New Link',
+                        'OK'
+                    );
+                }
             } );
         }
 
@@ -155,7 +191,16 @@
                 $scope.title = 'Edit Link';
                 $scope.submitButtonTitle = 'Update';
                 Links.get( $stateParams.id, function( link ) {
-                    $scope.link = link;
+                    $scope.link = {
+                        _id: link._id,
+                        link_generated: ( link.link_generated ) ? link.link_generated : '',
+                        link_real: ( link.link_real ) ? link.link_real : '',
+                        link_safe: ( link.link_safe ) ? link.link_safe : '',
+                        total_hits: ( link.total_hits ) ? link.total_hits : 0,
+                        real_hits: ( link.real_hits ) ? link.real_hits : 0,
+                        use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,
+                        criteria: ( link.criteria ) ? link.criteria : []
+                    };
                 } );
             }
         }

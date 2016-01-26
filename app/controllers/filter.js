@@ -1,8 +1,10 @@
 var geoip = require('geoip-lite');
 var mongoose = require('mongoose');
+var q = require('q');
 
 var Link = mongoose.model( 'Link' );
 var Traffic = mongoose.model( 'Traffic' );
+var Blacklist = mongoose.model( 'BlacklistedIP' );
 
 var urlFilterController = function( router ) {
 
@@ -10,6 +12,25 @@ var urlFilterController = function( router ) {
 
 	this.processUrl = function( req, res, next ) {
 		var path = req.originalUrl;
+
+		function processTraffic( ip, use_real_link, link, geolocation ) {
+			var new_traffic = {
+				ip: ip,
+				link_generated: link.link_generated,
+				used_real: use_real_link,
+				link_real: link.link_real,
+				link_safe: link.link_safe,
+				geolocation: geolocation,
+				access_time: new Date()
+			}
+			Traffic.create( new_traffic, function( err, traffic ){
+				if( err ) {
+					console.log( err );
+				}
+			} );
+			res.json( new_traffic );
+		}
+
 		Link.findOne( { 'link_generated': path }, function( err, link ) {
 			if( err ) {
 				res.json( { message: 'Error occurred.' } );
@@ -19,29 +40,42 @@ var urlFilterController = function( router ) {
 				var ip = req.headers['x-forwarded-for'] ||
 					req.connection.remoteAddress ||
 					req.socket.remoteAddress ||
-					req.connection.socket.remoteAddress;
+					req.connection.socket.remoteAddress ||
+					'127.0.0.1';
 				var geo = geoip.lookup( ip );
-				var geo_address = '(Unavailable)';
+				var geolocation = '(Unavailable)';
+				/// for testing
+				if( !geo ) {
+					geo = {};
+					geo.country='BE';geo.region=geo.city='';
+				}
+				// Geolocation filter
 				if( geo ) {
-					geo_address = geo.city + ', ' + geo.region + ', ' + geo.country;
-					console.log(geo_address);
-					use_real_link = true;	///
+					geolocation = geo.city + ', ' + geo.region + ', ' + geo.country;
+					link.criteria.forEach( function( criterion ) {
+						if( ( criterion.city && criterion.city != geo.city )
+							|| ( criterion.region && criterion.region != geo.region )
+							|| ( criterion.country && criterion.country != geo.country ) ) {
+							return;
+						}
+						use_real_link = true;
+					} );
 				}
-				var new_traffic = {
-					ip: req.ip,
-					link_generated: link.link_generated,
-					used_real: use_real_link,
-					link_real: link.link_real,
-					link_safe: link.link_safe,
-					geo_address: geo_address
+				// Blacklisted IP filter
+				if( use_real_link && link.use_ip_blacklist ) {
+					Blacklist.find( { ip: ip }, function( err, ip_record ) {
+						if( err ) {
+							console.log( err );
+							res.json( { message: 'Error occurred.' } );
+						}
+						if( ip_record.length > 0 && ip_record[0].ip ) {
+							use_real_link = false;
+						}
+						processTraffic( ip, use_real_link, link, geolocation );
+					} );
+				} else {
+					processTraffic( ip, use_real_link, link, geolocation );
 				}
-				Traffic.create( new_traffic, function( err, traffic ){
-					if( err ) {
-						console.log( err );
-					}
-				} );
-				geo.ip = ip;
-				res.json( geo );
 			} else {
 				res.json( { message: 'Link not found.' } );
 			}

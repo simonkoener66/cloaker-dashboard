@@ -38,7 +38,7 @@
         	} );
         }
 
-        this.new = function( link, success, error ) {
+        this.newOrUpdate = function( link, success, error ) {
         	if( !this.isValid( link ) ) {
         		if( typeof error != 'undefined' ) {
 	        		error();
@@ -67,23 +67,6 @@
         		apiUrl( '/links/delete' ),
         		{ _id: id }
         	);
-        	if( typeof success != 'undefined' ) {
-        		request = request.success( success );
-        	}
-        	if( typeof error != 'undefined' ) {
-        		request = request.error( error );
-        	}
-        }
-
-        this.update = function( link, success, error ) {
-        	if( !link.id || !this.isValid( link ) ) {
-        		if( typeof error != 'undefined' ) {
-	        		error();
-	        	}
-        		return;
-        	}
-            $http.defaults.headers.common.token = $window.sessionStorage.token;
-        	var request = $http.post( apiUrl( '/links/update' ), link );
         	if( typeof success != 'undefined' ) {
         		request = request.success( success );
         	}
