@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var mongoosePaginate = require( 'mongoose-paginate' );
 
 var linkSchema = new mongoose.Schema( {
 	link_generated: { type: String, unique: true },
@@ -9,5 +10,6 @@ var linkSchema = new mongoose.Schema( {
 	use_ip_blacklist: Boolean,
 	criteria: [ {} ]
 } );
+linkSchema.plugin( mongoosePaginate );
 
 mongoose.model( 'Link', linkSchema );

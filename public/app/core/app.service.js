@@ -40,6 +40,17 @@
         	} );
         }
 
+        this.getPage = function( page, limit, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var apiPath = '/links/';
+            apiPath += page + '/' + limit;
+            $http
+            .get( apiUrl( apiPath ) )
+            .then( function( response ) {
+                callback( response.data );
+            } );
+        }
+
         this.newOrUpdate = function( link, success, error ) {
         	if( !this.isValid( link ) ) {
         		if( typeof error != 'undefined' ) {

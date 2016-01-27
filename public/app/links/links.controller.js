@@ -8,50 +8,26 @@
     function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links, Dialog ) {
 
         $scope.links = [];
-        $scope.filteredLinks = [];
-        $scope.searchKeywords = '';
         $scope.row = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
-        $scope.currentPageLinks = [];
+        $scope.total = 0;
 
         $scope.select = select;
-        $scope.onFilterChange = onFilterChange;
         $scope.onNumPerPageChange = onNumPerPageChange;
-        $scope.onOrderChange = onOrderChange;
-        $scope.search = search;
         $scope.order = order;
+
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.deleteLink = deleteLink;
         $scope.editLink = editLink;
 
-        function select(page) {
-            var end, start;
-            start = (page - 1) * $scope.numPerPage;
-            end = start + $scope.numPerPage;
-            return $scope.currentPageLinks = $scope.filteredLinks.slice(start, end);
-        };
-
-        function onFilterChange() {
-            $scope.select(1);
-            $scope.currentPage = 1;
-            return $scope.row = '';
+        function select( page ) {
+            refresh( page );
         };
 
         function onNumPerPageChange() {
-            $scope.select(1);
-            return $scope.currentPage = 1;
-        };
-
-        function onOrderChange() {
-            $scope.select(1);
-            return $scope.currentPage = 1;
-        };
-
-        function search() {
-            $scope.filteredLinks = $filter('filter')($scope.links, $scope.searchKeywords);
-            return $scope.onFilterChange();
+            $scope.select( 1 );
         };
 
         function order(rowName) {
@@ -59,15 +35,18 @@
                 return;
             }
             $scope.row = rowName;
-            $scope.filteredLinks = $filter('orderBy')($scope.links, rowName);
-            return $scope.onOrderChange();
+            $scope.links = $filter('orderBy')($scope.links, rowName);
         };
 
-        function refresh() {
-            Links.all( function( links ) {
-                $scope.links = links;
-                $scope.search();
-                $scope.select($scope.currentPage);
+        function refresh( page ) {
+            if( !page ) {
+                page = $scope.currentPage;
+            }
+            Links.getPage( page, $scope.numPerPage, function( result ) {
+                $scope.links = result.links;
+                $scope.currentPage = ( result.page ) ? result.page : 1;
+                $scope.total = ( result.total ) ? result.total : 0;
+                $scope.pages = ( result.pages ) ? result.pages : 0;
             } );
         }
 
@@ -80,6 +59,8 @@
         }
 
         function deleteLink( ev, id ) {
+            ev.stopPropagation();
+            ev.preventDefault();
             Dialog.showConfirm(
                 ev,
                 'Confirm to Delete Link',
@@ -120,7 +101,7 @@
             real_hits: 0,
             use_ip_blacklist: false,
             criteria: [
-                { country: 'US', region: 'LA', city: 'Avalon' },
+                { country: 'US', region: 'CA', city: '' },
             ]
         };
         $scope.title = 'Create New Link';
@@ -150,6 +131,8 @@
 
         function updateRegions( index ) {
             $scope.regions[index] = GeolocationCodes.getCountry( $scope.link.criteria[index].country ).regions;
+            console.log($scope.link.criteria[index].country );
+            console.log(GeolocationCodes.getCountry( $scope.link.criteria[index].country ));
         }
 
         function updateAllRegions() {
@@ -213,6 +196,8 @@
                     };
                     updateAllRegions();
                 } );
+            } else {
+                updateAllRegions();
             }
         }
 

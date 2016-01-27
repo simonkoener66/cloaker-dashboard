@@ -47,6 +47,8 @@
         }
 
         function deleteIP( ev, id ) {
+            ev.stopPropagation();
+            ev.preventDefault();
             Dialog.showConfirm(
                 ev,
                 'Confirm to Remove IP',
@@ -99,6 +101,8 @@
         $scope.goBack = goBack;
 
         function submit( ev ) {
+            ev.stopPropagation();
+            ev.preventDefault();
             if( !IPBlacklist.isValid( $scope.ip ) ) {
                 Dialog.showAlert(
                     ev,
@@ -111,13 +115,23 @@
             IPBlacklist.new( $scope.ip, function() {
                 $location.path( '/ipblacklist' );
             }, function() {
-                Dialog.showAlert( 
-                    ev,
-                    'Failed to Add IP to Blacklist',
-                    'Request to add an IP to blacklist has failed. Please retry or contact administrator.',
-                    'Failed to Add IP to Blacklist',
-                    'OK'
-                );
+                if( $scope.ip._id ) {
+                    Dialog.showAlert( 
+                        ev,
+                        'Failed to Update Blacklisted IP',
+                        'Request to update blacklisted IP has failed. Please retry or contact administrator.',
+                        'Failed to Update Blacklisted IP',
+                        'OK'
+                    );
+                } else {
+                    Dialog.showAlert( 
+                        ev,
+                        'Failed to Add IP to Blacklist',
+                        'Request to add an IP to blacklist has failed. Please retry or contact administrator.',
+                        'Failed to Add IP to Blacklist',
+                        'OK'
+                    );
+                }
             } );
         }
 

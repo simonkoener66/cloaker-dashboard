@@ -58,6 +58,55 @@ var apiController = function( router ) {
 		}
 	}
 
+	function formKeywordQuery( keyword, field, query ) {
+		if( !query ) {
+			query = {};
+		}
+		if( keyword ) {
+			var keywords = keyword.split( ' ' );
+			if( keywords.length == 1 ) {
+				query[field] = new RegExp( ".*" + keyword + ".*" )
+			} else {
+				var or_conditions = [];
+				for(var i = 0; i < keywords.length; i++ ) {
+					var condition = {};
+					condition[field] = new RegExp( ".*" + keywords[i] + ".*" );
+					or_conditions.push( condition );
+				}
+				query = {
+					$or: or_conditions
+				};
+			}
+			return query;
+		} else {
+			return {};
+		}
+	}
+
+	this.getLinksPage = function( req, res, next ) {
+		var page = req.params.page;
+		var pagesize = req.params.pagesize;
+		var keyword = req.params.keyword;
+		var query = formKeywordQuery( keyword, 'link_generated' );
+		Link.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+			var return_value = {};
+			if( result ) {
+				return_value.links = result.docs;
+				return_value.total = result.total;
+				return_value.limit = result.limit;
+				return_value.page = result.page;
+				return_value.pages = result.pages;
+			} else {
+				return_value.links = [];
+				return_value.total = 0;
+				return_value.limit = pagesize;
+				return_value.page = 1;
+				return_value.pages = 0;
+			}
+			res.json( return_value );
+		} );
+	}
+
 	this.getLink = function( req, res, next ) {
 		var id = req.params.id;
 		Link.findById( id, function( err, link ) {
@@ -185,7 +234,9 @@ var apiController = function( router ) {
 	this.getTraffics = function( req, res, next ) {
 		var page = req.params.page;
 		var pagesize = req.params.pagesize;
-		Traffic.paginate( {}, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+		var keyword = req.params.keyword;
+		var query = formKeywordQuery( keyword, 'link_generated' );
+		Traffic.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
 			var return_value = {};
 			if( result ) {
 				return_value.traffics = result.docs;
@@ -195,6 +246,10 @@ var apiController = function( router ) {
 				return_value.pages = result.pages;
 			} else {
 				return_value.traffics = [];
+				return_value.total = 0;
+				return_value.limit = pagesize;
+				return_value.page = 1;
+				return_value.pages = 0;
 			}
 			res.json( return_value );
 		} );
@@ -219,8 +274,10 @@ var apiController = function( router ) {
 	this.getIPBlacklist = function( req, res, next ) {
 		var page = req.params.page;
 		var pagesize = req.params.pagesize;
+		var keyword = req.params.keyword;
+		var query = formKeywordQuery( keyword, 'ip' );
 		initIPBlacklist();
-		BlacklistedIP.paginate( {}, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+		BlacklistedIP.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
 			var return_value = {};
 			if( result ) {
 				return_value.ips = result.docs;
@@ -230,6 +287,10 @@ var apiController = function( router ) {
 				return_value.pages = result.pages;
 			} else {
 				return_value.ips = [];
+				return_value.total = 0;
+				return_value.limit = pagesize;
+				return_value.page = 1;
+				return_value.pages = 0;
 			}
 			res.json( return_value );
 		} );

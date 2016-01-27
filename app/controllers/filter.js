@@ -69,6 +69,10 @@ var urlFilterController = function( router ) {
 					req.connection.remoteAddress ||
 					req.socket.remoteAddress ||
 					req.connection.socket.remoteAddress;
+                // Check if IP is v4 in v6 form
+                if( ip.indexOf( '::ffff:' ) >= 0 ) {
+                    ip = ip.substr( 7 );
+                }
 				var geo = geoip.lookup( ip );
 				var geolocation = '(Unavailable)';
 				// Geolocation filter

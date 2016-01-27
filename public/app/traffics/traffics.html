@@ -7,78 +7,80 @@
     <div class="col-md-12">
         <section class="panel panel-default table-dynamic">
 
-        <div class="table-responsive1">
-	        <table class="table table-bordered table-striped table-responsive">
-	            <thead>
-	            <tr>
-	            	<th><div class="th">
-	                IP Address
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('ip') "
-	                    data-ng-class="{active: row == 'ip'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-ip') "
-	                    data-ng-class="{active: row == '-ip'}"></span>
-	                </div></th>
-	                <th><div class="th">
-	                Generated Link
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('link_generated') "
-	                    data-ng-class="{active: row == 'link_generated'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-link_generated') "
-	                    data-ng-class="{active: row == '-link_generated'}"></span>
-	                </div></th>
-	                <th><div class="th">
-	                Private Link
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('link_real') "
-	                    data-ng-class="{active: row == 'link_real'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-link_real') "
-	                    data-ng-class="{active: row == '-link_real'}"></span>
-	                </div></th>
-	                <th><div class="th">
-	                Public Link
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('link_safe') "
-	                    data-ng-class="{active: row == 'link_safe'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-link_safe') "
-	                    data-ng-class="{active: row == '-link_safe'}"></span>
-	                </div></th>
-	                <th><div class="th">
-	                Geolocation
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('geolocation') "
-	                    data-ng-class="{active: row == 'geolocation'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-geolocation') "
-	                    data-ng-class="{active: row == '-geolocation'}"></span>
-	                </div></th>
-	                <th><div class="th">
-	                Accessed Time
-	                <span class="fa fa-angle-up"
-	                    data-ng-click=" order('access_time') "
-	                    data-ng-class="{active: row == 'access_time'}"></span>
-	                <span class="fa fa-angle-down"
-	                    data-ng-click=" order('-access_time') "
-	                    data-ng-class="{active: row == '-access_time'}"></span>
-	                </div></th>
-	            </tr>
-	            </thead>
-	            <tbody>
-	            <tr data-ng-repeat="traffic in traffics">
-	            	<td>{{traffic.ip}}</td>
-	                <td>{{traffic.link_generated}}</td>
-	                <td>{{traffic.link_real}}</td>
-	                <td>{{traffic.link_safe}}</td>
-	                <td>{{traffic.geolocation}}</td>
-	                <td><span ng-bind="traffic.access_time | date:'MM/dd/yyyy hh:mm:ss'"></span></td>
-	            </tr>
-	            </tbody>
-	        </table>
-	    </div>
+        	<div class="panel-body">
+		        <div class="table-responsive">
+			        <table class="table">
+			            <thead>
+			            <tr>
+			            	<th><div class="th">
+			                IP Address
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('ip') "
+			                    data-ng-class="{active: row == 'ip'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-ip') "
+			                    data-ng-class="{active: row == '-ip'}"></span>
+			                </div></th>
+			                <th><div class="th">
+			                Generated Link
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('link_generated') "
+			                    data-ng-class="{active: row == 'link_generated'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-link_generated') "
+			                    data-ng-class="{active: row == '-link_generated'}"></span>
+			                </div></th>
+			                <th><div class="th">
+			                Real Link
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('link_real') "
+			                    data-ng-class="{active: row == 'link_real'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-link_real') "
+			                    data-ng-class="{active: row == '-link_real'}"></span>
+			                </div></th>
+			                <th><div class="th">
+			                Safe Link
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('link_safe') "
+			                    data-ng-class="{active: row == 'link_safe'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-link_safe') "
+			                    data-ng-class="{active: row == '-link_safe'}"></span>
+			                </div></th>
+			                <th><div class="th">
+			                Geolocation
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('geolocation') "
+			                    data-ng-class="{active: row == 'geolocation'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-geolocation') "
+			                    data-ng-class="{active: row == '-geolocation'}"></span>
+			                </div></th>
+			                <th><div class="th">
+			                Accessed Time
+			                <span class="fa fa-angle-up"
+			                    data-ng-click=" order('access_time') "
+			                    data-ng-class="{active: row == 'access_time'}"></span>
+			                <span class="fa fa-angle-down"
+			                    data-ng-click=" order('-access_time') "
+			                    data-ng-class="{active: row == '-access_time'}"></span>
+			                </div></th>
+			            </tr>
+			            </thead>
+			            <tbody>
+			            <tr data-ng-repeat="traffic in traffics">
+			            	<td>{{traffic.ip}}</td>
+			                <td>{{traffic.link_generated}}</td>
+			                <td>{{traffic.link_real}}</td>
+			                <td>{{traffic.link_safe}}</td>
+			                <td>{{traffic.geolocation}}</td>
+			                <td><span ng-bind="traffic.access_time | date:'MM/dd/yyyy hh:mm:ss'"></span></td>
+			            </tr>
+			            </tbody>
+			        </table>
+			    </div>
+			</div>
 
         <footer class="table-footer">
             <div class="row">

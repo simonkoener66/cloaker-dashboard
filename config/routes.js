@@ -4,13 +4,17 @@ var router = express.Router();
 var apiController = require( '../app/controllers/api' );
 var filterController = require( '../app/controllers/filter' );
 
+router.get(  '/api/links/:keyword/:page/:pagesize',	apiController.checkApiAuth, apiController.getLinksPage );
+router.get(  '/api/links/:page/:pagesize',			apiController.checkApiAuth, apiController.getLinksPage );
 router.get(  '/api/links/:id',						apiController.checkApiAuth, apiController.getLink );
 router.get(  '/api/links',							apiController.checkApiAuth, apiController.getLinks );
 router.post( '/api/links/delete',					apiController.checkApiAuth, apiController.deleteLink );
 router.post( '/api/links',							apiController.checkApiAuth, apiController.editLink );
 
+router.get(  '/api/traffics/:keyword/:page/:pagesize',		apiController.checkApiAuth, apiController.getTraffics );
 router.get(  '/api/traffics/:page/:pagesize',		apiController.checkApiAuth, apiController.getTraffics );
 
+router.get(  '/api/ipblacklist/:keyword/:page/:pagesize',	apiController.checkApiAuth, apiController.getIPBlacklist );
 router.get(  '/api/ipblacklist/:page/:pagesize',	apiController.checkApiAuth, apiController.getIPBlacklist );
 router.get(  '/api/ipblacklist/:id',				apiController.checkApiAuth, apiController.getIPBlacklistSingle );
 router.post( '/api/ipblacklist',					apiController.checkApiAuth, apiController.editBlacklistIP );
