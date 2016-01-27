@@ -117,6 +117,9 @@ var apiController = function( router ) {
 			use_ip_blacklist: req.body.use_ip_blacklist,
 			criteria: copyLinkRegions( req.body.criteria )
 		};
+		if( updated_link.link_generated.substr( 0, 1 ) != '/' ) {
+            updated_link.link_generated = '/' + updated_link.link_generated;
+        }
 		if( req.body._id ) {
 			Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
 				if( err ) {
@@ -158,6 +161,7 @@ var apiController = function( router ) {
 					return;
 				}
 				if( profile.emails[0].value == 'hakim.jaya666@gmail.com' || profile.emails[0].value == 'stevenngobui@gmail.com' ) {
+					console.log(req.session);
 					req.session.token = generateToken();	/// email comparison must be done 
 					req.session.email = profile.emails[0].value;
 					res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );

@@ -14,7 +14,9 @@
     	}
 
     	this.isValid = function( link ) {
-    		return ( link.link_generated != '' ) && ( link.link_real != '' ) && ( link.link_safe != '' );
+    		return ( link.link_generated != '' ) && 
+                ( link.link_real != '' ) && 
+                ( link.link_safe != '' );
     	}
 
         this.all = function( callback ) {
@@ -62,6 +64,9 @@
 	        	}
         		return;
         	}
+            if( link.link_generated.substr( 0, 1 ) != '/' ) {
+                link.link_generated = '/' + link.link_generated;
+            }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
         	var request = $http.post( 
         		apiUrl( '/links/delete' ),

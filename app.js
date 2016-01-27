@@ -6,9 +6,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 var crypto = require('crypto');
+var config = require('./config/config');
 
 // db init
+mongoose.connect( config.databaseConnection );
 require('./app/models/init');
 
 // controllers init
@@ -38,6 +41,7 @@ app.use( session( {
     return sha.digest( 'hex' );
   },
   secret: 'si8gyw45ytwb45nw5',
+  store: new MongoStore( { mongooseConnection: mongoose.connection } ),
   resave: false,
   saveUninitialized: false
 } ) );
