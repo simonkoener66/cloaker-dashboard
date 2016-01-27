@@ -36,24 +36,10 @@
 
             <li class="dropdown text-normal nav-profile"    uib-dropdown is-open="status.isopenProfile">
                 <a href="javascript:;" class="dropdown-toggle" uib-dropdown-toggle ng-disabled="disabled" md-button aria-label="profile">
-                    <img src="images/g1.jpg" alt="" class="img-circle img30_30">
-                    <span class="hidden-xs">
-                        <span data-translate="LISA"></span>
+                    <span class="hidden-xs" ng-bind="email">
                     </span>
                 </a>
                 <ul class="uib-dropdown-menu with-arrow pull-right dropdown-menu-scaleIn">
-                    <li>
-                        <a href="#/">
-                            <i class="zmdi zmdi-home"></i>
-                            <span data-translate="DASHBOARD"></span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#/page/profile">
-                            <i class="zmdi zmdi-account"></i>
-                            <span data-translate="MY_PROFILE"></span>
-                        </a>
-                    </li>
                     <li>
                         <a href="#/page/signin">
                             <i class="zmdi zmdi-forward"></i>

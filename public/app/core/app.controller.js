@@ -2,14 +2,15 @@
     'use strict';
 
     angular.module('app')
-    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', AppCtrl])
+    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', '$window', 'appConfig', AppCtrl])
     .controller('LoginCtrl', [ '$scope', '$window', '$location', '$stateParams', 'appConfig', LoginCtrl])
     
-    function AppCtrl($scope, $rootScope, $state, $document, appConfig) {
+    function AppCtrl($scope, $rootScope, $state, $document, $window, appConfig) {
 
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
         $scope.color = appConfig.color;
+        $scope.email = $window.sessionStorage.email;
 
         $scope.$watch('main', function(newVal, oldVal) {
             // if (newVal.menu !== oldVal.menu || newVal.layout !== oldVal.layout) {
@@ -44,6 +45,7 @@
 
     function LoginCtrl( $scope, $window, $location, $stateParams, appConfig ) {
         $window.sessionStorage.token = $stateParams.token;
+        $window.sessionStorage.email = $stateParams.email;
         $location.path( '/links' );
     }
 
