@@ -19,9 +19,9 @@
         $scope.order = order;
 
         $scope.gotoCreatePage = gotoCreatePage;
-        $scope.deleteLink = deleteLink;
         $scope.editLink = editLink;
-
+        $scope.deleteLink = deleteLink;
+        
         function select( page ) {
             refresh( page );
         };

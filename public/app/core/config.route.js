@@ -29,6 +29,10 @@
                     template: 'traffics/traffics'
                 },
                 {
+                    url: 'traffics/export',
+                    template: 'traffics/export'
+                },
+                {
                     url: 'ipblacklist',
                     template: 'ipblacklist/list'
                 },
@@ -39,6 +43,14 @@
                 {
                     url: 'ipblacklist/:id/edit',
                     template: 'ipblacklist/edit'
+                },
+                {
+                    url: 'ipblacklist/import',
+                    template: 'ipblacklist/import'
+                },
+                {
+                    url: 'ipblacklist/export',
+                    template: 'ipblacklist/export'
                 }
             ];
             setRoutes = function(route) {

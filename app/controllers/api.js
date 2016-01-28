@@ -4,6 +4,7 @@ var google = require('googleapis');
 var OAuth2Client = google.auth.OAuth2;
 var plus = google.plus('v1');
 var config = require('../../config/config');
+var multiparty = require('multiparty');
 
 var mongoose = require('mongoose');
 var Link = mongoose.model( 'Link' );
@@ -48,6 +49,46 @@ var apiController = function( router ) {
 		var sha = crypto.createHash( 'sha256' );
 		sha.update( Math.random().toString() );
 		return sha.digest( 'hex' );
+	}
+
+	function dateFromMmddyyyy( mdy, endtime ) {
+		if( endtime ) {
+			return new Date(
+				parseInt( mdy.substr( 4 ) ),
+				parseInt( mdy.substr( 0, 2 ) ),
+				parseInt( mdy.substr( 2, 2 ) ),
+				23, 59, 59
+			);
+		} else {
+			return new Date(
+				parseInt( mdy.substr( 4 ) ),
+				parseInt( mdy.substr( 0, 2 ) ),
+				parseInt( mdy.substr( 2, 2 ) ),
+				0, 0, 0
+			);
+		}
+	}
+
+	function formFromToQuery( from, to ) {
+		var query = {};
+		var condition_exists = false;
+		var condition = {};
+		if( from && from != '0' ) {
+			var fromDate = dateFromMmddyyyy( from );
+			condition_exists = true;
+			condition['$gte'] = fromDate;
+		}
+		if( to && to != '0' ) {
+			var toDate = dateFromMmddyyyy( to, true );
+			condition_exists = true;
+			condition['$lte'] = toDate;
+		}
+		if( condition_exists ) {
+			query = {
+				access_time: condition
+			}
+		}
+		return query;
 	}
 
 	this.checkApiAuth = function( req, res, next ) {
@@ -256,6 +297,30 @@ var apiController = function( router ) {
 		} );
 	};
 
+	this.exportTraffics = function( req, res, next ) {
+		if( req.session.token ) {
+			var query = formFromToQuery( req.params.from, req.params.to );
+			console.log(query);
+			Traffic.find( query, function( err, docs ) {
+				res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
+				var data = 'IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time' + "\n";
+				docs.forEach( function( traffic ) {
+					data += traffic.ip + ',';
+					data += traffic.link_generated + ',';
+					data += traffic.used_real + ',';
+					data += traffic.link_real + ',';
+					data += traffic.link_safe + ',';
+					data += '"' + traffic.geolocation + '",';
+					data += traffic.access_time + "\n";
+				} );
+				res.write( data );
+				res.end();
+			} );
+		} else {
+			res.status( 404 ).json( { message: 'API access unauthorized' } );
+		}
+	}
+
 	function initIPBlacklist() {
 		var initialList = [
 			{ ip: '0.0.0.0', description: 'Reserved Address. Must not be used' },
@@ -270,6 +335,44 @@ var apiController = function( router ) {
 				} );
 			}
 		} );
+	}
+
+	this.exportBlacklist = function( req, res, next ) {
+		if( req.session.token ) {
+			BlacklistedIP.find( {}, function( err, docs ) {
+				res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
+				var data = 'IP,Description' + "\n";
+				docs.forEach( function( ip ) {
+					data += ip.ip + ',';
+					data += '"' + ip.description + "\"\n";
+				} );
+				res.write( data );
+				res.end();
+			} );
+		} else {
+			res.status( 404 ).json( { message: 'API access unauthorized' } );
+		}
+	}
+
+	this.importBlacklist = function( req, res, next ) {
+		if( !req.session.token ) {
+			res.status( 404 ).json( { message: 'API access unauthorized' } );
+		}
+		var form = new multiparty.Form();
+		var data = '';
+		form.on( 'close', function() {
+			var records = data.split( "\n" );
+			res.status( 200 ).json( { message: 'Done' } );
+		} );
+		form.on( 'part', function( part ){
+			if( part.name !== 'file' ) {
+				return part.resume();
+			}
+			part.on( 'data', function( buf ){
+				data += buf.toString();
+			} );
+		} );
+		form.parse(req);
 	}
 
 	this.getIPBlacklist = function( req, res, next ) {

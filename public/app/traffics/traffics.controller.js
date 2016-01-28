@@ -3,6 +3,7 @@
 
     angular.module( 'app.traffics' )
         .controller( 'TrafficsCtrl', ['$scope', '$filter', '$location', 'Traffics', TrafficsCtrl] )
+        .controller( 'TrafficsExportCtrl', ['$scope', '$window', 'Traffics', TrafficsExportCtrl] )
 
     function TrafficsCtrl( $scope, $filter, $location, Traffics ) {
 
@@ -16,6 +17,11 @@
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
+
+        /// for test
+        $scope.download = function() {
+            window.location.href = '/api/traffics/download';
+        }
 
         function select( page ) {
             refresh( page );
@@ -50,6 +56,35 @@
         }
 
         _init();
+    }
+
+    function TrafficsExportCtrl( $scope, $window, Traffics ) {
+
+        $scope.fromDateEnabled = false;
+        $scope.toDateEnabled = false;
+
+        $scope.exportCSV = exportCSV;
+
+        function mmddyyyy( date ) {
+            var str = '';
+            var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
+            str += ( m < 10 ) ? '0' + m : m;
+            str += ( d < 10 ) ? '0' + d : d;
+            str += y;
+            return str;
+        }
+
+        function exportCSV() {
+            var from = '0', to = '0';
+            if( $scope.fromDate && $scope.fromDateEnabled ) {
+                from = mmddyyyy( $scope.fromDate );
+            }
+            if( $scope.toDate && $scope.toDateEnabled ) {
+                to = mmddyyyy( $scope.toDate );
+            }
+            Traffics.exportCSV( from, to );
+        }
+
     }
 
 })(); 

@@ -23,6 +23,7 @@
     "mongoose": "^4.3.6",
     "mongoose-paginate": "^5.0.0",
     "morgan": "~1.6.1",
+    "multiparty": "^4.1.2",
     "q": "^1.4.1",
     "serve-favicon": "~2.3.0"
   },

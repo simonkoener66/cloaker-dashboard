@@ -41,7 +41,10 @@ app.use( session( {
     return sha.digest( 'hex' );
   },
   secret: 'si8gyw45ytwb45nw5',
-  store: new MongoStore( { mongooseConnection: mongoose.connection } ),
+  store: new MongoStore( {
+    mongooseConnection: mongoose.connection,
+    ttl: 24 * 3600
+  } ),
   resave: false,
   saveUninitialized: false
 } ) );
@@ -84,6 +87,6 @@ app.use(function(err, req, res, next) {
 });
 
 console.log('App will listen at port ' + port);
-var server = app.listen( port );//, '127.0.0.1' ); /// second parameter is for testing on localhost
+var server = app.listen( port, '127.0.0.1' ); /// second parameter is for testing on localhost
 
 module.exports = app;

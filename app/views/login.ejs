@@ -6,22 +6,41 @@
 	<link rel="stylesheet" href="/styles/bootstrap.css">
     <link rel="stylesheet" href="/styles/ui.css">
     <link rel="stylesheet" href="/styles/main.css">
+    <style>
+    body {
+    	background-color: #EDF0F1;
+    	position: relative;
+    }
+    .box {
+    	-webkit-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    	-moz-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    	box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    	position: absolute;
+    	left: 50%;
+    	top: 45%;
+    	margin-left: -250px;
+    	margin-top: -170px;
+    	width: 500px;
+    	height: 350px;
+    	background-color: #fff;
+    	text-align: center;
+    	padding-top: 60px;
+    }
+    .box .title {
+    	font-size: 40px;
+    	color: #009688;
+    	margin-bottom: 80px;
+    }
+    </style>
 	<title><%= title %></title>
 </head>
 
-<body class="app ng-scope body-wide body-err">
-	<div class="page-err" style="margin: auto">
-	    <div class="err-container text-center">
-	        <div class="err">
-	            <h2>Sign In to Cloaker</h2>
-	        </div>
-
-	        <div class="err-body">
-	            <a ui-wave href="<%= googleAuthUrl %>" class="btn btn-raised btn-lg btn-default">
-	                Sign In With Google Account
-	            </a>
-	        </div>
-	    </div>
+<body>
+	<div class="box">
+	    <h1 class='title'>Cloaker</h1>
+        <a ui-wave href="<%= googleAuthUrl %>" class="btn btn-lg btn-default">
+            Sign In With Google Account
+		</a>
 	</div>
 </body>
 

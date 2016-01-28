@@ -23,7 +23,9 @@
     "angular-ui-tree": "~2.13.0",
     "ngmap": "~1.15.0",
     "echarts": "~2.2.7",
-    "ngECharts": "ngecharts#~0.1.1"
+    "ngECharts": "ngecharts#~0.1.1",
+    "ng-file-upload": "~11.2.3",
+    "ng-file-upload-shim": "~11.2.3"
   },
   "devDependencies": {
     "bourbon": "~4.2.0",

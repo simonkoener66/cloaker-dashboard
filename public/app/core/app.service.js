@@ -107,6 +107,10 @@
     			callback( response.data );
     		} );
     	}
+
+        this.exportCSV = function( from, to ) {
+            $window.location.href = apiUrl( '/traffics/export/' + from + '/' + to );
+        }
     }
 
     function IPBlacklistService( $http, $window, appConfig ) {
@@ -175,6 +179,10 @@
             if( typeof error != 'undefined' ) {
                 request = request.error( error );
             }
+        }
+
+        this.exportCSV = function() {
+            $window.location.href = apiUrl( '/ipblacklist/export' );
         }
     }
 

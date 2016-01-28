@@ -71,7 +71,6 @@ var urlFilterController = function( router ) {
 					console.log( err );
 				}
 			} );
-			//res.json( new_traffic ); ///
             var url = '';
             if( use_real_link ) {
                 url = link.link_real;

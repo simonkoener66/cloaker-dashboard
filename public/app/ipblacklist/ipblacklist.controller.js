@@ -4,6 +4,8 @@
     angular.module( 'app.ipblacklist' )
         .controller( 'IPBlacklistListCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'IPBlacklist', 'Dialog', IPBlacklistListCtrl] )
         .controller( 'IPBlacklistEditCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Dialog', IPBlacklistEditCtrl] )
+        .controller( 'IPBlacklistImportCtrl', ['$scope', '$timeout', 'appConfig', 'IPBlacklist', 'Upload', IPBlacklistImportCtrl] )
+        .controller( 'IPBlacklistExportCtrl', ['$scope', '$window', 'IPBlacklist', IPBlacklistExportCtrl] )
 
     function IPBlacklistListCtrl( $scope, $filter, $location, $mdDialog, IPBlacklist, Dialog ) {
 
@@ -150,6 +152,50 @@
         }
 
         _init();
+    }
+
+    function IPBlacklistImportCtrl( $scope, $timeout, appConfig, IPBlacklist, Upload ) {
+
+        const input = document.getElementById( 'fileinput' );
+        $scope.filename = '';
+        
+        $scope.chooseFile = function() {
+            var event = new Event('click');
+            input.dispatchEvent( event );
+        }
+
+        $scope.importCSV = function( file ) {
+            //IPBlacklist.exportCSV();
+            file.upload = Upload.upload( {
+                url: appConfig.dbserver + '/api/ipblacklist/import',
+                data: { file: file }
+            } );
+
+            file.upload.then( function( response ) {
+                $timeout( function() {
+                    file.result = response.data;
+                } );
+            }, function( response ) {
+                console.log( response.status + ': ' + response.data );
+            }, function( evt ) {
+                console.log( evt.loaded + '/' + evt.total );
+            } );
+        }
+
+        function _init() {
+            $(input).change( function() {
+                $scope.filename = $(input).val();
+            } );
+        }
+
+        _init();
+    }
+
+    function IPBlacklistExportCtrl( $scope, $window, IPBlacklist ) {
+
+        $scope.exportCSV = function() {
+            IPBlacklist.exportCSV();
+        }
     }
 
 })(); 

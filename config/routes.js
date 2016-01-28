@@ -11,9 +11,12 @@ router.get(  '/api/links',							apiController.checkApiAuth, apiController.getLi
 router.post( '/api/links/delete',					apiController.checkApiAuth, apiController.deleteLink );
 router.post( '/api/links',							apiController.checkApiAuth, apiController.editLink );
 
+router.get(  '/api/traffics/export/:from/:to',		apiController.exportTraffics );
 router.get(  '/api/traffics/:keyword/:page/:pagesize',		apiController.checkApiAuth, apiController.getTraffics );
 router.get(  '/api/traffics/:page/:pagesize',		apiController.checkApiAuth, apiController.getTraffics );
 
+router.get(  '/api/ipblacklist/export',				apiController.exportBlacklist );
+router.post( '/api/ipblacklist/import',				apiController.importBlacklist );
 router.get(  '/api/ipblacklist/:keyword/:page/:pagesize',	apiController.checkApiAuth, apiController.getIPBlacklist );
 router.get(  '/api/ipblacklist/:page/:pagesize',	apiController.checkApiAuth, apiController.getIPBlacklist );
 router.get(  '/api/ipblacklist/:id',				apiController.checkApiAuth, apiController.getIPBlacklistSingle );

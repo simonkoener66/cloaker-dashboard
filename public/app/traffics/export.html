@@ -1,0 +1,49 @@
+<div class="page" data-ng-controller="TrafficsExportCtrl">
+
+    <div class="row ui-section">
+        <div class="col-lg-8 clearfix">
+            <h2 class="section-header">Export Traffics</h2>
+        </div>
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body padding-xl">
+
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-1">
+                            <table class='cl-table-datepick'>
+                                <tr>
+                                    <td class='td-check'>
+                                        <md-checkbox ng-model="fromDateEnabled" aria-label="From">From</md-checkbox>
+                                    </td>
+                                    <td>
+                                        <md-datepicker ng-model="fromDate" md-placeholder="Enter date" ng-disabled="!fromDateEnabled"></md-datepicker>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-5">
+                            <table class='cl-table-datepick'>
+                                <tr>
+                                    <td class='td-check'>
+                                        <md-checkbox ng-model="toDateEnabled" aria-label="To">To</md-checkbox>
+                                    </td>
+                                    <td>
+                                        <md-datepicker ng-model="toDate" md-placeholder="Enter date" ng-disabled="!toDateEnabled"></md-datepicker>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class='divider divider-lg'></div>
+                            Click the button below to export IP blacklist as CSV file.
+                            <div class='divider divider-sm clearfix'></div>
+                            <md-button class="md-raised btn-w-lg md-primary" data-ng-click="exportCSV()">Export</md-button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+</div>
