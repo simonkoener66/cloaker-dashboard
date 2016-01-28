@@ -164,7 +164,8 @@ var apiController = function( router ) {
 			total_hits: req.body.total_hits,
 			real_hits: req.body.real_hits,
 			use_ip_blacklist: req.body.use_ip_blacklist,
-			criteria: copyLinkRegions( req.body.criteria )
+			criteria: copyLinkRegions( req.body.criteria ),
+			criteria_disallow: copyLinkRegions( req.body.criteria_disallow )
 		};
 		if( updated_link.link_generated.substr( 0, 1 ) != '/' ) {
             updated_link.link_generated = '/' + updated_link.link_generated;

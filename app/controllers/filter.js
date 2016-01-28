@@ -41,6 +41,21 @@ var urlFilterController = function( router ) {
 	this.processUrl = function( req, res, next ) {
 		var path = req.originalUrl;
 
+        function esc_url( url ) {
+            var schema = '';
+            var schpos = url.indexOf( '://' );
+            if( schpos >= 0 ) {
+                schema = url.substr( 0, schpos );
+                url = url.substr( schpos + 3 );
+                if( !schema ) {
+                    schema = 'http';
+                }
+            } else {
+                schema = 'http';
+            }
+            return schema + '://' + encodeURIComponent( url );
+        }
+
 		function processTraffic( ip, use_real_link, link, geolocation ) {
 			var new_traffic = {
 				ip: ip,
@@ -56,7 +71,14 @@ var urlFilterController = function( router ) {
 					console.log( err );
 				}
 			} );
-			res.json( new_traffic );
+			//res.json( new_traffic ); ///
+            var url = '';
+            if( use_real_link ) {
+                url = link.link_real;
+            } else {
+                url = link.link_safe;
+            }
+            res.redirect( esc_url( url ) );
 		}
 
 		Link.findOne( { 'link_generated': path }, function( err, link ) {
@@ -69,12 +91,14 @@ var urlFilterController = function( router ) {
 					req.connection.remoteAddress ||
 					req.socket.remoteAddress ||
 					req.connection.socket.remoteAddress;
+
                 // Check if IP is v4 in v6 form
                 if( ip.indexOf( '::ffff:' ) >= 0 ) {
                     ip = ip.substr( 7 );
                 }
 				var geo = geoip.lookup( ip );
 				var geolocation = '(Unavailable)';
+
 				// Geolocation filter
 				var country;
 				if( geo ) {
@@ -92,15 +116,29 @@ var urlFilterController = function( router ) {
 						}
 					}
 					geolocation += country.longname;
-					link.criteria.forEach( function( criterion ) {
-						if( ( criterion.city && criterion.city.toLowerCase() != geo.city.toLowerCase() )
-							|| ( criterion.region && criterion.region.toLowerCase() != geo.region.toLowerCase() )
-							|| ( criterion.country && criterion.country.toLowerCase() != geo.country.toLowerCase() ) ) {
-							return;
+                    geo.city = geo.city.toLowerCase();
+                    geo.region = geo.region.toLowerCase();
+                    geo.country = geo.country.toLowerCase();
+					link.criteria.every( function( criterion ) {
+						if( ( criterion.city && criterion.city.toLowerCase() != geo.city )
+							|| ( criterion.region && criterion.region.toLowerCase() != geo.region )
+							|| ( criterion.country && criterion.country.toLowerCase() != geo.country ) ) {
+							return true;
 						}
 						use_real_link = true;
+                        return false;
 					} );
+                    link.criteria_disallow.every( function( criterion ) {
+                        if( ( !criterion.city || criterion.city.toLowerCase() == geo.city )
+                            && ( !criterion.region || criterion.region.toLowerCase() == geo.region )
+                            && ( criterion.country && criterion.country.toLowerCase() == geo.country ) ) {
+                            use_real_link = false;
+                            return false;
+                        }
+                        return true;
+                    } );
 				}
+
 				// Blacklisted IP filter
 				if( use_real_link && link.use_ip_blacklist ) {
 					Blacklist.find( { ip: ip }, function( err, ip_record ) {

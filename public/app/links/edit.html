@@ -24,10 +24,12 @@
                                     <input ng-model="link.link_safe">
                                 </md-input-container>
                                 <md-checkbox ng-model="link.use_ip_blacklist" aria-label="Filter Blacklisted IP">Filter blacklisted IP addresses</md-checkbox>
+
+                                <!-- Allowed Locations -->
                                 <div class="divider divider-xl"></div>
                                 <h4>Allowed Geolocations</h4>
                                 <div class="divider divider-lg"></div>
-                                <md-button class="md-raised md-accent btn-w-sm" ng-click="addNewCriteria()">Add Location</md-button>
+                                <md-button class="md-raised md-accent btn-w-sm" ng-click="addNewLocation()">Add Location</md-button>
                                 <table class="table no-margin">
                                     <thead>
                                         <th>Country</th>
@@ -58,6 +60,43 @@
                                         </tr>
                                     </tbody>
                                 </table>
+
+                                <!-- Disallowed Locations -->
+                                <div class="divider divider-xl"></div>
+                                <h4>Disallowed Geolocations</h4>
+                                <div class="divider divider-lg"></div>
+                                <md-button class="md-raised md-accent btn-w-sm" ng-click="addNewDisallowedLocation()">Add Location</md-button>
+                                <table class="table no-margin">
+                                    <thead>
+                                        <th>Country</th>
+                                        <th>State/Region</th>
+                                        <th>City</th>
+                                        <th></th>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="criterion in link.criteria_disallow">
+                                            <td>
+                                                <select class="form-control" ng-model="criterion.country" ng-change="updateDisallowRegions( $index )">
+                                                    <option ng-repeat="country in countries" value="{{country.code}}">{{country.longname}}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" ng-model="criterion.region">
+                                                    <option ng-repeat="region in regions_disallow[$index]" value="{{region.code}}">{{region.longname}}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" ng-model="criterion.city">
+                                            </td>
+                                            <td>
+                                                <md-button class="md-icon-button md-warn" aria-label="delete" ng-click="removeDisallowedCriteria($index)">
+                                                    <span class="fa fa-remove"></span>
+                                                </md-button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
                                 <div class="divider divider-xl"></div>
                                 <md-button type="submit" class="md-raised md-primary btn-w-md">{{submitButtonTitle}}</md-button>
                                 <div class="space"></div>

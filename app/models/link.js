@@ -8,7 +8,8 @@ var linkSchema = new mongoose.Schema( {
 	total_hits: { type: Number, min: 0 },
 	real_hits: { type: Number, min: 0 },
 	use_ip_blacklist: Boolean,
-	criteria: [ {} ]
+	criteria: [ {} ],
+	criteria_disallow: [ {} ]
 } );
 linkSchema.plugin( mongoosePaginate );
 

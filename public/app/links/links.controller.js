@@ -93,6 +93,8 @@
 
     function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links, Dialog, GeolocationCodes ) {
 
+        var empty_regions = [ [ { code: '', longname: 'All Regions' } ] ];
+
         $scope.link = {
             link_generated: '',
             link_real: '',
@@ -102,21 +104,34 @@
             use_ip_blacklist: false,
             criteria: [
                 { country: 'US', region: 'CA', city: '' },
-            ]
+            ],
+            criteria_disallow: []
         };
         $scope.title = 'Create New Link';
         $scope.submitButtonTitle = 'Create';
         $scope.countries = GeolocationCodes.getCountries();
-        $scope.regions = [ [ { code: '', longname: 'All Regions' } ] ];
+        $scope.regions = empty_regions;
+        $scope.regions_disallow = empty_regions;
 
-        $scope.addNewCriteria = addNewCriteria;
+        $scope.addNewLocation = addNewLocation;
+        $scope.addNewDisallowedLocation = addNewDisallowedLocation;
         $scope.removeCriteria = removeCriteria;
+        $scope.removeDisallowedCriteria = removeDisallowedCriteria;
         $scope.updateRegions = updateRegions;
+        $scope.updateDisallowRegions = updateDisallowRegions;
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
 
-        function addNewCriteria() {
+        function addNewLocation() {
             $scope.link.criteria.push( {
+                country: '',
+                region: '',
+                city: ''
+            } );
+        }
+
+        function addNewDisallowedLocation() {
+            $scope.link.criteria_disallow.push( {
                 country: '',
                 region: '',
                 city: ''
@@ -129,16 +144,39 @@
             }
         }
 
+        function removeDisallowedCriteria( index ) {
+            if( index > -1 ) {
+                $scope.link.criteria_disallow.splice( index, 1 );
+            }
+        }
+
+        function copyRegions( orgRegions ) {
+            var new_regions = [];
+            orgRegions.forEach( function( region ) {
+                new_regions.push( {
+                    code: region.code,
+                    longname: region.longname
+                } );
+            } );
+            return new_regions;
+        }
+
         function updateRegions( index ) {
-            $scope.regions[index] = GeolocationCodes.getCountry( $scope.link.criteria[index].country ).regions;
-            console.log($scope.link.criteria[index].country );
-            console.log(GeolocationCodes.getCountry( $scope.link.criteria[index].country ));
+            $scope.regions[index] = copyRegions( GeolocationCodes.getCountry( $scope.link.criteria[index].country ).regions );
+        }
+
+        function updateDisallowRegions( index ) {
+            $scope.regions_disallow[index] = copyRegions( GeolocationCodes.getCountry( $scope.link.criteria_disallow[index].country ).regions );
         }
 
         function updateAllRegions() {
             $scope.regions = [];
             for( var i = 0; i < $scope.link.criteria.length; i++ ) {
                 updateRegions( i );
+            }
+            $scope.regions_disallow = [];
+            for( var i = 0; i < $scope.link.criteria_disallow.length; i++ ) {
+                updateDisallowRegions( i );
             }
         }
 
@@ -192,7 +230,8 @@
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,
                         real_hits: ( link.real_hits ) ? link.real_hits : 0,
                         use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,
-                        criteria: ( link.criteria ) ? link.criteria : []
+                        criteria: ( link.criteria ) ? link.criteria : [],
+                        criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
                     };
                     updateAllRegions();
                 } );
