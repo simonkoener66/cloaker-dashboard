@@ -71,6 +71,13 @@ var urlFilterController = function( router ) {
 					console.log( err );
 				}
 			} );
+            link.total_hits++;
+            if( use_real_link ) {
+                link.real_hits++;
+            }
+            Link.findByIdAndUpdate( link._id, link, function( err, doc ) {
+                if( err ) console.log( err );
+            } );
             var url = '';
             if( use_real_link ) {
                 url = link.link_real;

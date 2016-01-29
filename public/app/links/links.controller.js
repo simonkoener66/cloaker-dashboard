@@ -191,7 +191,7 @@
                 return;
             }
             Links.newOrUpdate( $scope.link, function() {
-                $location.path( '/links' );
+                $location.path( '/links/list' );
             }, function() {
                 if( $scope.link._id ) {
                     Dialog.showAlert( 
@@ -214,7 +214,7 @@
         }
 
         function gotoLinks() {
-            $location.path( '/links' );
+            $location.path( '/links/list' );
         }
 
         function _init() {
@@ -227,6 +227,7 @@
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
+                        description: ( link.description ) ? description : '',
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,
                         real_hits: ( link.real_hits ) ? link.real_hits : 0,
                         use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,

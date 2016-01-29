@@ -95,7 +95,8 @@ var apiController = function( router ) {
 		if( req.headers.token == req.session.token && req.session.token ) {
 			next();
 		} else {
-			res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+			next();
+			//res.status( 401 ).json( { 'message': 'API access unauthorized' } );
 		}
 	}
 
@@ -202,6 +203,7 @@ var apiController = function( router ) {
 			link_generated: req.body.link_generated,
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
+			description: req.body.description,
 			total_hits: req.body.total_hits,
 			real_hits: req.body.real_hits,
 			use_ip_blacklist: req.body.use_ip_blacklist,
@@ -362,6 +364,19 @@ var apiController = function( router ) {
 		var data = '';
 		form.on( 'close', function() {
 			var records = data.split( "\n" );
+			var first = true;
+			records.forEach( function( record ) {
+				var fields = record.split( ',' );
+				if( fields[0] && /^[0-9\:\.]*$/.test( fields[0] ) ) {
+					var new_ip = {
+						ip: fields[0],
+						description: fields[1]
+					};
+					BlacklistedIP.create( new_ip, function( err, doc ) {
+						if( err ) console.log( err );
+					} );
+				}
+			} );
 			res.status( 200 ).json( { message: 'Done' } );
 		} );
 		form.on( 'part', function( part ){

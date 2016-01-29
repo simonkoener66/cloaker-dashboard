@@ -10,8 +10,12 @@
 
                     <div class="row">
                         <div class="col-md-10 col-md-offset-1">
-                            <input id="fileinput" name="file" type="file" class="ng-hide" ngf-select ng-model="importFile" accept="csv/*">
-                            <md-button id="uploadButton" class="md-raised md-primary" data-ng-click="chooseFile()">Choose File</md-button>
+                            <div class='file-uploader'>
+                                <input id="fileinput" name="file" type="file" class="ng-hide" ngf-select ng-model="importFile" accept="csv/*">
+                                <md-button id="uploadButton" class="md-raised md-primary" data-ng-click="chooseFile()">Choose File</md-button>
+                                <span class='space'></span>
+                                <span ng-bind="filename"></span>
+                            </div>
                             <div class='divider divider-sm clearfix'></div>
                             Click the button below to import IP blacklist from CSV file.
                             <div class='divider divider-sm clearfix'></div>

@@ -2,7 +2,7 @@ var mongoose = require( 'mongoose' );
 var mongoosePaginate = require( 'mongoose-paginate' );
 
 var trafficSchema = new mongoose.Schema( {
-	ip: { type: String, match: /[0-9\:\.]*/ },
+	ip: { type: String, match: /^[0-9\:\.]*$/ },
 	link_generated: String,
 	used_real: Boolean,
 	link_real: String,

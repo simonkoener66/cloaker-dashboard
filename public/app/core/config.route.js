@@ -13,7 +13,7 @@
                     controller: 'LoginCtrl'
                 },
                 {
-                    url: 'links',
+                    url: 'links/list',
                     template: 'links/links'
                 },
                 {
@@ -25,7 +25,7 @@
                     template: 'links/edit'
                 },
                 {
-                    url: 'traffics',
+                    url: 'traffics/list',
                     template: 'traffics/traffics'
                 },
                 {
@@ -33,7 +33,7 @@
                     template: 'traffics/export'
                 },
                 {
-                    url: 'ipblacklist',
+                    url: 'ipblacklist/list',
                     template: 'ipblacklist/list'
                 },
                 {
@@ -69,8 +69,8 @@
 
             /* Dashboard route */
             $urlRouterProvider
-                .when('/', '/links')
-                .otherwise('/links');
+                .when('/', '/links/list')
+                .otherwise('/links/list');
 
         }]
     );

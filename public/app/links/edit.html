@@ -23,6 +23,10 @@
                                     <label>Safe(Public) Link</label>
                                     <input ng-model="link.link_safe">
                                 </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label>Description</label>
+                                    <textarea ng-model="link.description"></textarea>
+                                </md-input-container>
                                 <md-checkbox ng-model="link.use_ip_blacklist" aria-label="Filter Blacklisted IP">Filter blacklisted IP addresses</md-checkbox>
 
                                 <!-- Allowed Locations -->

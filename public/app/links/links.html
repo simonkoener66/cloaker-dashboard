@@ -54,6 +54,27 @@
 				                    data-ng-click=" order('-link_safe') "
 				                    data-ng-class="{active: row == '-link_safe'}"></span>
 				                </div></th>
+				                <th><div class="th">
+				                Total Hits
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('total_hits') "
+				                    data-ng-class="{active: row == 'total_hits'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-total_hits') "
+				                    data-ng-class="{active: row == '-total_hits'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Passed Hits
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('real_hits') "
+				                    data-ng-class="{active: row == 'real_hits'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-real_hits') "
+				                    data-ng-class="{active: row == '-real_hits'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Description
+				                </div></th>
 				                <th></th>
 				            </tr>
 			            </thead>
@@ -62,6 +83,9 @@
 				                <td>{{link.link_generated}}</td>
 				                <td>{{link.link_real}}</td>
 				                <td>{{link.link_safe}}</td>
+				                <td>{{link.total_hits}}</td>
+				                <td>{{link.real_hits}}</td>
+				                <td>{{link.description}}</td>
 				                <td class='buttons'>
 				                	<md-button class="md-icon-button md-warn" aria-label="Delete Link" data-ng-click="deleteLink($event, link._id)"><span class="fa fa-remove"></span></md-button>
 				                </td>

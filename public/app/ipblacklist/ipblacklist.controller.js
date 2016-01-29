@@ -115,7 +115,7 @@
                 return;
             }
             IPBlacklist.new( $scope.ip, function() {
-                $location.path( '/ipblacklist' );
+                $location.path( '/ipblacklist/list' );
             }, function() {
                 if( $scope.ip._id ) {
                     Dialog.showAlert( 
@@ -138,7 +138,7 @@
         }
 
         function goBack() {
-            $location.path( '/ipblacklist' );
+            $location.path( '/ipblacklist/list' );
         }
 
         function _init() {
@@ -165,7 +165,6 @@
         }
 
         $scope.importCSV = function( file ) {
-            //IPBlacklist.exportCSV();
             file.upload = Upload.upload( {
                 url: appConfig.dbserver + '/api/ipblacklist/import',
                 data: { file: file }
@@ -184,7 +183,16 @@
 
         function _init() {
             $(input).change( function() {
-                $scope.filename = $(input).val();
+                var fn = $(input).val();
+                var sep_idx = fn.lastIndexOf( '\\' );
+                if( sep_idx >= 0 ) {
+                    fn = fn.substr( sep_idx + 1 );
+                }
+                var sep_idx = fn.lastIndexOf( '/' );
+                if( sep_idx >= 0 ) {
+                    fn = fn.substr( sep_idx + 1 );
+                }
+                $scope.filename = fn;
             } );
         }
 

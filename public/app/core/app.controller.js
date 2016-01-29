@@ -46,7 +46,7 @@
     function LoginCtrl( $scope, $window, $location, $stateParams, appConfig ) {
         $window.sessionStorage.token = $stateParams.token;
         $window.sessionStorage.email = $stateParams.email;
-        $location.path( '/links' );
+        $location.path( '/links/list' );
     }
 
 })(); 
