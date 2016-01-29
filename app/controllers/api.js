@@ -95,8 +95,7 @@ var apiController = function( router ) {
 		if( req.headers.token == req.session.token && req.session.token ) {
 			next();
 		} else {
-			next();
-			//res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+			res.status( 401 ).json( { 'message': 'API access unauthorized' } );
 		}
 	}
 
@@ -269,8 +268,7 @@ var apiController = function( router ) {
 
 	this.checkAdminAuth = function( req, res, next ) {
 		if( !req.session.token ) {
-			next();
-			//res.redirect( '/admin/login' );
+			res.redirect( '/admin/login' );
 		} else {
 			next();
 		}
