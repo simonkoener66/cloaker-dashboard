@@ -269,7 +269,8 @@ var apiController = function( router ) {
 
 	this.checkAdminAuth = function( req, res, next ) {
 		if( !req.session.token ) {
-			res.redirect( '/admin/login' );
+			next();
+			//res.redirect( '/admin/login' );
 		} else {
 			next();
 		}
