@@ -47,6 +47,8 @@
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
+
+                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             } );
         }
 
@@ -235,9 +237,11 @@
                         criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
                     };
                     updateAllRegions();
+                    $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
             } else {
                 updateAllRegions();
+                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             }
         }
 

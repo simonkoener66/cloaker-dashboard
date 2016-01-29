@@ -42,7 +42,7 @@
 
         this.getPage = function( page, limit, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-            var apiPath = '/links/';
+            var apiPath = '/links/page/';
             apiPath += page + '/' + limit;
             $http
             .get( apiUrl( apiPath ) )
@@ -102,7 +102,7 @@
     	this.getPage = function( page, limit, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
     		$http
-    		.get( apiUrl( '/traffics/' + page + '/' + limit ) )
+    		.get( apiUrl( '/traffics/page/' + page + '/' + limit ) )
     		.then( function( response ) {
     			callback( response.data );
     		} );
@@ -126,7 +126,7 @@
         this.getPage = function( page, limit, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             $http
-            .get( apiUrl( '/ipblacklist/' + page + '/' + limit ) )
+            .get( apiUrl( '/ipblacklist/page/' + page + '/' + limit ) )
             .then( function( response ) {
                 callback( response.data );
             } );

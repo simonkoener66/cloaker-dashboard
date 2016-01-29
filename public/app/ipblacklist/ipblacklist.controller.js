@@ -83,6 +83,8 @@
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
+
+                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             } );
         }
 
@@ -147,6 +149,8 @@
                 $scope.submitButtonTitle = 'Update';
                 IPBlacklist.get( $stateParams.id, function( ip ) {
                     $scope.ip = ip;
+
+                    $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
             }
         }

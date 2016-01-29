@@ -87,6 +87,7 @@ app.use(function(err, req, res, next) {
 });
 
 console.log('App will listen at port ' + port);
-var server = app.listen( port );//, '127.0.0.1' ); /// second parameter is for testing on localhost
+var server = app.listen( port ); // Normal
+//var server = app.listen( port, '127.0.0.1' ); // Local dev env
 
 module.exports = app;
