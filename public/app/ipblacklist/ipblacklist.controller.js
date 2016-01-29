@@ -152,6 +152,8 @@
 
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
+            } else {
+                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             }
         }
 

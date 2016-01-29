@@ -6,8 +6,8 @@
     .config(['$mdThemingProvider', mdConfig]);
 
     function appConfig() {
-        //var dbserver = 'http://localhost:3000';
-        var dbserver = 'https://cloaker-test.herokuapp.com'; ///
+        var server = 'http://localhost:3000';
+        //var server = 'https://cloaker-test.herokuapp.com'; ///
         var pageTransitionOpts = [
             {
                 name: 'Fade up',
@@ -51,7 +51,7 @@
             pageTransitionOpts: pageTransitionOpts,
             main: main,
             color: color,
-            dbserver: dbserver
+            server: server
         }
     }
 

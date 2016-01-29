@@ -2,15 +2,40 @@
     'use strict';
 
     angular.module('app')
-    .service( 'Links', [ '$http', '$window', 'appConfig', LinksService ] )
-    .service( 'Traffics', [ '$http', '$window', 'appConfig', TrafficsService ] )
-    .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', IPBlacklistService ] )
     .service( 'Dialog', [ '$mdDialog', DialogService ] )
+    .service( 'AuthenticationService', [ '$http', '$window', 'appConfig', 'Dialog', AuthenticationService ] )
+    .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
+    .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
+    .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
+
+    function AuthenticationService( $http, $window, appConfig, Dialog ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.checkAuth = function( response ) {
+            if( response.status == 401 ) {
+                if( !$window.sessionStorage.token ) {
+                    $window.location.href = appConfig.server + '/admin/login';
+                } else {
+                    Dialog
+                    .showAlert( false, 'Session Expired', 'You need to relogin to authenticate your session.', 'Session Expired', 'Login', false )
+                    .then( function() {
+                        $window.location.href = appConfig.server + '/admin/login';
+                    } );
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
     
-    function LinksService( $http, $window, appConfig ) {
+    function LinksService( $http, $window, appConfig, AuthenticationService ) {
 
     	function apiUrl( path ) {
-    		return appConfig.dbserver + '/api' + path;
+    		return appConfig.server + '/api' + path;
     	}
 
     	this.isValid = function( link ) {
@@ -24,8 +49,11 @@
         	$http
         	.get( apiUrl( '/links' ) )
         	.then( function( response ) {
-        		callback( response.data );
-        	} );
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
         }
 
         this.get = function( id, callback ) {
@@ -36,8 +64,11 @@
         	$http
         	.get( apiUrl( '/links/' + id ) )
         	.then( function( response ) {
-        		callback( response.data );
-        	} );
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
         }
 
         this.getPage = function( page, limit, callback ) {
@@ -48,6 +79,9 @@
             .get( apiUrl( apiPath ) )
             .then( function( response ) {
                 callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
             } );
         }
 
@@ -59,13 +93,20 @@
         		return;
         	}
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-        	var request = $http.post( apiUrl( '/links' ), link );
-        	if( typeof success != 'undefined' ) {
-        		request = request.success( success );
-        	}
-        	if( typeof error != 'undefined' ) {
-        		request = request.error( error );
-        	}
+        	$http
+            .post( apiUrl( '/links' ), link )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
         }
 
         this.delete = function( id, success, error ) {
@@ -79,24 +120,31 @@
                 link.link_generated = '/' + link.link_generated;
             }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-        	var request = $http.post( 
+        	$http
+            .post( 
         		apiUrl( '/links/delete' ),
         		{ _id: id }
-        	);
-        	if( typeof success != 'undefined' ) {
-        		request = request.success( success );
-        	}
-        	if( typeof error != 'undefined' ) {
-        		request = request.error( error );
-        	}
+        	)
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
         }
 
     }
 
-    function TrafficsService( $http, $window, appConfig ) {
+    function TrafficsService( $http, $window, appConfig, AuthenticationService ) {
 
     	function apiUrl( path ) {
-    		return appConfig.dbserver + '/api' + path;
+    		return appConfig.server + '/api' + path;
     	}
 
     	this.getPage = function( page, limit, callback ) {
@@ -104,8 +152,11 @@
     		$http
     		.get( apiUrl( '/traffics/page/' + page + '/' + limit ) )
     		.then( function( response ) {
-    			callback( response.data );
-    		} );
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
     	}
 
         this.exportCSV = function( from, to ) {
@@ -113,10 +164,10 @@
         }
     }
 
-    function IPBlacklistService( $http, $window, appConfig ) {
+    function IPBlacklistService( $http, $window, appConfig, AuthenticationService ) {
 
         function apiUrl( path ) {
-            return appConfig.dbserver + '/api' + path;
+            return appConfig.server + '/api' + path;
         }
 
         this.isValid = function( ip ) {
@@ -129,6 +180,9 @@
             .get( apiUrl( '/ipblacklist/page/' + page + '/' + limit ) )
             .then( function( response ) {
                 callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
             } );
         }
 
@@ -141,6 +195,9 @@
             .get( apiUrl( '/ipblacklist/' + id ) )
             .then( function( response ) {
                 callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
             } );
         }
 
@@ -152,13 +209,20 @@
                 return;
             }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-            var request = $http.post( apiUrl( '/ipblacklist' ), ip );
-            if( typeof success != 'undefined' ) {
-                request = request.success( success );
-            }
-            if( typeof error != 'undefined' ) {
-                request = request.error( error );
-            }
+            $http
+            .post( apiUrl( '/ipblacklist' ), ip )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
         }
 
         this.delete = function( id, success, error ) {
@@ -169,16 +233,22 @@
                 return;
             }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-            var request = $http.post( 
+            $http.post( 
                 apiUrl( '/ipblacklist/delete' ),
                 { _id: id }
-            );
-            if( typeof success != 'undefined' ) {
-                request = request.success( success );
-            }
-            if( typeof error != 'undefined' ) {
-                request = request.error( error );
-            }
+            )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
         }
 
         this.exportCSV = function() {
@@ -188,11 +258,12 @@
 
     function DialogService( $mdDialog ) {
 
-        this.showAlert = function( ev, title, content, ariaLabel, ok ) {
-            $mdDialog.show(
+        this.showAlert = function( ev, title, content, ariaLabel, ok, modal ) {
+            if( typeof modal === 'undefined' ) modal = true;
+            return $mdDialog.show(
                 $mdDialog.alert()
                     .parent( angular.element(document.querySelector('#popupContainer')) )
-                    .clickOutsideToClose( true )
+                    .clickOutsideToClose( modal )
                     .title( title )
                     .content( content )
                     .ariaLabel( ariaLabel )
