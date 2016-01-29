@@ -252,14 +252,14 @@ var apiController = function( router ) {
 					res.redirect( '/admin/login' );
 					return;
 				}
-				if( profile.emails[0].value == 'hakim.jaya666@gmail.com' || profile.emails[0].value == 'stevenngobui@gmail.com' ) {
+				//if( profile.emails[0].value == 'hakim.jaya666@gmail.com' || profile.emails[0].value == 'stevenngobui@gmail.com' ) {
 					console.log(req.session);
 					req.session.token = generateToken();	/// email comparison must be done 
 					req.session.email = profile.emails[0].value;
 					res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );
-				} else {
+				/*} else {
 					res.status( 404 ).send( 'Invalid credential.' );
-				}
+				}*/
 			} );
 		}, function(err) {
 			res.send( err );
