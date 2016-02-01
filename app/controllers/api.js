@@ -44,6 +44,12 @@ var apiController = function( router ) {
 			'https://www.googleapis.com/auth/userinfo.email'
 		]
 	} );
+	var allowedEmails = [
+		'hakim.jaya666@gmail.com',
+		'stevenngobui@gmail.com',
+		'leon.tan3@gmail.com',
+		'dho8461@gmail.com'
+	];
 
 	function generateToken() {
 		var sha = crypto.createHash( 'sha256' );
@@ -271,14 +277,16 @@ var apiController = function( router ) {
 					res.redirect( '/admin/login' );
 					return;
 				}
-				//if( profile.emails[0].value == 'hakim.jaya666@gmail.com' || profile.emails[0].value == 'stevenngobui@gmail.com' ) {
-					console.log(req.session);
+				var allowed = false;
+				allowedEmails.forEach( function( email ) {
+					allowed = true;
 					req.session.token = generateToken();	/// email comparison must be done 
 					req.session.email = profile.emails[0].value;
 					res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );
-				/*} else {
+				} );
+				if( !allowed ) {
 					res.status( 404 ).send( 'Invalid credential.' );
-				}*/
+				}
 			} );
 		}, function(err) {
 			res.send( err );
