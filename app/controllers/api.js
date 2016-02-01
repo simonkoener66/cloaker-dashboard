@@ -279,10 +279,12 @@ var apiController = function( router ) {
 				}
 				var allowed = false;
 				allowedEmails.forEach( function( email ) {
-					allowed = true;
-					req.session.token = generateToken();	/// email comparison must be done 
-					req.session.email = profile.emails[0].value;
-					res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );
+					if( email == profile.emails[0].value ) {
+						allowed = true;
+						req.session.token = generateToken();
+						req.session.email = profile.emails[0].value;
+						res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );
+					}
 				} );
 				if( !allowed ) {
 					res.status( 404 ).send( 'Invalid credential.' );
