@@ -251,7 +251,7 @@ var apiController = function( router ) {
 	};
 
 	this.admin = function( req, res, next ) {
-		res.render( 'index', { title: 'Cloaker' });
+		res.render( 'index', { title: 'Phantom' });
 	};
 
 	this.index = function( req, res, next ) {
@@ -259,7 +259,7 @@ var apiController = function( router ) {
 	};
 
 	this.loginAdmin = function( req, res, next ) {
-		res.render( 'login', { title: 'Login to Cloaker', googleAuthUrl: googleAuthUrl } );
+		res.render( 'login', { title: 'Login to Phantom', googleAuthUrl: googleAuthUrl } );
 	}
 
 	this.loggedInWithGoogle = function( req, res, next ) {

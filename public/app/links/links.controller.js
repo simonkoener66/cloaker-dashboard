@@ -46,9 +46,6 @@
             }
             Links.getPage( page, $scope.numPerPage, function( result ) {
                 $scope.links = result.links;
-                for(var i=0;i<$scope.links.length;i++) {
-                    $scope.links[i].enabled = true;
-                }
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;

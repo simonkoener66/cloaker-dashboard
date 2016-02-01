@@ -11,6 +11,8 @@
         $scope.main = appConfig.main;
         $scope.color = appConfig.color;
         $scope.email = $window.sessionStorage.email;
+        console.log( 'token: ' + $window.sessionStorage.token );
+        console.log( 'email: ' + $window.sessionStorage.email );
 
         $scope.$watch('main', function(newVal, oldVal) {
             // if (newVal.menu !== oldVal.menu || newVal.layout !== oldVal.layout) {
