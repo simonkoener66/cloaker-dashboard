@@ -7,6 +7,7 @@ var filterController = require( '../app/controllers/filter' );
 router.get(  '/api/links/page/:page/:pagesize',				apiController.checkApiAuth, apiController.getLinksPage );
 router.get(  '/api/links/:id',								apiController.checkApiAuth, apiController.getLink );
 router.get(  '/api/links',									apiController.checkApiAuth, apiController.getLinks );
+router.post( '/api/links/toggle',							apiController.checkApiAuth, apiController.toggleLink );
 router.post( '/api/links/delete',							apiController.checkApiAuth, apiController.deleteLink );
 router.post( '/api/links',									apiController.checkApiAuth, apiController.editLink );
 
@@ -20,12 +21,12 @@ router.get(  '/api/ipblacklist/:id',						apiController.checkApiAuth, apiControl
 router.post( '/api/ipblacklist',							apiController.checkApiAuth, apiController.editBlacklistIP );
 router.post( '/api/ipblacklist/delete',						apiController.checkApiAuth, apiController.deleteBlacklistIP );
 
-router.get(  '/admin/login',						apiController.loginAdmin );
-router.get(  '/admin/googlelogin',					apiController.loggedInWithGoogle )
-router.get(  '/admin',								apiController.checkAdminAuth, apiController.admin );
-router.get(  '/',									apiController.index );
+router.get(  '/admin/login',								apiController.loginAdmin );
+router.get(  '/admin/googlelogin',							apiController.loggedInWithGoogle )
+router.get(  '/admin',										apiController.checkAdminAuth, apiController.admin );
+router.get(  '/',											apiController.index );
 
 // filterController must be at the end because it tries to catch every url
-router.get( '/*', 									filterController.processUrl );
+router.get( '/*', 											filterController.processUrl );
 
 module.exports = router;

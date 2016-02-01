@@ -57,6 +57,11 @@ var urlFilterController = function( router ) {
         }
 
 		function processTraffic( ip, use_real_link, link, geolocation ) {
+            // Disable real link if status is overrided
+            if( !link.status ) {
+                use_real_link = false;
+            }
+            // Traffic record
 			var new_traffic = {
 				ip: ip,
 				link_generated: link.link_generated,
@@ -71,10 +76,12 @@ var urlFilterController = function( router ) {
 					console.log( err );
 				}
 			} );
+            // Link hits
             link.total_hits++;
             if( use_real_link ) {
                 link.real_hits++;
             }
+            // Update link
             Link.findByIdAndUpdate( link._id, link, function( err, doc ) {
                 if( err ) console.log( err );
             } );
@@ -84,6 +91,7 @@ var urlFilterController = function( router ) {
             } else {
                 url = link.link_safe;
             }
+            // Url redirect
             res.redirect( esc_url( url ) );
 		}
 

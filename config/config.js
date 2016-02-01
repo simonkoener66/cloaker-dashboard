@@ -5,7 +5,6 @@ module.exports = {
 	/* Local dev env */
 	//googleLoginRedirectUrl: 'http://localhost:3000/admin/googlelogin',
 	//databaseConnection: 'mongodb://localhost/cloaker',
-
 	/* Heroku test env */
 	googleLoginRedirectUrl: 'https://cloaker-test.herokuapp.com/admin/googlelogin',
 	databaseConnection: 'mongodb://cloakertester:dkagh123@ds047865.mongolab.com:47865/cloakerdb'

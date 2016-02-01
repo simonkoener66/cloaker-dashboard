@@ -8,9 +8,12 @@
 		margin-bottom: 0;
 	}
 	td.buttons {
-		width: 60px;
+		width: 140px;
 		padding: 0 !important;
 		vertical-align: middle;
+		button {
+			margin: 0;
+		}
 	}
 }
 .cl-table-datepick {

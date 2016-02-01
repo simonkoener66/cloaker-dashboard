@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module( 'app.links' )
-        .controller( 'LinksCtrl', ['$scope', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Dialog', LinksCtrl] )
-        .controller( 'EditLinkCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
+        .controller( 'LinksCtrl', ['$scope', '$state', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Dialog', LinksCtrl] )
+        .controller( 'EditLinkCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
 
-    function LinksCtrl( $scope, $window, $filter, $location, $mdDialog, Links, Dialog ) {
+    function LinksCtrl( $scope, $state, $window, $filter, $location, $mdDialog, Links, Dialog ) {
 
         $scope.links = [];
         $scope.row = '';
@@ -20,6 +20,8 @@
 
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.editLink = editLink;
+        $scope.toggleLink = toggleLink;
+        $scope.duplicateLink = duplicateLink;
         $scope.deleteLink = deleteLink;
         
         function select( page ) {
@@ -44,6 +46,9 @@
             }
             Links.getPage( page, $scope.numPerPage, function( result ) {
                 $scope.links = result.links;
+                for(var i=0;i<$scope.links.length;i++) {
+                    $scope.links[i].enabled = true;
+                }
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
@@ -58,6 +63,33 @@
 
         function editLink( id ) {
             $location.path( '/links/' + id + '/edit' );
+        }
+
+        function toggleLink( ev, link ) {
+            ev.stopPropagation();
+            ev.preventDefault();
+            Links.toggleEnableStatus( link, function( data ) {
+                console.log( data );
+                if( data.result ) {
+                    link.status = data.status;
+                } else {
+                    Dialog.showAlert( 
+                        ev,
+                        'Failed to Change Status',
+                        'Failed to change status of the link due to the server error.',
+                        'Failed to Change Status',
+                        'OK'
+                    );
+                }
+            }, function() {
+                Dialog.showAlert( 
+                    ev,
+                    'Failed to Change Status',
+                    'Request to change status of the link has failed. Please retry or contact administrator.',
+                    'Failed to Change Status',
+                    'OK'
+                );
+            } );
         }
 
         function deleteLink( ev, id ) {
@@ -86,6 +118,13 @@
             );
         }
 
+        function duplicateLink( ev, link ) {
+            ev.stopPropagation();
+            ev.preventDefault();
+            $state.duplicatingLink = link;
+            $location.path( '/links/new' );
+        }
+
         function _init() {
             refresh();
         }
@@ -93,7 +132,7 @@
         _init();
     }
 
-    function EditLinkCtrl( $scope, $location, $mdDialog, $stateParams, Links, Dialog, GeolocationCodes ) {
+    function EditLinkCtrl( $scope, $state, $location, $mdDialog, $stateParams, Links, Dialog, GeolocationCodes ) {
 
         var empty_regions = [ [ { code: '', longname: 'All Regions' } ] ];
 
@@ -229,7 +268,7 @@
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
-                        description: ( link.description ) ? description : '',
+                        description: ( link.description ) ? link.description : '',
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,
                         real_hits: ( link.real_hits ) ? link.real_hits : 0,
                         use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,
@@ -240,6 +279,12 @@
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
             } else {
+                if( $state.duplicatingLink ) {
+                    $scope.link = $state.duplicatingLink;
+                    $state.duplicatingLink = false;
+                    $scope.link._id = '';
+                    $scope.title = 'Duplicate Link';
+                }
                 updateAllRegions();
                 $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             }

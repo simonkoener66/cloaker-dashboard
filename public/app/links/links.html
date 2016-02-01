@@ -76,6 +76,7 @@
 				                Description
 				                </div></th>
 				                <th></th>
+				                <th></th>
 				            </tr>
 			            </thead>
 			            <tbody>
@@ -86,8 +87,15 @@
 				                <td>{{link.total_hits}}</td>
 				                <td>{{link.real_hits}}</td>
 				                <td>{{link.description}}</td>
-				                <td class='buttons'>
-				                	<md-button class="md-icon-button md-warn" aria-label="Delete Link" data-ng-click="deleteLink($event, link._id)"><span class="fa fa-remove"></span></md-button>
+				                <td>
+				                </td>
+				                <td class='buttons text-center'>
+				                	<md-button class="md-icon-button md-primary" aria-label="Enable/Override" data-ng-click="toggleLink($event, link)" tooltip-placement="top" uib-tooltip="Enable / Override" tooltip-append-to-body="true">
+				                		<span class="fa fa-toggle-on" data-ng-hide="!link.status"></span>
+				                		<span class="fa fa-toggle-off ng-hide" data-ng-hide="link.status"></span>
+				                	</md-button>
+				                	<md-button class="md-icon-button md-primary" aria-label="Duplicate Link" data-ng-click="duplicateLink($event, link)" tooltip-placement="top" uib-tooltip="Duplicate" tooltip-append-to-body="true"><span class="fa fa-copy"></span></md-button>
+				                	<md-button class="md-icon-button md-warn" aria-label="Delete Link" data-ng-click="deleteLink($event, link._id)" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true"><span class="fa fa-remove"></span></md-button>
 				                </td>
 				            </tr>
 			            </tbody>

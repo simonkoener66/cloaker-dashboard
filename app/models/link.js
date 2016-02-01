@@ -7,6 +7,7 @@ var linkSchema = new mongoose.Schema( {
 	link_safe: String,
 	description: String,
 	use_ip_blacklist: Boolean,
+	status: Boolean,
 	criteria: [ {} ],
 	criteria_disallow: [ {} ],
 	total_hits: { type: Number, min: 0 },

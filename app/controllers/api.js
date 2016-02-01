@@ -169,6 +169,24 @@ var apiController = function( router ) {
 		} );
 	};
 
+	this.toggleLink = function( req, res, next ) {
+		Link.findById( req.body._id, function( err, link ) {
+			if( err ) {
+				console.log( err );
+				res.json( { result: false } );
+			}
+			link.status = !link.status;
+			link._id = false;
+			Link.findByIdAndUpdate( req.body._id, link, function( err, doc ) {
+				if( err ) {
+					console.log( err );
+					res.json( { result: false } );
+				}
+				res.json( { result: true, status: link.status } );
+			} );
+		} );
+	}
+
 	this.deleteLink = function( req, res, next ) {
 		var rst = { result: false };
 		if( req.body._id ) {
@@ -203,6 +221,7 @@ var apiController = function( router ) {
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
 			description: req.body.description,
+			status: true,
 			total_hits: req.body.total_hits,
 			real_hits: req.body.real_hits,
 			use_ip_blacklist: req.body.use_ip_blacklist,

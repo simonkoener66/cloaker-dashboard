@@ -92,6 +92,9 @@
 	        	}
         		return;
         	}
+            if( link.link_generated.substr( 0, 1 ) != '/' ) {
+                link.link_generated = '/' + link.link_generated;
+            }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
         	$http
             .post( apiUrl( '/links' ), link )
@@ -109,6 +112,33 @@
             } );
         }
 
+        this.toggleEnableStatus = function( id, success, error ) {
+            if( !id ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .post( 
+                apiUrl( '/links/toggle' ),
+                { _id: id }
+            )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success( response );
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
+        }
+
         this.delete = function( id, success, error ) {
         	if( !id ) {
         		if( typeof error != 'undefined' ) {
@@ -116,9 +146,6 @@
 	        	}
         		return;
         	}
-            if( link.link_generated.substr( 0, 1 ) != '/' ) {
-                link.link_generated = '/' + link.link_generated;
-            }
             $http.defaults.headers.common.token = $window.sessionStorage.token;
         	$http
             .post( 
