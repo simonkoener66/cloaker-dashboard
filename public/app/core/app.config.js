@@ -7,7 +7,7 @@
 
     function appConfig() {
         //var server = 'http://localhost:3000';
-        var server = 'https://cloaker-test.herokuapp.com';
+        var server = 'http://ec2-54-213-16-224.us-west-2.compute.amazonaws.com';
         var pageTransitionOpts = [
             {
                 name: 'Fade up',
