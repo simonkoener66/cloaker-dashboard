@@ -1,6 +1,6 @@
 module.exports = {
-	googleClientID: '794547063462-klinv1to3d5fk5uatrk7g97o5lkhi17e.apps.googleusercontent.com',
-	googleClientSecret: '5ZL9WC3xLmZWQRBhHJZiVq4X',
+	googleClientID: '1085228624824-f4t5ne060o174aid7gm1n6ekl5tmo1bf.apps.googleusercontent.com',
+	googleClientSecret: '62UnfM8gL8KgFAjc0gk8MVNB',
 
 	/* Local dev env */
 	//googleLoginRedirectUrl: 'http://localhost:3000/admin/googlelogin',

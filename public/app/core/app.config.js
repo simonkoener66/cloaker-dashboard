@@ -2,12 +2,17 @@
     'use strict';
 
     angular.module('app.core')
-    .factory('appConfig', [appConfig])
+    .factory('appConfig', ['$location', appConfig])
     .config(['$mdThemingProvider', mdConfig]);
 
-    function appConfig() {
+    function appConfig( $location ) {
         //var server = 'http://localhost:3000';
-        var server = 'http://ec2-54-213-16-224.us-west-2.compute.amazonaws.com';
+        //var server = 'http://ec2-54-213-16-224.us-west-2.compute.amazonaws.com';
+        var server = $location.protocol() + "://" + $location.host();
+        if( $location.port() != 80 ) {
+            server += ':' + $location.port();
+        }
+        console.log( 'server: ' + server );
         var pageTransitionOpts = [
             {
                 name: 'Fade up',

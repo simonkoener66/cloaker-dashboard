@@ -274,6 +274,7 @@ var apiController = function( router ) {
 			oauth2Client.setCredentials( tokens );
 			plus.people.get( { userId: 'me', auth: oauth2Client }, function( err, profile ) {
 				if (err) {
+					console.log( err );
 					res.redirect( '/admin/login' );
 					return;
 				}
