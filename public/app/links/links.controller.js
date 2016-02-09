@@ -190,7 +190,7 @@
 
         function copyRegions( orgRegions ) {
             var new_regions = [];
-            if( orgRegions.constructor === Array ) {
+            if( orgRegions ) {
                 orgRegions.forEach( function( region ) {
                     new_regions.push( {
                         code: region.code,

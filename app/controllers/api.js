@@ -211,7 +211,7 @@ var apiController = function( router ) {
 
 	function copyLinkRegions( original_criteria ) {
 		var criteria = [];
-		if( original_criteria.constructor === Array ) {
+		if( original_criteria ) {
 			original_criteria.forEach( function( criterion ) {
 				criteria.push( {
 					country: ( criterion.country ) ? criterion.country : '',
