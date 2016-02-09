@@ -190,12 +190,14 @@
 
         function copyRegions( orgRegions ) {
             var new_regions = [];
-            orgRegions.forEach( function( region ) {
-                new_regions.push( {
-                    code: region.code,
-                    longname: region.longname
+            if( orgRegions.constructor === Array ) {
+                orgRegions.forEach( function( region ) {
+                    new_regions.push( {
+                        code: region.code,
+                        longname: region.longname
+                    } );
                 } );
-            } );
+            }
             return new_regions;
         }
 

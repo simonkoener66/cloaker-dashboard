@@ -45,7 +45,7 @@ var apiController = function( router ) {
 		]
 	} );
 	var allowedEmails = [
-		'hakim.jaya666@gmail.com',
+		'themeparadise06@gmail.com',
 		'stevenngobui@gmail.com',
 		'leon.tan3@gmail.com',
 		'dho8461@gmail.com'
@@ -211,13 +211,15 @@ var apiController = function( router ) {
 
 	function copyLinkRegions( original_criteria ) {
 		var criteria = [];
-		original_criteria.forEach( function( criterion ) {
-			criteria.push( {
-				country: ( criterion.country ) ? criterion.country : '',
-				region: ( criterion.region ) ? criterion.region : '',
-				city: ( criterion.city ) ? criterion.city : ''
+		if( original_criteria.constructor === Array ) {
+			original_criteria.forEach( function( criterion ) {
+				criteria.push( {
+					country: ( criterion.country ) ? criterion.country : '',
+					region: ( criterion.region ) ? criterion.region : '',
+					city: ( criterion.city ) ? criterion.city : ''
+				} );
 			} );
-		} );
+		}
 		return criteria;
 	}
 
