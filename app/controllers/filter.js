@@ -53,7 +53,7 @@ var urlFilterController = function( router ) {
             } else {
                 schema = 'http';
             }
-            return schema + '://' + encodeURIComponent( url );
+            return schema + '://' + url;
         }
 
 		function processTraffic( ip, use_real_link, link, geolocation ) {
