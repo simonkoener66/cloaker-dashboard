@@ -1,4 +1,5 @@
 module.exports = {
+	loginUrl: 'phantom.bnfaw.com',
 	// real
 	googleClientID: '1085228624824-f4t5ne060o174aid7gm1n6ekl5tmo1bf.apps.googleusercontent.com',
 	googleClientSecret: '62UnfM8gL8KgFAjc0gk8MVNB',
@@ -13,9 +14,6 @@ module.exports = {
 	//googleLoginRedirectUrl: 'https://cloaker-test.herokuapp.com/admin/googlelogin',
 	//databaseConnection: 'mongodb://cloakertester:dkagh123@ds047865.mongolab.com:47865/cloakerdb'
 	/* Amazon env */
-	//googleLoginRedirectUrl: 'http://phantom.bnfaw.com/admin/googlelogin',
-	//databaseConnection: 'mongodb://localhost/phantom',
-	/* Lightweb env */
-	googleLoginRedirectUrl: 'http://67.225.161.89/admin/googlelogin',
+	googleLoginRedirectUrl: 'http://phantom.bnfaw.com/admin/googlelogin',
 	databaseConnection: 'mongodb://localhost/phantom',
 }

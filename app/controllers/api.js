@@ -259,7 +259,11 @@ var apiController = function( router ) {
 	};
 
 	this.admin = function( req, res, next ) {
-		res.render( 'index', { title: 'Phantom' });
+		if( req.get('host') == config.loginUrl ) {
+			res.render( 'index', { title: 'Phantom' });
+		} else {
+			res.redirect( 'https://www.google.com' );
+		}
 	};
 
 	this.index = function( req, res, next ) {
@@ -267,7 +271,11 @@ var apiController = function( router ) {
 	};
 
 	this.loginAdmin = function( req, res, next ) {
-		res.render( 'login', { title: 'Login to Phantom', googleAuthUrl: googleAuthUrl } );
+		if( req.get('host') == config.loginUrl ) {
+			res.render( 'login', { title: 'Login to Phantom', googleAuthUrl: googleAuthUrl } );
+		} else {
+			res.redirect( 'https://www.google.com' );
+		}
 	}
 
 	this.loggedInWithGoogle = function( req, res, next ) {
