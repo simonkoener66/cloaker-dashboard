@@ -7,6 +7,12 @@
     
     function AppCtrl($scope, $rootScope, $state, $document, $window, appConfig) {
 
+        // Set auth token and email if exists
+        if( authData.token ) {
+            $window.sessionStorage.token = authData.token;
+            $window.sessionStorage.email = authData.email;
+        }
+
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
         $scope.color = appConfig.color;

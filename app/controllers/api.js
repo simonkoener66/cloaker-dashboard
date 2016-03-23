@@ -19,8 +19,8 @@ var oauth2Client = new OAuth2Client(
 var q = require('q');
 
 /**
-* Get oAuth2 Token
-*/
+ * Get oAuth2 Token
+ */
 function getToken(code) {
 	var deferred = q.defer();
 
@@ -130,12 +130,19 @@ var apiController = function( router ) {
 		}
 	}
 
-	this.getLinksPage = function( req, res, next ) {
+	this.getLinks = function( req, res, next ) {
 		var page = req.params.page;
 		var pagesize = req.params.pagesize;
 		var keyword = req.params.keyword;
 		var query = formKeywordQuery( keyword, 'link_generated' );
-		Link.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+		var params = { 
+			page: parseInt( page ), 
+			limit: parseInt( pagesize )
+		};
+		if( req.params.sort ) {
+			params.sort = req.params.sort;
+		}
+		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
 				return_value.links = result.docs;
@@ -162,16 +169,6 @@ var apiController = function( router ) {
 				res.json( { id: false } );
 			}
 			res.json( link );
-		} );
-	};
-
-	this.getLinks = function( req, res, next ) {
-		Link.find( function( err, links ) {
-			if( err ) {
-				console.log( err );
-				res.json( [] );
-			}
-			res.json( links );
 		} );
 	};
 
@@ -237,8 +234,8 @@ var apiController = function( router ) {
 			criteria_disallow: copyLinkRegions( req.body.criteria_disallow )
 		};
 		if( updated_link.link_generated.substr( 0, 1 ) != '/' ) {
-            updated_link.link_generated = '/' + updated_link.link_generated;
-        }
+      updated_link.link_generated = '/' + updated_link.link_generated;
+    }
 		if( req.body._id ) {
 			Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
 				if( err ) {
@@ -260,7 +257,11 @@ var apiController = function( router ) {
 
 	this.admin = function( req, res, next ) {
 		if( req.get('host') == config.loginUrl ) {
-			res.render( 'index', { title: 'Phantom' });
+			res.render( 'index', { 
+				title: 'Phantom',
+				token: req.session.token,
+				email: req.session.email
+			} );
 		} else {
 			res.redirect( 'https://www.google.com' );
 		}
@@ -272,7 +273,10 @@ var apiController = function( router ) {
 
 	this.loginAdmin = function( req, res, next ) {
 		if( req.get('host') == config.loginUrl ) {
-			res.render( 'login', { title: 'Login to Phantom', googleAuthUrl: googleAuthUrl } );
+			res.render( 'login', { 
+				title: 'Login to Phantom', 
+				googleAuthUrl: googleAuthUrl
+			} );
 		} else {
 			res.redirect( 'https://www.google.com' );
 		}
@@ -288,9 +292,20 @@ var apiController = function( router ) {
 					res.redirect( '/admin/login' );
 					return;
 				}
-				req.session.token = generateToken();
-				req.session.email = profile.emails[0].value;
-				res.redirect( '/admin#/login/' + req.session.token + '/' + req.session.email );
+				var allowed = false;
+				allowedEmails.every( function( email ) {
+					if( email == profile.emails[0].value ) {
+						allowed = true;
+						req.session.token = generateToken();
+						req.session.email = profile.emails[0].value;
+						res.redirect( '/admin' );
+						return false;
+					}
+					return true;
+				} );
+				if( !allowed ) {
+					res.status( 404 ).send( 'Invalid credential.' );
+				}
 			} );
 		}, function(err) {
 			res.send( err );
@@ -310,7 +325,11 @@ var apiController = function( router ) {
 		var pagesize = req.params.pagesize;
 		var keyword = req.params.keyword;
 		var query = formKeywordQuery( keyword, 'link_generated' );
-		Traffic.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+		var sortField = '-access_time';
+		if( req.params.sort ) {
+			sortField = req.params.sort;
+		}
+		Traffic.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ), sort: sortField }, function( err, result ) {
 			var return_value = {};
 			if( result ) {
 				return_value.traffics = result.docs;

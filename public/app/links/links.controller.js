@@ -37,14 +37,14 @@
                 return;
             }
             $scope.row = rowName;
-            $scope.links = $filter('orderBy')($scope.links, rowName);
+            refresh();
         };
 
         function refresh( page ) {
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.row, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -141,7 +141,7 @@
             real_hits: 0,
             use_ip_blacklist: false,
             criteria: [
-                { country: 'US', region: 'CA', city: '' },
+                { country: 'US', region: '', city: '' },
             ],
             criteria_disallow: []
         };

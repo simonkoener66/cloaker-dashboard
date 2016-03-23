@@ -15,14 +15,22 @@
         <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css">
         <!-- end Needs images -->
-
             
-            <!-- build:css({.tmp,client}) styles/main.css -->
-            <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
-            <link rel="stylesheet" href="styles/bootstrap.css">
-            <link rel="stylesheet" href="styles/ui.css">
-            <link rel="stylesheet" href="styles/main.css">
-            <!-- endbuild -->
+        <!-- build:css({.tmp,client}) styles/main.css -->
+        <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+        <link rel="stylesheet" href="styles/bootstrap.css">
+        <link rel="stylesheet" href="styles/ui.css">
+        <link rel="stylesheet" href="styles/main.css">
+        <!-- endbuild -->
+
+        <% if(typeof token !== 'undefined') { %>
+        <script type='text/javascript'>
+        var authData = {
+            token: '<%= token %>',
+            email: '<%= email %>'
+        };
+        </script>
+        <% } %>
 
     </head>
     <body data-ng-app="app"

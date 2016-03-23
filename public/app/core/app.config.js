@@ -12,7 +12,7 @@
         if( $location.port() != 80 ) {
             server += ':' + $location.port();
         }
-        console.log( 'server: ' + server );
+
         var pageTransitionOpts = [
             {
                 name: 'Fade up',

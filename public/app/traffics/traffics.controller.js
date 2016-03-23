@@ -36,14 +36,14 @@
                 return;
             }
             $scope.row = rowName;
-            $scope.traffics = $filter('orderBy')( $scope.traffics, rowName );
+            refresh();
         };
 
         function refresh( page ) {
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Traffics.getPage( page, $scope.numPerPage, function( result ) {
+            Traffics.getPage( page, $scope.numPerPage, $scope.row, function( result ) {
                 $scope.traffics = result.traffics;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;

@@ -35,3 +35,5 @@ npm-debug.log
 admin_template
 
 .idea
+
+config/config.js

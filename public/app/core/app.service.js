@@ -17,7 +17,12 @@
         this.checkAuth = function( response ) {
             if( response.status == 401 ) {
                 if( !$window.sessionStorage.token ) {
-                    $window.location.href = appConfig.server + '/admin/login';
+                    if( authData.token ) {
+                        $window.sessionStorage.token = authData.token;
+                        $window.sessionStorage.email = authData.email;
+                    } else {
+                        $window.location.href = appConfig.server + '/admin/login';
+                    }
                 } else {
                     Dialog
                     .showAlert( false, 'Session Expired', 'You need to relogin to authenticate your session.', 'Session Expired', 'Login', false )
@@ -44,18 +49,6 @@
                 ( link.link_safe != '' );
     	}
 
-        this.all = function( callback ) {
-            $http.defaults.headers.common.token = $window.sessionStorage.token;
-        	$http
-        	.get( apiUrl( '/links' ) )
-        	.then( function( response ) {
-                callback( response.data );
-            } )
-            .catch( function( response ) {
-                AuthenticationService.checkAuth( response );
-            } );
-        }
-
         this.get = function( id, callback ) {
         	if( !id ) {
         		callback( { id: false } );
@@ -71,10 +64,13 @@
             } );
         }
 
-        this.getPage = function( page, limit, callback ) {
+        this.getPage = function( page, limit, sort, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             var apiPath = '/links/page/';
             apiPath += page + '/' + limit;
+            if( sort) {
+                apiPath += '/' + sort;
+            }
             $http
             .get( apiUrl( apiPath ) )
             .then( function( response ) {
@@ -174,10 +170,15 @@
     		return appConfig.server + '/api' + path;
     	}
 
-    	this.getPage = function( page, limit, callback ) {
+    	this.getPage = function( page, limit, sort, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var apiPath = '/traffics/page/';
+            apiPath += page + '/' + limit;
+            if( sort) {
+                apiPath += '/' + sort;
+            }
     		$http
-    		.get( apiUrl( '/traffics/page/' + page + '/' + limit ) )
+    		.get( apiUrl( apiPath ) )
     		.then( function( response ) {
                 callback( response.data );
             } )

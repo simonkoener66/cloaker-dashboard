@@ -172,7 +172,7 @@
 
         $scope.importCSV = function( file ) {
             file.upload = Upload.upload( {
-                url: appConfig.dbserver + '/api/ipblacklist/import',
+                url: appConfig.server + '/api/ipblacklist/import',
                 data: { file: file }
             } );
 
@@ -183,7 +183,7 @@
             }, function( response ) {
                 console.log( response.status + ': ' + response.data );
             }, function( evt ) {
-                console.log( evt.loaded + '/' + evt.total );
+                // console.log( evt.loaded + '/' + evt.total );
             } );
         }
 
