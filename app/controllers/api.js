@@ -152,6 +152,8 @@ var apiController = function( router ) {
 			params.sort = req.body.sort;
 		}
 		var query = formSearchQuery( keyword, 'link_generated' );
+		query = formSearchQuery( keyword, 'link_real', query );
+		query = formSearchQuery( keyword, 'link_safe', query );
 		query = formSearchQuery( keyword, 'tags', query );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
