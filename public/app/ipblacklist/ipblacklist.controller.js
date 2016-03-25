@@ -15,10 +15,12 @@
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
         $scope.total = 0;
+        $scope.searchKeyword = '';
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
+        $scope.searchKeywordChange = searchKeywordChange;
 
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.editIP = editIP;
@@ -26,19 +28,23 @@
 
         function select( page ) {
             refresh( page );
-        };
+        }
 
         function onNumPerPageChange() {
-            $scope.select( 1 );
-        };
+            select(1);
+        }
 
         function order(rowName) {
             if ($scope.row === rowName) {
                 return;
             }
             $scope.row = rowName;
-            $scope.ips = $filter('orderBy')( $scope.ips, rowName );
-        };
+            select(1);
+        }
+
+        function searchKeywordChange() {
+            select(1);
+        }
 
         function gotoCreatePage() {
             $location.path( '/ipblacklist/new' );
@@ -78,7 +84,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            IPBlacklist.getPage( page, $scope.numPerPage, function( result ) {
+            IPBlacklist.getPage( page, $scope.numPerPage, $scope.row, $scope.searchKeyword, function( result ) {
                 $scope.ips = result.ips;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;

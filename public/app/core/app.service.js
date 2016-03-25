@@ -208,10 +208,20 @@
             return ( ip.ip != '' ) && ( ip.description != '' );
         }
 
-        this.getPage = function( page, limit, callback ) {
+        this.getPage = function( page, limit, sort, keyword, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var data = {
+                page: page,
+                pagesize: limit
+            };
+            if(sort) {
+                data.sort = sort;
+            }
+            if(keyword) {
+                data.keyword = keyword;
+            }
             $http
-            .get( apiUrl( '/ipblacklist/page/' + page + '/' + limit ) )
+            .post( apiUrl( '/ipblacklist/page' ), data )
             .then( function( response ) {
                 callback( response.data );
             } )

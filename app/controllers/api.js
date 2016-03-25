@@ -106,29 +106,23 @@ var apiController = function( router ) {
 		}
 	}
 
-	function formKeywordQuery( keyword, field, query ) {
+	function formSearchQuery( keyword, field, query ) {
 		if( !query ) {
 			query = {};
 		}
 		if( keyword ) {
-			var keywords = keyword.split( ' ' );
-			if( keywords.length == 1 ) {
-				query[field] = new RegExp( ".*" + keyword + ".*" )
-			} else {
-				var or_conditions = [];
-				for(var i = 0; i < keywords.length; i++ ) {
-					var condition = {};
-					condition[field] = new RegExp( ".*" + keywords[i] + ".*" );
-					or_conditions.push( condition );
-				}
-				query = {
-					$or: or_conditions
-				};
+			var or_conditions = [];
+			if(query['$or']) {
+				or_conditions = query['$or'];
 			}
-			return query;
-		} else {
-			return {};
+			var condition = {};
+			condition[field] = new RegExp( ".*" + keyword + ".*", "i" );
+			or_conditions.push(condition);
+			query = {
+				'$or': or_conditions
+			};
 		}
+		return query;
 	}
 
 	function updateTagsIfRequired( tags ) {
@@ -157,7 +151,8 @@ var apiController = function( router ) {
 		if( req.body.sort ) {
 			params.sort = req.body.sort;
 		}
-		var query = formKeywordQuery( keyword, 'link_generated' );
+		var query = formSearchQuery( keyword, 'link_generated' );
+		query = formSearchQuery( keyword, 'tags', query );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -187,6 +182,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( { id: false } );
+					return;
 				}
 				res.json( {
 					link: link,
@@ -201,6 +197,7 @@ var apiController = function( router ) {
 			if( err ) {
 				console.log( err );
 				res.json( { result: false } );
+				return;
 			}
 			link.status = !link.status;
 			link._id = false;
@@ -208,6 +205,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( { result: false } );
+					return;
 				}
 				res.json( { result: true, status: link.status } );
 			} );
@@ -221,6 +219,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( rst );
+					return;
 				}
 				rst.result = true;
 				res.json( rst );
@@ -284,6 +283,7 @@ var apiController = function( router ) {
 					if( err ) {
 						console.log( err );
 						res.json( { id: false } );
+						return;
 					}
 					updateTagsIfRequired(req.body.tags);
 					res.json( link );
@@ -293,6 +293,7 @@ var apiController = function( router ) {
 					if( err ) {
 						console.log( err );
 						res.json( { id: false } );
+						return;
 					}
 					updateTagsIfRequired(req.body.tags);
 					res.json( link );
@@ -372,7 +373,7 @@ var apiController = function( router ) {
 		var page = req.params.page;
 		var pagesize = req.params.pagesize;
 		var keyword = req.params.keyword;
-		var query = formKeywordQuery( keyword, 'link_generated' );
+		var query = formSearchQuery( keyword, 'link_generated' );
 		var sortField = '-access_time';
 		if( req.params.sort ) {
 			sortField = req.params.sort;
@@ -488,12 +489,21 @@ var apiController = function( router ) {
 	}
 
 	this.getIPBlacklist = function( req, res, next ) {
-		var page = req.params.page;
-		var pagesize = req.params.pagesize;
-		var keyword = req.params.keyword;
-		var query = formKeywordQuery( keyword, 'ip' );
+		var page = req.body.page;
+		var pagesize = req.body.pagesize;
+		var params = { 
+			page: parseInt( page ), 
+			limit: parseInt( pagesize )
+		};
+		if( req.body.sort ) {
+			params.sort = req.body.sort;
+		}
+		var keyword = req.body.keyword;
+		var query = formSearchQuery( keyword, 'ip' );
+
 		initIPBlacklist();
-		BlacklistedIP.paginate( query, { page: parseInt( page ), limit: parseInt( pagesize ) }, function( err, result ) {
+
+		BlacklistedIP.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
 				return_value.ips = result.docs;
@@ -518,6 +528,7 @@ var apiController = function( router ) {
 			if( err ) {
 				console.log( err );
 				res.json( { id: false } );
+				return;
 			}
 			res.json( doc );
 		} );
@@ -533,6 +544,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( { id: false } );
+					return;
 				}
 				res.json( doc );
 			} );
@@ -541,6 +553,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( { id: false } );
+					return;
 				}
 				res.json( doc );
 			} );
@@ -554,6 +567,7 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( rst );
+					return;
 				}
 				rst.result = true;
 				res.json( rst );

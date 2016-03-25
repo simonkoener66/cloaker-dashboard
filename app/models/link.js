@@ -7,7 +7,7 @@ var linkSchema = new mongoose.Schema( {
 	link_safe: String,
 	description: String,
 	owner: String,
-	tags: [],
+	tags: [String],
 	use_ip_blacklist: Boolean,
 	status: Boolean,
 	criteria: [ {} ],

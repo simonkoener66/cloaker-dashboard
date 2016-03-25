@@ -31,7 +31,7 @@
         }
 
         function onNumPerPageChange() {
-            $scope.select( 1 );
+            select(1);
         }
 
         function order(rowName) {
@@ -39,7 +39,7 @@
                 return;
             }
             $scope.row = rowName;
-            refresh();
+            select(1);
         }
 
         function searchKeywordChange() {

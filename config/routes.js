@@ -16,7 +16,7 @@ router.get(  '/api/traffics/page/:page/:pagesize/:sort',  apiController.checkApi
 
 router.get(  '/api/ipblacklist/export',                   apiController.exportBlacklist );
 router.post( '/api/ipblacklist/import',                   apiController.importBlacklist );
-router.get(  '/api/ipblacklist/page/:page/:pagesize',     apiController.checkApiAuth, apiController.getIPBlacklist );
+router.post( '/api/ipblacklist/page',                     apiController.checkApiAuth, apiController.getIPBlacklist );
 router.get(  '/api/ipblacklist/:id',                      apiController.checkApiAuth, apiController.getIPBlacklistSingle );
 router.post( '/api/ipblacklist',                          apiController.checkApiAuth, apiController.editBlacklistIP );
 router.post( '/api/ipblacklist/delete',                   apiController.checkApiAuth, apiController.deleteBlacklistIP );

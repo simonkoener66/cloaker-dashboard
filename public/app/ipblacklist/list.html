@@ -9,25 +9,24 @@
 
         	<div class="panel-body">
 		        <div class="table-filters">
-		            <div class="row">
-			            <!--<div class="col-sm-4 col-xs-6">
-			                <form>
-			                <input type="text"
-			                     placeholder="Search..."
-			                     class="form-control"
-			                     data-ng-model="searchKeywords"
-			                     data-ng-keyup="search()">
-			                </form>
-			            </div>
-			            <div class="col-sm-3 col-xs-6 filter-result-info">
-			                <span>
-			                Showing {{filteredLinks.length}}/{{links.length}} entries
-			                </span>                
-			            </div>-->
-			            <div class="col-sm-4 col-xs-12">
-			            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="gotoCreatePage()">Add IP to Blacklist</md-button>
-			            </div>
+	            <div class="row">
+		            <div class="col-sm-4 col-xs-12">
+		            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="gotoCreatePage()">Add IP to Blacklist</md-button>
 		            </div>
+	            </div>
+	            <div class='divider divider-md'></div>
+	            <div class="row">
+		            <div class="col-sm-4 col-xs-6">
+	                <form>
+		                <input type="text"
+		                     placeholder="Search..."
+		                     class="form-control"
+		                     data-ng-model="searchKeyword"
+		                     data-ng-model-options='{ debounce: 1000 }'
+		                     data-ng-change="searchKeywordChange()">
+	                </form>
+		            </div>
+            	</div>
 		        </div>
 
 		        <div class="table-responsive">
