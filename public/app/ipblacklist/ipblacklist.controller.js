@@ -162,7 +162,7 @@
 
     function IPBlacklistImportCtrl( $scope, $timeout, appConfig, IPBlacklist, Upload ) {
 
-        const input = document.getElementById( 'fileinput' );
+        var input = document.getElementById( 'fileinput' );
         $scope.filename = '';
         
         $scope.chooseFile = function() {

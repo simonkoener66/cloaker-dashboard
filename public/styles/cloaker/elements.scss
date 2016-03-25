@@ -11,6 +11,7 @@
 		width: 140px;
 		padding: 0 !important;
 		vertical-align: middle;
+    white-space: nowrap;
 		button {
 			margin: 0;
 		}
@@ -51,4 +52,12 @@
     line-height: 30px;
     margin-top: -15px;
     text-align: center;
+}
+.tag-cloud {
+  white-space: nowrap;
+  &:not(:last-child) {
+    &:after {
+      content: ', ';
+    }
+  }
 }

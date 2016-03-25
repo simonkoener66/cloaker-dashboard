@@ -4,12 +4,11 @@ var router = express.Router();
 var apiController = require( '../app/controllers/api' );
 var filterController = require( '../app/controllers/filter' );
 
-router.get(  '/api/links/page/:page/:pagesize',           apiController.checkApiAuth, apiController.getLinks );
-router.get(  '/api/links/page/:page/:pagesize/:sort',     apiController.checkApiAuth, apiController.getLinks );
+router.post( '/api/links/page',                           apiController.checkApiAuth, apiController.getLinks );
 router.get(  '/api/links/:id',                            apiController.checkApiAuth, apiController.getLink );
 router.post( '/api/links/toggle',                         apiController.checkApiAuth, apiController.toggleLink );
 router.post( '/api/links/delete',                         apiController.checkApiAuth, apiController.deleteLink );
-router.post( '/api/links',                                apiController.checkApiAuth, apiController.editLink );
+router.post( '/api/links',                                apiController.checkApiAuth, apiController.newOrUpdateLink );
 
 router.get(  '/api/traffics/export/:from/:to',            apiController.exportTraffics );
 router.get(  '/api/traffics/page/:page/:pagesize',        apiController.checkApiAuth, apiController.getTraffics );

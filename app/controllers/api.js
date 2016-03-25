@@ -8,6 +8,7 @@ var multiparty = require('multiparty');
 
 var mongoose = require('mongoose');
 var Link = mongoose.model( 'Link' );
+var Tag = mongoose.model( 'Tag' );
 var Traffic = mongoose.model( 'Traffic' );
 var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
 
@@ -25,14 +26,14 @@ function getToken(code) {
 	var deferred = q.defer();
 
 	oauth2Client.getToken( code, function( err, tokens ) {
-		if (err) {
-			deferred.reject(err);
-			return;
-		}
-		deferred.resolve(tokens);
-    } );
+	if (err) {
+		deferred.reject(err);
+		return;
+	}
+	deferred.resolve(tokens);
+  } );
 
-    return deferred.promise;
+  return deferred.promise;
 }
 
 var apiController = function( router ) {
@@ -130,18 +131,33 @@ var apiController = function( router ) {
 		}
 	}
 
+	function updateTagsIfRequired( tags ) {
+		tags.forEach(function(tag) {
+			Tag.findOne({ tag: tag }, function(err, doc) {
+				if(err) {
+					console.log(err);
+					return;
+				}
+				if(doc) {
+					return;
+				}
+				Tag.create( { tag: tag }, function( err, tagDoc ) {} );
+			});
+		});
+	}
+
 	this.getLinks = function( req, res, next ) {
-		var page = req.params.page;
-		var pagesize = req.params.pagesize;
-		var keyword = req.params.keyword;
-		var query = formKeywordQuery( keyword, 'link_generated' );
+		var page = req.body.page;
+		var pagesize = req.body.pagesize;
+		var keyword = req.body.keyword;
 		var params = { 
 			page: parseInt( page ), 
 			limit: parseInt( pagesize )
 		};
-		if( req.params.sort ) {
-			params.sort = req.params.sort;
+		if( req.body.sort ) {
+			params.sort = req.body.sort;
 		}
+		var query = formKeywordQuery( keyword, 'link_generated' );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -163,13 +179,21 @@ var apiController = function( router ) {
 
 	this.getLink = function( req, res, next ) {
 		var id = req.params.id;
-		Link.findById( id, function( err, link ) {
-			if( err ) {
-				console.log( err );
-				res.json( { id: false } );
+		Tag.find(function(err, tags) {
+			if(err || !tags) {
+				tags = [];
 			}
-			res.json( link );
-		} );
+			Link.findById( id, function( err, link ) {
+				if( err ) {
+					console.log( err );
+					res.json( { id: false } );
+				}
+				res.json( {
+					link: link,
+					alltags: tags
+				} );
+			} );
+		});
 	};
 
 	this.toggleLink = function( req, res, next ) {
@@ -220,12 +244,14 @@ var apiController = function( router ) {
 		return criteria;
 	}
 
-	this.editLink = function( req, res, next ) {
+	this.newOrUpdateLink = function( req, res, next ) {
 		var updated_link = {
 			link_generated: req.body.link_generated,
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
 			description: req.body.description,
+			owner: req.body.owner,
+			tags: req.body.tags,
 			status: true,
 			total_hits: req.body.total_hits,
 			real_hits: req.body.real_hits,
@@ -236,23 +262,43 @@ var apiController = function( router ) {
 		if( updated_link.link_generated.substr( 0, 1 ) != '/' ) {
       updated_link.link_generated = '/' + updated_link.link_generated;
     }
-		if( req.body._id ) {
-			Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
-				if( err ) {
-					console.log( err );
-					res.json( { id: false } );
-				}
-				res.json( link );
-			} );
-		} else {
-			Link.create( updated_link, function( err, link ) {
-				if( err ) {
-					console.log( err );
-					res.json( { id: false } );
-				}
-				res.json( link );
-			} );
-		}
+    // Duplication check is added
+    dupCriteria = { 
+    	link_generated: updated_link.link_generated
+    };
+    if(req.body._id) {
+    	dupCriteria._id = { '$ne': req.body._id };
+    }
+    Link.findOne(dupCriteria, function(err, doc) {
+    	if(!err && doc) {
+    		console.log( 'Attempted to create duplicated link' );
+				res.json( {
+					id: false,
+					duplicated: true
+				} );
+				return;
+    	}
+    	// Update or create
+    	if( req.body._id ) {
+				Link.findByIdAndUpdate( req.body._id, updated_link, function( err, link ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+					}
+					updateTagsIfRequired(req.body.tags);
+					res.json( link );
+				} );
+			} else {
+				Link.create( updated_link, function( err, link ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+					}
+					updateTagsIfRequired(req.body.tags);
+					res.json( link );
+				} );
+			}
+    });
 	};
 
 	this.admin = function( req, res, next ) {
@@ -298,7 +344,9 @@ var apiController = function( router ) {
 						allowed = true;
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
-						res.redirect( '/admin' );
+						setTimeout( function() {
+							res.redirect( '/admin' );
+						}, 100 );
 						return false;
 					}
 					return true;

@@ -64,15 +64,21 @@
             } );
         }
 
-        this.getPage = function( page, limit, sort, callback ) {
+        this.getPage = function( page, limit, sort, keyword, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
-            var apiPath = '/links/page/';
-            apiPath += page + '/' + limit;
-            if( sort) {
-                apiPath += '/' + sort;
+            var apiPath = '/links/page';
+            var data = {
+                page: page,
+                pagesize: limit
+            };
+            if(sort) {
+                data.sort = sort;
+            }
+            if(keyword) {
+                data.keyword = keyword;
             }
             $http
-            .get( apiUrl( apiPath ) )
+            .post( apiUrl( apiPath ), data )
             .then( function( response ) {
                 callback( response.data );
             } )
@@ -97,13 +103,13 @@
             .success( function( response ) {
                 if( AuthenticationService.checkAuth( response ) ) {
                     if( typeof success != 'undefined' ) {
-                        success();
+                        success(response);
                     }
                 }
             } )
             .error( function( response ) {
                 if( typeof error != 'undefined' ) {
-                    error();
+                    error(response);
                 }
             } );
         }
@@ -288,6 +294,9 @@
 
         this.showAlert = function( ev, title, content, ariaLabel, ok, modal ) {
             if( typeof modal === 'undefined' ) modal = true;
+            if(!ariaLabel) {
+                ariaLabel = title;
+            }
             return $mdDialog.show(
                 $mdDialog.alert()
                     .parent( angular.element(document.querySelector('#popupContainer')) )

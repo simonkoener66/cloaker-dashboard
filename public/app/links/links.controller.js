@@ -13,24 +13,26 @@
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
         $scope.total = 0;
+        $scope.searchKeyword = '';
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
+        $scope.searchKeywordChange = searchKeywordChange;
 
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.editLink = editLink;
         $scope.toggleLink = toggleLink;
         $scope.duplicateLink = duplicateLink;
         $scope.deleteLink = deleteLink;
-        
+
         function select( page ) {
             refresh( page );
-        };
+        }
 
         function onNumPerPageChange() {
             $scope.select( 1 );
-        };
+        }
 
         function order(rowName) {
             if ($scope.row === rowName) {
@@ -38,13 +40,17 @@
             }
             $scope.row = rowName;
             refresh();
-        };
+        }
+
+        function searchKeywordChange() {
+            select(1);
+        }
 
         function refresh( page ) {
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.row, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.row, $scope.searchKeyword, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -137,6 +143,8 @@
             link_generated: '',
             link_real: '',
             link_safe: '',
+            owner: '',
+            tags: [],
             total_hits: 0,
             real_hits: 0,
             use_ip_blacklist: false,
@@ -230,9 +238,19 @@
                     'OK' );
                 return;
             }
-            Links.newOrUpdate( $scope.link, function() {
-                $location.path( '/links/list' );
-            }, function() {
+            Links.newOrUpdate( $scope.link, function(response) {
+                if(response.duplicated) {
+                    Dialog.showAlert( 
+                        ev,
+                        'Duplicated Link',
+                        'Duplicated generated link: such link already exists.',
+                        false,
+                        'OK'
+                    );
+                } else {
+                    $location.path( '/links/list' );
+                }
+            }, function(response) {
                 if( $scope.link._id ) {
                     Dialog.showAlert( 
                         ev,
@@ -261,12 +279,15 @@
             if( $stateParams.id ) {
                 $scope.title = 'Edit Link';
                 $scope.submitButtonTitle = 'Update';
-                Links.get( $stateParams.id, function( link ) {
+                Links.get( $stateParams.id, function( data ) {
+                    var link = data.link;
                     $scope.link = {
                         _id: link._id,
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
+                        owner: ( link.owner ) ? link.owner : '',
+                        tags: ( link.tags ) ? link.tags : [],
                         description: ( link.description ) ? link.description : '',
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,
                         real_hits: ( link.real_hits ) ? link.real_hits : 0,
@@ -274,6 +295,7 @@
                         criteria: ( link.criteria ) ? link.criteria : [],
                         criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
                     };
+                    $scope.allTags = data.alltags;
                     updateAllRegions();
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
