@@ -245,7 +245,7 @@
             } );
         }
 
-        this.new = function( ip, success, error ) {
+        this.newOrUpdate = function( ip, success, error ) {
             if( !this.isValid( ip ) ) {
                 if( typeof error != 'undefined' ) {
                     error();
@@ -258,13 +258,13 @@
             .success( function( response ) {
                 if( AuthenticationService.checkAuth( response ) ) {
                     if( typeof success != 'undefined' ) {
-                        success();
+                        success(response);
                     }
                 }
             } )
             .error( function( response ) {
                 if( typeof error != 'undefined' ) {
-                    error();
+                    error(response);
                 }
             } );
         }

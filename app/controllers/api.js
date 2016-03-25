@@ -155,6 +155,7 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'link_real', query );
 		query = formSearchQuery( keyword, 'link_safe', query );
 		query = formSearchQuery( keyword, 'tags', query );
+		query = formSearchQuery( keyword, 'description', query );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -272,7 +273,6 @@ var apiController = function( router ) {
     }
     Link.findOne(dupCriteria, function(err, doc) {
     	if(!err && doc) {
-    		console.log( 'Attempted to create duplicated link' );
 				res.json( {
 					id: false,
 					duplicated: true
@@ -537,29 +537,45 @@ var apiController = function( router ) {
 	}
 
 	this.editBlacklistIP = function( req, res, next ) {
-		if( req.body._id ) {
-			var updated_ip = {
-				'ip': req.body.ip,
-				'description': req.body.description
-			};
-			BlacklistedIP.findByIdAndUpdate( req.body._id, updated_ip, function( err, doc ) {
-				if( err ) {
-					console.log( err );
-					res.json( { id: false } );
-					return;
-				}
-				res.json( doc );
-			} );
-		} else {
-			BlacklistedIP.create( req.body, function( err, doc ) {
-				if( err ) {
-					console.log( err );
-					res.json( { id: false } );
-					return;
-				}
-				res.json( doc );
-			} );
-		}
+		var editingIP = {
+			ip: req.body.ip,
+			description: req.body.description
+		};
+		// Duplication check is added
+    dupCriteria = { 
+      ip: editingIP.ip
+    };
+    if(req.body._id) {
+      dupCriteria._id = { '$ne': req.body._id };
+    }
+    BlacklistedIP.findOne(dupCriteria, function(err, doc) {
+      if(!err && doc) {
+        res.json( {
+          id: false,
+          duplicated: true
+        } );
+        return;
+      }
+			if( req.body._id ) {
+				BlacklistedIP.findByIdAndUpdate( req.body._id, editingIP, function( err, doc ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+						return;
+					}
+					res.json( doc );
+				} );
+			} else {
+				BlacklistedIP.create( editingIP, function( err, doc ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+						return;
+					}
+					res.json( doc );
+				} );
+			}
+		});
 	}
 
 	this.deleteBlacklistIP = function( req, res, next ) {

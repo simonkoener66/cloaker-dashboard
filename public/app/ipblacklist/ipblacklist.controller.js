@@ -122,8 +122,18 @@
                     'OK' );
                 return;
             }
-            IPBlacklist.new( $scope.ip, function() {
-                $location.path( '/ipblacklist/list' );
+            IPBlacklist.newOrUpdate( $scope.ip, function(response) {
+                if(response.duplicated) {
+                    Dialog.showAlert( 
+                        ev,
+                        'Duplicated Link',
+                        'Duplicated IP: such IP already exists in blacklist.',
+                        false,
+                        'OK'
+                    );
+                } else {
+                    $location.path( '/ipblacklist/list' );
+                }
             }, function() {
                 if( $scope.ip._id ) {
                     Dialog.showAlert( 
