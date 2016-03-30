@@ -13,7 +13,8 @@ var linkSchema = new mongoose.Schema( {
 	criteria: [ {} ],
 	criteria_disallow: [ {} ],
 	total_hits: { type: Number, min: 0 },
-	real_hits: { type: Number, min: 0 }
+	real_hits: { type: Number, min: 0 },
+	created_time: Date
 } );
 linkSchema.plugin( mongoosePaginate );
 

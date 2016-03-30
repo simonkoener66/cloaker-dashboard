@@ -8,7 +8,7 @@
     function LinksCtrl( $scope, $state, $window, $filter, $location, $mdDialog, Links, Dialog ) {
 
         $scope.links = [];
-        $scope.row = '';
+        $scope.orderCol = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
@@ -34,11 +34,11 @@
             select(1);
         }
 
-        function order(rowName) {
-            if ($scope.row === rowName) {
+        function order(colName) {
+            if ($scope.orderCol === colName) {
                 return;
             }
-            $scope.row = rowName;
+            $scope.orderCol = colName;
             select(1);
         }
 
@@ -50,7 +50,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.row, $scope.searchKeyword, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -147,7 +147,7 @@
             tags: [],
             total_hits: 0,
             real_hits: 0,
-            use_ip_blacklist: false,
+            use_ip_blacklist: true,
             criteria: [
                 { country: 'US', region: '', city: '' },
             ],
@@ -159,6 +159,7 @@
         $scope.regions = empty_regions;
         $scope.regions_disallow = empty_regions;
 
+        $scope.searchedTags = searchedTags;
         $scope.addNewLocation = addNewLocation;
         $scope.addNewDisallowedLocation = addNewDisallowedLocation;
         $scope.removeCriteria = removeCriteria;
@@ -167,6 +168,18 @@
         $scope.updateDisallowRegions = updateDisallowRegions;
         $scope.submit = submit;
         $scope.gotoLinks = gotoLinks;
+
+        function searchedTags(searchText) {
+            var tags = [];
+            $scope.allTags.every( function( value ) {
+                var tag = value.tag;
+                if( tag.indexOf( searchText ) >= 0 ) {
+                    tags.push( value.tag );
+                }
+                return true;
+            } );
+            return tags;
+        }
 
         function addNewLocation() {
             $scope.link.criteria.push( {

@@ -42,6 +42,13 @@
                                     delete-button-label="Remove Tag"
                                     delete-hint="Press delete to remove tag"
                                     secondary-placeholder="Enter tags">
+                                    <md-autocomplete
+                                        md-selected-item="selectedTag"
+                                        md-search-text="searchText"
+                                        md-items="tag in searchedTags(searchText)"
+                                        md-item-text="tag">
+                                        <span md-highlight-text="searchText">{{tag}}</span>
+                                    </md-autocomplete>
                                 </md-chips>
                                 <div class="divider divider-lg"></div>
 

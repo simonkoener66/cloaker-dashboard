@@ -8,10 +8,18 @@
         <section class="panel panel-default table-dynamic cl-panel-loading">
 
         	<div class="panel-body">
+            <div class="table-filters">
+              <div class="row">
+                <div class="col-sm-6 col-xs-12 text-left">
+                  <md-button class="md-raised btn-w-lg md-primary" data-ng-click="addToBlacklist()" ng-disabled="!selectedItemExists()">Add To Blacklist</md-button>
+                </div>
+              </div>
+            </div>
 		        <div class="table-responsive">
-			        <table class="table">
+			        <table class="table cl-table-with-buttons">
 			            <thead>
 			            <tr>
+                    <th class='with-checkbox'><md-checkbox ng-model="headerCheckbox" ng-change="toggleAllCheckboxes()" aria-label="Select"></md-checkbox></th>
 			            	<th><div class="th">
 			                IP Address
 			                <span class="fa fa-angle-up"
@@ -30,6 +38,15 @@
 			                    data-ng-click=" order('-link_generated') "
 			                    data-ng-class="{active: row == '-link_generated'}"></span>
 			                </div></th>
+                      <th><div class="th">
+                      Passed Filter?
+                      <span class="fa fa-angle-up"
+                          data-ng-click=" order('used_real') "
+                          data-ng-class="{active: row == 'used_real'}"></span>
+                      <span class="fa fa-angle-down"
+                          data-ng-click=" order('-used_real') "
+                          data-ng-class="{active: row == '-used_real'}"></span>
+                      </div></th>
 			                <th><div class="th">
 			                Real Link
 			                <span class="fa fa-angle-up"
@@ -66,16 +83,38 @@
 			                    data-ng-click=" order('-access_time') "
 			                    data-ng-class="{active: row == '-access_time'}"></span>
 			                </div></th>
+                      <th><div class="th">
+                      Network
+                      <span class="fa fa-angle-up"
+                          data-ng-click=" order('bl_network') "
+                          data-ng-class="{active: row == 'bl_network'}"></span>
+                      <span class="fa fa-angle-down"
+                          data-ng-click=" order('-bl_network') "
+                          data-ng-class="{active: row == '-bl_network'}"></span>
+                      </div></th>
+                      <th><div class="th">
+                      Location
+                      <span class="fa fa-angle-up"
+                          data-ng-click=" order('bl_location') "
+                          data-ng-class="{active: row == 'bl_location'}"></span>
+                      <span class="fa fa-angle-down"
+                          data-ng-click=" order('-bl_location') "
+                          data-ng-class="{active: row == '-bl_location'}"></span>
+                      </div></th>
 			            </tr>
 			            </thead>
 			            <tbody>
 			            <tr data-ng-repeat="traffic in traffics">
+                    <td class='with-checkbox'><md-checkbox ng-model="selected[$index]" aria-label="Select"></md-checkbox></td>
 			            	<td>{{traffic.ip}}</td>
-			                <td>{{traffic.link_generated}}</td>
-			                <td>{{traffic.link_real}}</td>
-			                <td>{{traffic.link_safe}}</td>
-			                <td>{{traffic.geolocation}}</td>
-			                <td><span ng-bind="traffic.access_time | date:'MM/dd/yyyy hh:mm:ss'"></span></td>
+		                <td>{{traffic.link_generated}}</td>
+                    <td>{{traffic.used_real}}</td>
+		                <td>{{traffic.link_real}}</td>
+		                <td>{{traffic.link_safe}}</td>
+		                <td>{{traffic.geolocation}}</td>
+		                <td><span ng-bind="traffic.access_time | date:'MM/dd/yyyy hh:mm:ss'"></span></td>
+                    <td>{{traffic.bl_network}}</td>
+                    <td>{{traffic.bl_location}}</td>
 			            </tr>
 			            </tbody>
 			        </table>

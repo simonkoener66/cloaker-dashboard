@@ -51,6 +51,24 @@
 				                    data-ng-click=" order('-description') "
 				                    data-ng-class="{active: row == '-description'}"></span>
 				                </div></th>
+				                <th><div class="th">
+				                Network
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('network') "
+				                    data-ng-class="{active: row == 'network'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-network') "
+				                    data-ng-class="{active: row == '-network'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Location
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('location') "
+				                    data-ng-class="{active: row == 'location'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-location') "
+				                    data-ng-class="{active: row == '-location'}"></span>
+				                </div></th>
 				                <th></th>
 				            </tr>
 			            </thead>
@@ -58,6 +76,8 @@
 				            <tr data-ng-repeat="ip in ips" data-ng-click="editIP(ip._id)">
 				                <td>{{ip.ip}}</td>
 				                <td>{{ip.description}}</td>
+				                <td>{{ip.network}}</td>
+				                <td>{{ip.location}}</td>
 				                <td class='buttons text-center'>
 				                	<md-button class="md-icon-button md-warn" aria-label="Delete IP" data-ng-click="deleteIP($event, ip._id)"><span class="fa fa-remove"></span></md-button>
 				                </td>

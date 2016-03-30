@@ -2,48 +2,100 @@
     'use strict';
 
     angular.module( 'app.traffics' )
-        .controller( 'TrafficsCtrl', ['$scope', '$filter', '$location', 'Traffics', TrafficsCtrl] )
-        .controller( 'TrafficsExportCtrl', ['$scope', '$window', 'Traffics', TrafficsExportCtrl] )
+        .controller( 'TrafficsCtrl', ['$scope', '$state', '$filter', '$location', 'Traffics', TrafficsCtrl] )
+        .controller( 'TrafficsExportCtrl', ['$scope', 'Traffics', TrafficsExportCtrl] )
 
-    function TrafficsCtrl( $scope, $filter, $location, Traffics ) {
+    function TrafficsCtrl( $scope, $state, $filter, $location, Traffics ) {
 
         $scope.traffics = [];
-        $scope.row = '';
+        $scope.orderCol = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
         $scope.total = 0;
+        $scope.selected = [];
+        $scope.headerCheckbox = false;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
+        $scope.toggleAllCheckboxes = toggleAllCheckboxes;
+        $scope.selectedItemExists = selectedItemExists;
+        $scope.addToBlacklist = addToBlacklist;
 
         /// for test
+        /*
         $scope.download = function() {
             window.location.href = '/api/traffics/download';
         }
+        */
 
         function select( page ) {
             refresh( page );
-        };
+        }
 
         function onNumPerPageChange() {
             $scope.select( 1 );
-        };
+        }
 
-        function order(rowName) {
-            if ($scope.row === rowName) {
+        function order(colName) {
+            if ($scope.orderCol === colName) {
                 return;
             }
-            $scope.row = rowName;
+            $scope.orderCol = colName;
             refresh();
-        };
+        }
+
+        function toggleAllCheckboxes() {
+            var len = $scope.traffics.length;
+            for(var i = 0; i < len; i++) {
+                $scope.selected[i] = $scope.headerCheckbox;
+            }
+        }
+
+        function selectedItemExists() {
+            var exists = false
+            $scope.selected.every(function(val) {
+                if(val) {
+                    exists = true;
+                    return false;
+                }
+                return true;
+            });
+            return exists;
+        }
+
+        function uniq(a) {
+            var seen = {};
+            return a.filter(function(item) {
+                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+            })
+        }
+
+        function addToBlacklist() {
+            var index = 0, ips = [];
+            $scope.selected.every(function(val) {
+                if(index >= $scope.traffics.length) {
+                    return false;
+                }
+                if(val) {
+                    ips.push($scope.traffics[index].ip);
+                }
+                index++;
+                return true;
+            });
+            if(ips.length > 0) {
+                var uniqueIps = uniq(ips);
+                $state.selectedIPs = uniqueIps;
+                $location.path( '/ipblacklist/new' );
+            }
+        }
 
         function refresh( page ) {
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Traffics.getPage( page, $scope.numPerPage, $scope.row, function( result ) {
+            Traffics.getPage( page, $scope.numPerPage, $scope.orderCol, function( result ) {
                 $scope.traffics = result.traffics;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -60,7 +112,7 @@
         _init();
     }
 
-    function TrafficsExportCtrl( $scope, $window, Traffics ) {
+    function TrafficsExportCtrl( $scope, Traffics ) {
 
         $scope.fromDateEnabled = false;
         $scope.toDateEnabled = false;

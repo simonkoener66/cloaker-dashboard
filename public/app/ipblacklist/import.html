@@ -23,6 +23,15 @@
                         </div>
                     </div>
 
+                    <div class="row" ng-show="started">
+                        <div class='divider divider-md clearfix'></div>
+                        <div class="col-md-5 col-md-offset-1">
+                            <h4>{{statusText}}</h4>
+                            <div class="divider"></div>
+                            <md-progress-linear md-mode="determinate" value="{{progressValue}}"></md-progress-linear>
+                        </div>
+                    </div>
+
                 </div>
             </section>
         </div>

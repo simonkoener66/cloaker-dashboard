@@ -5,6 +5,7 @@ var OAuth2Client = google.auth.OAuth2;
 var plus = google.plus('v1');
 var config = require('../../config/config');
 var multiparty = require('multiparty');
+var moment = require('moment-timezone');
 
 var mongoose = require('mongoose');
 var Link = mongoose.model( 'Link' );
@@ -146,7 +147,8 @@ var apiController = function( router ) {
 		var keyword = req.body.keyword;
 		var params = { 
 			page: parseInt( page ), 
-			limit: parseInt( pagesize )
+			limit: parseInt( pagesize ),
+			sort: '-created_time'
 		};
 		if( req.body.sort ) {
 			params.sort = req.body.sort;
@@ -291,6 +293,7 @@ var apiController = function( router ) {
 					res.json( link );
 				} );
 			} else {
+				updated_link.created_time = new Date();
 				Link.create( updated_link, function( err, link ) {
 					if( err ) {
 						console.log( err );
@@ -405,7 +408,7 @@ var apiController = function( router ) {
 			console.log(query);
 			Traffic.find( query, function( err, docs ) {
 				res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
-				var data = 'IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time' + "\n";
+				var data = 'IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n";
 				docs.forEach( function( traffic ) {
 					data += traffic.ip + ',';
 					data += traffic.link_generated + ',';
@@ -413,7 +416,11 @@ var apiController = function( router ) {
 					data += traffic.link_real + ',';
 					data += traffic.link_safe + ',';
 					data += '"' + traffic.geolocation + '",';
-					data += traffic.access_time + "\n";
+					var format = 'YYYY-MM-DD HH:mm:ss';
+					data += moment(traffic.access_time).tz('EST').format(format) + ',';
+					data += traffic.blacklisted + ',';
+					data += '"' + traffic.bl_network + '",';
+					data += '"' + traffic.bl_location + '"\n';
 				} );
 				res.write( data );
 				res.end();
@@ -439,14 +446,23 @@ var apiController = function( router ) {
 		} );
 	}
 
+	function escapeUndefined(val) {
+		if(typeof val === 'undefined') {
+			return '';
+		}
+		return val;
+	}
+
 	this.exportBlacklist = function( req, res, next ) {
 		if( req.session.token ) {
 			BlacklistedIP.find( {}, function( err, docs ) {
 				res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
-				var data = 'IP,Description' + "\n";
+				var data = 'IP,Description,Network,Location' + "\n";
 				docs.forEach( function( ip ) {
 					data += ip.ip + ',';
-					data += '"' + ip.description + "\"\n";
+					data += '"' + escapeUndefined(ip.description) + "\",";
+					data += '"' + escapeUndefined(ip.network) + "\",";
+					data += '"' + escapeUndefined(ip.location) + "\"\n";
 				} );
 				res.write( data );
 				res.end();
@@ -454,6 +470,19 @@ var apiController = function( router ) {
 		} else {
 			res.status( 404 ).json( { message: 'API access unauthorized' } );
 		}
+	}
+
+	function removeQuotes(str) {
+		if(!str) {
+			return '';
+		}
+		if(str.substr(0,1) == '"') {
+			str = str.substr(1);
+		}
+		if(str && str.substr(str.length - 1, 1) == '"') {
+			str = str.substr(0, str.length - 1);
+		}
+		return str;
 	}
 
 	this.importBlacklist = function( req, res, next ) {
@@ -470,11 +499,11 @@ var apiController = function( router ) {
 				if( fields[0] && /^[0-9\:\.]*$/.test( fields[0] ) ) {
 					var new_ip = {
 						ip: fields[0],
-						description: fields[1]
+						description: removeQuotes(fields[1]),
+						network: removeQuotes(fields[2]),
+						location: removeQuotes(fields[3])
 					};
-					BlacklistedIP.create( new_ip, function( err, doc ) {
-						if( err ) console.log( err );
-					} );
+					BlacklistedIP.create( new_ip, function( err, doc ) {} );
 				}
 			} );
 			res.status( 200 ).json( { message: 'Done' } );
@@ -536,18 +565,12 @@ var apiController = function( router ) {
 		} );
 	}
 
-	this.editBlacklistIP = function( req, res, next ) {
-		var editingIP = {
-			ip: req.body.ip,
-			description: req.body.description
-		};
+	function updateExistingBlacklistedIP( res, id, editingIP ) {
 		// Duplication check is added
     dupCriteria = { 
       ip: editingIP.ip
     };
-    if(req.body._id) {
-      dupCriteria._id = { '$ne': req.body._id };
-    }
+    dupCriteria._id = { '$ne': id };
     BlacklistedIP.findOne(dupCriteria, function(err, doc) {
       if(!err && doc) {
         res.json( {
@@ -556,26 +579,56 @@ var apiController = function( router ) {
         } );
         return;
       }
-			if( req.body._id ) {
-				BlacklistedIP.findByIdAndUpdate( req.body._id, editingIP, function( err, doc ) {
-					if( err ) {
-						console.log( err );
-						res.json( { id: false } );
-						return;
-					}
-					res.json( doc );
-				} );
-			} else {
+			BlacklistedIP.findByIdAndUpdate( id, editingIP, function( err, doc ) {
+				if( err ) {
+					console.log( err );
+					res.json( { id: false } );
+					return;
+				}
+				res.json( doc );
+			} );
+		});
+	}
+
+	function addIPtoBlacklist( res, editingIP ) {
+		var ips = editingIP.ip.split(',');
+		ips.forEach( function(ip) {
+			ip = ip.trim();
+			// Duplication check is added
+	    dupCriteria = { 
+	      ip: ip
+	    };
+	    BlacklistedIP.findOne(dupCriteria, function(err, doc) {
+	      if(!err && doc) {
+	        res.json( {
+	          id: false,
+	          duplicated: true
+	        } );
+	        return;
+	      }
+	      editingIP.ip = ip;
 				BlacklistedIP.create( editingIP, function( err, doc ) {
 					if( err ) {
 						console.log( err );
-						res.json( { id: false } );
-						return;
 					}
-					res.json( doc );
 				} );
-			}
+			});
 		});
+		res.json({ result: true });
+	}
+
+	this.editBlacklistIP = function( req, res, next ) {
+		var editingIP = {
+			ip: req.body.ip,	// req.body.ip can be multiple ips separated by comma when adding to list
+			description: req.body.description,
+			network: req.body.network,
+			location: req.body.location
+		};
+		if(req.body._id) {
+			updateExistingBlacklistedIP( res, req.body._id, editingIP );
+		} else {
+			addIPtoBlacklist( res, editingIP );
+		}
 	}
 
 	this.deleteBlacklistIP = function( req, res, next ) {

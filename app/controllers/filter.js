@@ -56,7 +56,7 @@ var urlFilterController = function( router ) {
             return schema + '://' + url;
         }
 
-		function processTraffic( ip, use_real_link, link, geolocation ) {
+		function processTraffic( ip, use_real_link, link, geolocation, blacklisted ) {
             // Disable real link if status is overrided
             if( !link.status ) {
                 use_real_link = false;
@@ -69,8 +69,16 @@ var urlFilterController = function( router ) {
 				link_real: link.link_real,
 				link_safe: link.link_safe,
 				geolocation: geolocation,
-				access_time: new Date()
+				access_time: new Date(),
+                blacklisted: false,
+                bl_network: '',
+                bl_location: ''
 			}
+            if(blacklisted) {
+                new_traffic.blacklisted = true;
+                new_traffic.bl_network = blacklisted.network;
+                new_traffic.bl_location = blacklisted.location;
+            }
 			Traffic.create( new_traffic, function( err, traffic ){
 				if( err ) {
 					console.log( err );
@@ -114,44 +122,48 @@ var urlFilterController = function( router ) {
 				var geolocation = '(Unavailable)';
 
 				// Geolocation filter
-				var country;
-				if( geo ) {
-					country = getCountry( geo.country );
-				}
-				if( geo && country ) {
-					geolocation = '';
-					if( geo.city ) {
-						geolocation += geo.city + ', ';
-					}
-					if( geo.region ) {
-						var region_num = parseInt( geo.region );
-						if( region_num < country.regions.length ) {
-							geolocation += country.regions[region_num].longname + ', ';
-						}
-					}
-					geolocation += country.longname;
-                    geo.city = geo.city.toLowerCase();
-                    geo.region = geo.region.toLowerCase();
-                    geo.country = geo.country.toLowerCase();
-					link.criteria.every( function( criterion ) {
-						if( ( criterion.city && criterion.city.toLowerCase() != geo.city )
-							|| ( criterion.region && criterion.region.toLowerCase() != geo.region )
-							|| ( criterion.country && criterion.country.toLowerCase() != geo.country ) ) {
-							return true;
-						}
-						use_real_link = true;
-                        return false;
-					} );
-                    link.criteria_disallow.every( function( criterion ) {
-                        if( ( !criterion.city || criterion.city.toLowerCase() == geo.city )
-                            && ( !criterion.region || criterion.region.toLowerCase() == geo.region )
-                            && ( criterion.country && criterion.country.toLowerCase() == geo.country ) ) {
-                            use_real_link = false;
+                if(!link.criteria || link.criteria.length == 0) {
+                    use_real_link = true;
+                } else {
+    				var country;
+    				if( geo ) {
+    					country = getCountry( geo.country );
+    				}
+    				if( geo && country ) {
+    					geolocation = '';
+    					if( geo.city ) {
+    						geolocation += geo.city + ', ';
+    					}
+    					if( geo.region ) {
+    						var region_num = parseInt( geo.region );
+    						if( region_num < country.regions.length ) {
+    							geolocation += country.regions[region_num].longname + ', ';
+    						}
+    					}
+    					geolocation += country.longname;
+                        geo.city = geo.city.toLowerCase();
+                        geo.region = geo.region.toLowerCase();
+                        geo.country = geo.country.toLowerCase();
+    					link.criteria.every( function( criterion ) {
+    						if( ( criterion.city && criterion.city.toLowerCase() != geo.city )
+    							|| ( criterion.region && criterion.region.toLowerCase() != geo.region )
+    							|| ( criterion.country && criterion.country.toLowerCase() != geo.country ) ) {
+    							return true;
+    						}
+    						use_real_link = true;
                             return false;
-                        }
-                        return true;
-                    } );
-				}
+    					} );
+                        link.criteria_disallow.every( function( criterion ) {
+                            if( ( !criterion.city || criterion.city.toLowerCase() == geo.city )
+                                && ( !criterion.region || criterion.region.toLowerCase() == geo.region )
+                                && ( criterion.country && criterion.country.toLowerCase() == geo.country ) ) {
+                                use_real_link = false;
+                                return false;
+                            }
+                            return true;
+                        } );
+    				}
+                }
 
 				// Blacklisted IP filter
 				if( use_real_link && link.use_ip_blacklist ) {
@@ -163,7 +175,7 @@ var urlFilterController = function( router ) {
 						if( ip_record.length > 0 && ip_record[0].ip ) {
 							use_real_link = false;
 						}
-						processTraffic( ip, use_real_link, link, geolocation );
+						processTraffic( ip, use_real_link, link, geolocation, ip_record[0] );
 					} );
 				} else {
 					processTraffic( ip, use_real_link, link, geolocation );

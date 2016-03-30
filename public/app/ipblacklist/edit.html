@@ -19,6 +19,19 @@
                                     <label>Description (You can enter multiple lines)</label>
                                     <textarea ng-model="ip.description" columns="1" md-maxlength="150"></textarea>
                                 </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label>Network</label>
+                                    <md-select ng-model="ip.network">
+                                        <md-option ng-repeat="network in networks" value="{{network}}">
+                                            {{networkName(network)}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <div class='clearfix'></div>
+                                <md-input-container class="md-block">
+                                    <label>Location</label>
+                                    <input ng-model="ip.location">
+                                </md-input-container>
                                 <md-button type="submit" class="md-raised md-primary btn-w-md">{{submitButtonTitle}}</md-button>
                                 <div class="space"></div>
                                 <md-button class="md-raised btn-w-md" data-ng-click="goBack()">Back</md-button>

@@ -1,12 +1,4 @@
 .cl-table-with-buttons {
-	td.list-checkbox {
-		width: 40px;
-		padding: 0 0 0 15px;
-		vertical-align: middle;
-	}
-	.listitem-checkbox {
-		margin-bottom: 0;
-	}
 	td.buttons {
 		width: 140px;
 		padding: 0 !important;
@@ -16,6 +8,13 @@
 			margin: 0;
 		}
 	}
+  .with-checkbox {
+    padding-right: 0;
+    & > md-checkbox {
+      max-width: 25px;
+      margin-bottom: 0;
+    }
+  }
 }
 .cl-table-datepick {
 	.td-check {

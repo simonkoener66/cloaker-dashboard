@@ -20,6 +20,7 @@
     "geoip-lite": "~1.1.6",
     "googleapis": "^2.1.7",
     "kerberos": "0.0.18",
+    "moment-timezone": "^0.5.3",
     "mongoose": "^4.3.6",
     "mongoose-paginate": "^5.0.0",
     "morgan": "~1.6.1",

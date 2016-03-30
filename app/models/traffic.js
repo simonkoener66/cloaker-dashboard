@@ -8,7 +8,10 @@ var trafficSchema = new mongoose.Schema( {
 	link_real: String,
 	link_safe: String,
 	geolocation: String,
-	access_time: Date
+	access_time: Date,
+  blacklisted: Boolean,
+  bl_network: String,
+  bl_location: String
 } );
 trafficSchema.plugin( mongoosePaginate );
 

@@ -3,14 +3,14 @@
 
     angular.module( 'app.ipblacklist' )
         .controller( 'IPBlacklistListCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'IPBlacklist', 'Dialog', IPBlacklistListCtrl] )
-        .controller( 'IPBlacklistEditCtrl', ['$scope', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Dialog', IPBlacklistEditCtrl] )
+        .controller( 'IPBlacklistEditCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Dialog', IPBlacklistEditCtrl] )
         .controller( 'IPBlacklistImportCtrl', ['$scope', '$timeout', 'appConfig', 'IPBlacklist', 'Upload', IPBlacklistImportCtrl] )
         .controller( 'IPBlacklistExportCtrl', ['$scope', '$window', 'IPBlacklist', IPBlacklistExportCtrl] )
 
     function IPBlacklistListCtrl( $scope, $filter, $location, $mdDialog, IPBlacklist, Dialog ) {
 
         $scope.ips = [];
-        $scope.row = '';
+        $scope.orderCol = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
         $scope.numPerPage = $scope.numPerPageOpt[2];
         $scope.currentPage = 1;
@@ -34,11 +34,11 @@
             select(1);
         }
 
-        function order(rowName) {
-            if ($scope.row === rowName) {
+        function order(colName) {
+            if ($scope.orderCol === colName) {
                 return;
             }
-            $scope.row = rowName;
+            $scope.orderCol = colName;
             select(1);
         }
 
@@ -84,7 +84,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            IPBlacklist.getPage( page, $scope.numPerPage, $scope.row, $scope.searchKeyword, function( result ) {
+            IPBlacklist.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
                 $scope.ips = result.ips;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -101,14 +101,24 @@
         _init();
     }
 
-    function IPBlacklistEditCtrl( $scope, $location, $mdDialog, $stateParams, IPBlacklist, Dialog ) {
+    function IPBlacklistEditCtrl( $scope, $state, $location, $mdDialog, $stateParams, IPBlacklist, Dialog ) {
 
         $scope.title = 'Add an IP Address to Blacklist';
         $scope.submitButtonTitle = 'Create';
+        $scope.networks = ['', 'Subnet 1', 'Subnet 2', 'BadNet'];
         $scope.ip = {};
 
+        $scope.networkName = networkName;
         $scope.submit = submit;
         $scope.goBack = goBack;
+
+        function networkName(network) {
+            if(!network) {
+                return 'No network';
+            } else {
+                return network;
+            }
+        }
 
         function submit( ev ) {
             ev.stopPropagation();
@@ -165,11 +175,15 @@
                 $scope.submitButtonTitle = 'Update';
                 IPBlacklist.get( $stateParams.id, function( ip ) {
                     $scope.ip = ip;
-
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
             } else {
+                if( $state.selectedIPs ) {
+                    $scope.ip.ip = $state.selectedIPs.join(', ');
+                    $state.selectedIPs = false;
+                }
                 $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
+                $scope.ip.network = '';
             }
         }
 
@@ -180,6 +194,9 @@
 
         var input = document.getElementById( 'fileinput' );
         $scope.filename = '';
+        $scope.started = false;
+        $scope.statusText = '';
+        $scope.progressValue = 0;
         
         $scope.chooseFile = function() {
             var event = new Event('click');
@@ -187,6 +204,9 @@
         }
 
         $scope.importCSV = function( file ) {
+            $scope.statusText = 'Importing...';
+            $scope.started = true;
+
             file.upload = Upload.upload( {
                 url: appConfig.server + '/api/ipblacklist/import',
                 data: { file: file }
@@ -195,11 +215,17 @@
             file.upload.then( function( response ) {
                 $timeout( function() {
                     file.result = response.data;
-                } );
+                    $scope.progressValue = 100;
+                    $scope.statusText = 'Import finished.';
+                }, 200 );
             }, function( response ) {
-                console.log( response.status + ': ' + response.data );
+                console.log(response);
             }, function( evt ) {
-                // console.log( evt.loaded + '/' + evt.total );
+                if(!evt.total) {
+                    $scope.progressValue = 0;
+                } else {
+                    $scope.progressValue = evt.loaded / evt.total * 100;
+                }
             } );
         }
 
