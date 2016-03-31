@@ -7,6 +7,7 @@
     .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
+    .service( 'Networks', [ '$http', '$window', 'appConfig', 'AuthenticationService', NetworksService ] )
 
     function AuthenticationService( $http, $window, appConfig, Dialog ) {
 
@@ -298,6 +299,104 @@
         this.exportCSV = function() {
             $window.location.href = apiUrl( '/ipblacklist/export' );
         }
+    }
+
+    function NetworksService( $http, $window, appConfig, AuthenticationService ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.isValid = function( network ) {
+            return network.network != '';
+        }
+
+        this.get = function( id, callback ) {
+            if( !id ) {
+                callback( { id: false } );
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/networks/' + id ) )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.getPage = function( page, limit, sort, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var apiPath = '/networks/page';
+            var data = {
+                page: page,
+                pagesize: limit
+            };
+            if(sort) {
+                data.sort = sort;
+            }
+            $http
+            .post( apiUrl( apiPath ), data )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.newOrUpdate = function( network, success, error ) {
+            if( !this.isValid( network ) ) {
+                if( typeof error != 'undefined' ) {
+                  error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .post( apiUrl( '/networks' ), network )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success(response);
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error(response);
+                }
+            } );
+        }
+
+        this.delete = function( id, success, error ) {
+          if( !id ) {
+            if( typeof error != 'undefined' ) {
+              error();
+            }
+            return;
+          }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+          $http
+            .post( 
+            apiUrl( '/networks/delete' ),
+            { _id: id }
+          )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
+        }
+
     }
 
     function DialogService( $mdDialog ) {

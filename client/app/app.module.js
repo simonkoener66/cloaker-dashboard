@@ -9,6 +9,7 @@
         ,'app.links'
         ,'app.traffics'
         ,'app.ipblacklist'
+        ,'app.networks'
         
         // 3rd party feature modules
         ,'ui.tree'

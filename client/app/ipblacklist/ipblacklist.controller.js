@@ -3,7 +3,7 @@
 
     angular.module( 'app.ipblacklist' )
         .controller( 'IPBlacklistListCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'IPBlacklist', 'Dialog', IPBlacklistListCtrl] )
-        .controller( 'IPBlacklistEditCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Dialog', IPBlacklistEditCtrl] )
+        .controller( 'IPBlacklistEditCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Networks', 'Dialog', IPBlacklistEditCtrl] )
         .controller( 'IPBlacklistImportCtrl', ['$scope', '$timeout', 'appConfig', 'IPBlacklist', 'Upload', IPBlacklistImportCtrl] )
         .controller( 'IPBlacklistExportCtrl', ['$scope', '$window', 'IPBlacklist', IPBlacklistExportCtrl] )
 
@@ -101,11 +101,11 @@
         _init();
     }
 
-    function IPBlacklistEditCtrl( $scope, $state, $location, $mdDialog, $stateParams, IPBlacklist, Dialog ) {
+    function IPBlacklistEditCtrl( $scope, $state, $location, $mdDialog, $stateParams, IPBlacklist, Networks, Dialog ) {
 
         $scope.title = 'Add an IP Address to Blacklist';
         $scope.submitButtonTitle = 'Create';
-        $scope.networks = ['', 'Subnet 1', 'Subnet 2', 'BadNet'];
+        $scope.networks = [''];
         $scope.ip = {};
 
         $scope.networkName = networkName;
@@ -173,8 +173,9 @@
             if( $stateParams.id ) {
                 $scope.title = 'Edit Blacklisted IP';
                 $scope.submitButtonTitle = 'Update';
-                IPBlacklist.get( $stateParams.id, function( ip ) {
-                    $scope.ip = ip;
+                IPBlacklist.get( $stateParams.id, function( data ) {
+                    $scope.ip = data.blacklisted;
+                    $scope.networks = $scope.networks.concat(data.networks);
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
             } else {
@@ -182,8 +183,11 @@
                     $scope.ip.ip = $state.selectedIPs.join(', ');
                     $state.selectedIPs = false;
                 }
-                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
-                $scope.ip.network = '';
+                Networks.getPage(1, 9999, false, function( data ) {
+                    $scope.networks = $scope.networks.concat(data.networks);
+                    $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
+                    $scope.ip.network = '';
+                } );
             }
         }
 

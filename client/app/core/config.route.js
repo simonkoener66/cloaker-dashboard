@@ -46,6 +46,18 @@
                 {
                     url: 'ipblacklist/export',
                     template: 'ipblacklist/export'
+                },
+                {
+                    url: 'networks/list',
+                    template: 'networks/list'
+                },
+                {
+                    url: 'networks/new',
+                    template: 'networks/edit'
+                },
+                {
+                    url: 'networks/:id/edit',
+                    template: 'networks/edit'
                 }
             ];
             setRoutes = function(route) {

@@ -21,6 +21,11 @@ router.get(  '/api/ipblacklist/:id',                      apiController.checkApi
 router.post( '/api/ipblacklist',                          apiController.checkApiAuth, apiController.editBlacklistIP );
 router.post( '/api/ipblacklist/delete',                   apiController.checkApiAuth, apiController.deleteBlacklistIP );
 
+router.post( '/api/networks/page',                        apiController.checkApiAuth, apiController.getNetworks );
+router.get(  '/api/networks/:id',                         apiController.checkApiAuth, apiController.getNetwork );
+router.post( '/api/networks/delete',                      apiController.checkApiAuth, apiController.deleteNetwork );
+router.post( '/api/networks',                             apiController.checkApiAuth, apiController.newOrUpdateNetwork );
+
 router.get(  '/admin/login',                              apiController.loginAdmin );
 router.get(  '/admin/googlelogin',                        apiController.loggedInWithGoogle )
 router.get(  '/admin',                                    apiController.checkAdminAuth, apiController.admin );
@@ -28,6 +33,6 @@ router.get(  '/',                                         apiController.index );
 
 // filterController must be at the end because it tries to catch every url
 
-router.get( '/*',                                      filterController.processUrl );
+router.get( '/*',                                         filterController.processUrl );
 
 module.exports = router;

@@ -12,6 +12,7 @@ var Link = mongoose.model( 'Link' );
 var Tag = mongoose.model( 'Tag' );
 var Traffic = mongoose.model( 'Traffic' );
 var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
+var Network = mongoose.model( 'Network' );
 
 var oauth2Client = new OAuth2Client(
 	config.googleClientID, 
@@ -555,14 +556,22 @@ var apiController = function( router ) {
 
 	this.getIPBlacklistSingle = function( req, res, next ) {
 		var id = req.params.id;
-		BlacklistedIP.findById( id, function( err, doc ) {
-			if( err ) {
-				console.log( err );
-				res.json( { id: false } );
-				return;
+		Network.find(function(err, nets) {
+			if(err || !nets) {
+				nets = [];
 			}
-			res.json( doc );
-		} );
+			BlacklistedIP.findById( id, function( err, doc ) {
+				if( err ) {
+					console.log( err );
+					res.json( { id: false } );
+					return;
+				}
+				res.json( {
+					blacklisted: doc,
+					networks: nets
+				} );
+			} );
+		});
 	}
 
 	function updateExistingBlacklistedIP( res, id, editingIP ) {
@@ -647,6 +656,108 @@ var apiController = function( router ) {
 			res.json( rst );
 		}
 	}
+
+	this.getNetworks = function( req, res, next ) {
+		var page = req.body.page;
+		var pagesize = req.body.pagesize;
+		var params = { 
+			page: parseInt( page ), 
+			limit: parseInt( pagesize )
+		};
+		if( req.body.sort ) {
+			params.sort = req.body.sort;
+		}
+		var query = {};
+		Network.paginate( query, params, function( err, result ) {
+			var return_value = {};
+			if( result ) {
+				return_value.networks = result.docs;
+				return_value.total = result.total;
+				return_value.limit = result.limit;
+				return_value.page = result.page;
+				return_value.pages = result.pages;
+			} else {
+				return_value.networks = [];
+				return_value.total = 0;
+				return_value.limit = pagesize;
+				return_value.page = 1;
+				return_value.pages = 0;
+			}
+			res.json( return_value );
+		} );
+	}
+
+	this.getNetwork = function( req, res, next ) {
+		var id = req.params.id;
+		Network.findById( id, function( err, doc ) {
+			if( err ) {
+				console.log( err );
+				res.json( { id: false } );
+				return;
+			}
+			res.json( doc );
+		} );
+	};
+
+	this.deleteNetwork = function( req, res, next ) {
+		var rst = { result: false };
+		if( req.body._id ) {
+			Network.findByIdAndRemove( req.body._id, function( err, doc ) {
+				if( err ) {
+					console.log( err );
+					res.json( rst );
+					return;
+				}
+				rst.result = true;
+				res.json( rst );
+			} );
+		} else {
+			res.json( rst );
+		}
+	};
+
+	this.newOrUpdateNetwork = function( req, res, next ) {
+		var updated_network = {
+			network: req.body.network,
+			description: req.body.description
+		};
+    // Duplication check is added
+    dupCriteria = { 
+    	network: updated_network.network
+    };
+    if(req.body._id) {
+    	dupCriteria._id = { '$ne': req.body._id };
+    }
+    Network.findOne(dupCriteria, function(err, doc) {
+    	if(!err && doc) {
+				res.json( {
+					id: false,
+					duplicated: true
+				} );
+				return;
+    	}
+    	// Update or create
+    	if( req.body._id ) {
+				Network.findByIdAndUpdate( req.body._id, updated_network, function( err, doc ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+						return;
+					}
+					res.json( doc );
+				} );
+			} else {
+				Network.create( updated_network, function( err, doc ) {
+					if( err ) {
+						console.log( err );
+						res.json( { id: false } );
+						return;
+					}
+					res.json( doc );
+				} );
+			}
+    });
+	};
 }
 
 module.exports = new apiController();
