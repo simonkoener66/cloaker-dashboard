@@ -111,7 +111,8 @@
 			            <tbody>
 				            <tr data-ng-repeat="link in links">
 				            		<td class='with-button'>
-				            			<md-button class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></md-button>
+				            			<!--<md-button class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></md-button>-->
+				            			<a href='#/links/{{link._id}}/edit' class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></a>
 				            		</td>
 				                <td>{{link.link_generated}}</td>
 				                <td>{{link.link_real}}</td>
