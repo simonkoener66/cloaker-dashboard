@@ -593,6 +593,7 @@ var apiController = function( router ) {
       if(!err && doc) {
         res.json( {
           id: false,
+          result: false,
           duplicated: true
         } );
         return;
@@ -601,11 +602,15 @@ var apiController = function( router ) {
 				if( err ) {
 					console.log( err );
 					res.json( { 
-						id: false 
+						id: false,
+						result: false
 					} );
 					return;
 				}
-				res.json( doc );
+				res.json( {
+					result: true,
+					ip: doc
+				} );
 			} );
 		});
 	}
