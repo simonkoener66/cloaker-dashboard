@@ -51,7 +51,8 @@ var apiController = function( router ) {
 		'themeparadise06@gmail.com',
 		'stevenngobui@gmail.com',
 		'leon.tan3@gmail.com',
-		'dho8461@gmail.com'
+		'dho8461@gmail.com',
+		'calvinchan90@gmail.com'
 	];
 
 	function generateToken() {
@@ -353,7 +354,7 @@ var apiController = function( router ) {
 				}
 				var allowed = false;
 				allowedEmails.every( function( email ) {
-					if( email == profile.emails[0].value ) {
+					if( email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
 						allowed = true;
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;

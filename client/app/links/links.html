@@ -43,9 +43,10 @@
 		        </div>
 
 		        <div class="table-responsive">
-			        <table class="table table-hover cl-table-with-buttons">
+			        <table class="table cl-table-with-buttons">
 			            <thead>
 				            <tr>
+				            		<th></th>
 				                <th><div class="th">
 				                Generated Link
 				                <span class="fa fa-angle-up"
@@ -108,7 +109,10 @@
 				            </tr>
 			            </thead>
 			            <tbody>
-				            <tr data-ng-repeat="link in links" data-ng-click="editLink(link._id)">
+				            <tr data-ng-repeat="link in links">
+				            		<td class='with-button'>
+				            			<md-button class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></md-button>
+				            		</td>
 				                <td>{{link.link_generated}}</td>
 				                <td>{{link.link_real}}</td>
 				                <td>{{link.link_safe}}</td>
