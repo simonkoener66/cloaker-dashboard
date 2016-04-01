@@ -22,7 +22,7 @@
                                 <md-input-container class="md-block">
                                     <label>Network</label>
                                     <md-select ng-model="ip.network">
-                                        <md-option ng-repeat="network in networks" value="{{network}}">
+                                        <md-option ng-repeat="network in networks" value="{{network.network}}">
                                             {{networkName(network.network)}}
                                         </md-option>
                                     </md-select>

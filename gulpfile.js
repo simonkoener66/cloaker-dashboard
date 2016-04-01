@@ -52,9 +52,7 @@ gulp.task('js-watcher', function() {
     gulp.watch([config.jsFiles], ['js-bundle']);
 })
 
-gulp.task('build', ['optimize', 'copy'], function() {
-    startBrowserSync('dist');
-});
+gulp.task('build', ['sass', 'copy', 'js-bundle']);
 
 function log(msg) {
     if (typeof(msg) === 'object') {

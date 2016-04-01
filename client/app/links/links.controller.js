@@ -14,6 +14,8 @@
         $scope.currentPage = 1;
         $scope.total = 0;
         $scope.searchKeyword = '';
+        $scope.ownerFilter = '';
+        $scope.searchUpdating = false;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
@@ -43,6 +45,7 @@
         }
 
         function searchKeywordChange() {
+            $scope.searchUpdating = true;
             select(1);
         }
 
@@ -50,12 +53,12 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, $scope.ownerFilter, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
-
+                $scope.searchUpdating = false;
                 $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             } );
         }

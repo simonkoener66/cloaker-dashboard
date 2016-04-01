@@ -159,6 +159,12 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'link_safe', query );
 		query = formSearchQuery( keyword, 'tags', query );
 		query = formSearchQuery( keyword, 'description', query );
+		query = formSearchQuery( keyword, 'owner', query );
+		if(req.body.owner) {
+			var condition = {};
+			condition['owner'] = new RegExp( ".*" + req.body.owner + ".*", "i" );
+			query['$and'] = [condition];
+		}
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -532,6 +538,9 @@ var apiController = function( router ) {
 		}
 		var keyword = req.body.keyword;
 		var query = formSearchQuery( keyword, 'ip' );
+		query = formSearchQuery( keyword, 'description', query );
+		query = formSearchQuery( keyword, 'network', query );
+		query = formSearchQuery( keyword, 'location', query );
 
 		initIPBlacklist();
 
@@ -591,7 +600,9 @@ var apiController = function( router ) {
 			BlacklistedIP.findByIdAndUpdate( id, editingIP, function( err, doc ) {
 				if( err ) {
 					console.log( err );
-					res.json( { id: false } );
+					res.json( { 
+						id: false 
+					} );
 					return;
 				}
 				res.json( doc );
@@ -601,29 +612,37 @@ var apiController = function( router ) {
 
 	function addIPtoBlacklist( res, editingIP ) {
 		var ips = editingIP.ip.split(',');
+		var dup = false, result = false;
+		var ipCount = ips.length, doneCount = 0;
 		ips.forEach( function(ip) {
 			ip = ip.trim();
-			// Duplication check is added
-	    dupCriteria = { 
+	    dupCriteria = { 		// Duplication check criteria
 	      ip: ip
 	    };
 	    BlacklistedIP.findOne(dupCriteria, function(err, doc) {
 	      if(!err && doc) {
-	        res.json( {
-	          id: false,
-	          duplicated: true
-	        } );
+	        dup = true;
+	        doneCount++;
+	        if(doneCount >= ipCount) {
+						res.json({ result: result, duplicated: dup });
+					}
 	        return;
 	      }
 	      editingIP.ip = ip;
 				BlacklistedIP.create( editingIP, function( err, doc ) {
+					doneCount++;
+					console.log(doneCount, ipCount);
 					if( err ) {
 						console.log( err );
+					} else {
+						result = true;
+					}
+					if(doneCount >= ipCount) {
+						res.json({ result: result, duplicated: dup });
 					}
 				} );
 			});
 		});
-		res.json({ result: true });
 	}
 
 	this.editBlacklistIP = function( req, res, next ) {

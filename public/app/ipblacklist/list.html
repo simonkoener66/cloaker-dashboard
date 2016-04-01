@@ -16,16 +16,17 @@
 	            </div>
 	            <div class='divider divider-md'></div>
 	            <div class="row">
-		            <div class="col-sm-4 col-xs-6">
-	                <form>
-		                <input type="text"
-		                     placeholder="Search..."
-		                     class="form-control"
-		                     data-ng-model="searchKeyword"
-		                     data-ng-model-options='{ debounce: 1000 }'
-		                     data-ng-change="searchKeywordChange()">
-	                </form>
+		            <div class="col-md-4 col-xs-10">
+	                <input type="text"
+	                     placeholder="Search..."
+	                     class="form-control"
+	                     data-ng-model="searchKeyword"
+	                     data-ng-model-options='{ debounce: 1000 }'
+	                     data-ng-change="searchKeywordChange()">
 		            </div>
+		            <div class="col-md-4 col-xs-2">
+                  <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="40" ng-show='searchUpdating'></md-progress-circular>
+	              </div>
             	</div>
 		        </div>
 

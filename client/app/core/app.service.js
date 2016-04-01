@@ -65,7 +65,7 @@
             } );
         }
 
-        this.getPage = function( page, limit, sort, keyword, callback ) {
+        this.getPage = function( page, limit, sort, keyword, owner, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             var apiPath = '/links/page';
             var data = {
@@ -77,6 +77,9 @@
             }
             if(keyword) {
                 data.keyword = keyword;
+            }
+            if(owner) {
+                data.owner = owner;
             }
             $http
             .post( apiUrl( apiPath ), data )

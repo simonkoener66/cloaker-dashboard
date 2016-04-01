@@ -16,6 +16,7 @@
         $scope.currentPage = 1;
         $scope.total = 0;
         $scope.searchKeyword = '';
+        $scope.searchUpdating = false;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
@@ -43,6 +44,7 @@
         }
 
         function searchKeywordChange() {
+            $scope.searchUpdating = true;
             select(1);
         }
 
@@ -89,7 +91,7 @@
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
-
+                $scope.searchUpdating = false;
                 $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             } );
         }
@@ -133,16 +135,35 @@
                 return;
             }
             IPBlacklist.newOrUpdate( $scope.ip, function(response) {
-                if(response.duplicated) {
-                    Dialog.showAlert( 
-                        ev,
-                        'Duplicated Link',
-                        'Duplicated IP: such IP already exists in blacklist.',
-                        false,
-                        'OK'
-                    );
-                } else {
+                if(response.result) {
+                    if(response.duplicated) {
+                        Dialog.showAlert( 
+                            ev,
+                            'Duplicated Link',
+                            'One or more of entered IPs already exist in blacklist, and are not added.',
+                            false,
+                            'OK'
+                        );
+                    }
                     $location.path( '/ipblacklist/list' );
+                } else {
+                    if(response.duplicated) {
+                        Dialog.showAlert( 
+                            ev,
+                            'Duplicated IP(s)',
+                            'Duplicated IP(s): such IP(s) already exist in blacklist.',
+                            false,
+                            'OK'
+                        );
+                    } else {
+                        Dialog.showAlert( 
+                            ev,
+                            'Failed to Update Blacklisted IP',
+                            'Request to update blacklisted IP has failed. Please retry or contact administrator.',
+                            false,
+                            'OK'
+                        );
+                    }
                 }
             }, function() {
                 if( $scope.ip._id ) {
@@ -150,7 +171,7 @@
                         ev,
                         'Failed to Update Blacklisted IP',
                         'Request to update blacklisted IP has failed. Please retry or contact administrator.',
-                        'Failed to Update Blacklisted IP',
+                        false,
                         'OK'
                     );
                 } else {
@@ -158,7 +179,7 @@
                         ev,
                         'Failed to Add IP to Blacklist',
                         'Request to add an IP to blacklist has failed. Please retry or contact administrator.',
-                        'Failed to Add IP to Blacklist',
+                        false,
                         'OK'
                     );
                 }
