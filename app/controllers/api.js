@@ -413,26 +413,46 @@ var apiController = function( router ) {
 	this.exportTraffics = function( req, res, next ) {
 		if( req.session.token ) {
 			var query = formFromToQuery( req.params.from, req.params.to );
-			console.log(query);
-			Traffic.find( query, function( err, docs ) {
-				res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
-				var data = 'IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n";
-				docs.forEach( function( traffic ) {
-					data += traffic.ip + ',';
-					data += traffic.link_generated + ',';
-					data += traffic.used_real + ',';
-					data += traffic.link_real + ',';
-					data += traffic.link_safe + ',';
-					data += '"' + traffic.geolocation + '",';
-					var format = 'YYYY-MM-DD HH:mm:ss';
-					data += moment(traffic.access_time).tz('EST').format(format) + ',';
-					data += traffic.blacklisted + ',';
-					data += '"' + traffic.bl_network + '",';
-					data += '"' + traffic.bl_location + '"\n';
-				} );
-				res.write( data );
+			var page = 1, pagesize = 5000, data = '';
+			// Sendout file header and column header first
+			res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
+			res.write('IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n");
+			// Start with timer and load page by page
+			var timer;
+			function stopTimer() {
+				clearInterval(timer);
 				res.end();
-			} );
+			}
+			timer = setInterval(function() {
+
+				Traffic.paginate( query, { page: page, limit: pagesize, sort: '-access_time' }, function( err, result ) {
+					if( result ) {
+						if(page > result.pages) {		// All pages loaded
+							stopTimer();
+						} else {		// Data to be read exist
+							data = '';
+							result.docs.forEach( function( traffic ) {
+								data += traffic.ip + ',';
+								data += traffic.link_generated + ',';
+								data += traffic.used_real + ',';
+								data += traffic.link_real + ',';
+								data += traffic.link_safe + ',';
+								data += '"' + traffic.geolocation + '",';
+								var format = 'YYYY-MM-DD HH:mm:ss';
+								data += moment(traffic.access_time).tz('EST').format(format) + ',';
+								data += traffic.blacklisted + ',';
+								data += '"' + traffic.bl_network + '",';
+								data += '"' + traffic.bl_location + '"\n';
+							} );
+							res.write( data );
+							page++;
+						}
+					} else {	// Error occurred or something
+						stopTimer();
+					}
+				} );
+
+			}, 10);
 		} else {
 			res.status( 404 ).json( { message: 'API access unauthorized' } );
 		}
@@ -484,6 +504,7 @@ var apiController = function( router ) {
 		if(!str) {
 			return '';
 		}
+		str = str.trim();
 		if(str.substr(0,1) == '"') {
 			str = str.substr(1);
 		}
@@ -504,14 +525,23 @@ var apiController = function( router ) {
 			var first = true;
 			records.forEach( function( record ) {
 				var fields = record.split( ',' );
+				fields[0] = fields[0].trim();
 				if( fields[0] && /^[0-9\:\.]*$/.test( fields[0] ) ) {
-					var new_ip = {
-						ip: fields[0],
-						description: removeQuotes(fields[1]),
-						network: removeQuotes(fields[2]),
-						location: removeQuotes(fields[3])
-					};
-					BlacklistedIP.create( new_ip, function( err, doc ) {} );
+					dupCriteria = { 
+			      ip: fields[0]
+			    };
+			    BlacklistedIP.findOne(dupCriteria, function(err, doc) {
+			      if(!err && doc) {
+			        return;
+			      }
+						var new_ip = {
+							ip: fields[0],
+							description: removeQuotes(fields[1]),
+							network: removeQuotes(fields[2]),
+							location: removeQuotes(fields[3])
+						};
+						BlacklistedIP.create( new_ip, function( err, doc ) {} );
+					});
 				}
 			} );
 			res.status( 200 ).json( { message: 'Done' } );
