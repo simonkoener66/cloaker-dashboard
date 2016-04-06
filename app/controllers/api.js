@@ -302,6 +302,8 @@ var apiController = function( router ) {
 				} );
 			} else {
 				updated_link.created_time = new Date();
+		  	updated_link.total_hits = 0;
+		  	updated_link.real_hits = 0;
 				Link.create( updated_link, function( err, link ) {
 					if( err ) {
 						console.log( err );
@@ -413,7 +415,7 @@ var apiController = function( router ) {
 	this.exportTraffics = function( req, res, next ) {
 		if( req.session.token ) {
 			var query = formFromToQuery( req.params.from, req.params.to );
-			var page = 1, pagesize = 5000, data = '';
+			var page = 1, pagesize = 3, data = '';
 			// Sendout file header and column header first
 			res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
 			res.write('IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n");
@@ -452,7 +454,7 @@ var apiController = function( router ) {
 					}
 				} );
 
-			}, 10);
+			}, 1000);
 		} else {
 			res.status( 404 ).json( { message: 'API access unauthorized' } );
 		}
