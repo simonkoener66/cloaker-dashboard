@@ -11,7 +11,8 @@ var trafficSchema = new mongoose.Schema( {
 	access_time: Date,
   blacklisted: Boolean,
   bl_network: String,
-  bl_location: String
+  bl_location: String,
+  owner: String
 } );
 trafficSchema.plugin( mongoosePaginate );
 

@@ -14,7 +14,6 @@
         $scope.currentPage = 1;
         $scope.total = 0;
         $scope.searchKeyword = '';
-        $scope.ownerFilter = '';
         $scope.searchUpdating = false;
 
         $scope.select = select;
@@ -53,7 +52,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, $scope.ownerFilter, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -146,7 +145,6 @@
             link_generated: '',
             link_real: '',
             link_safe: '',
-            owner: '',
             tags: [],
             total_hits: 0,
             real_hits: 0,
@@ -302,7 +300,6 @@
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
-                        owner: ( link.owner ) ? link.owner : '',
                         tags: ( link.tags ) ? link.tags : [],
                         description: ( link.description ) ? link.description : '',
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,

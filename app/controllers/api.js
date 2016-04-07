@@ -48,11 +48,11 @@ var apiController = function( router ) {
 		]
 	} );
 	var allowedEmails = [
-		'themeparadise06@gmail.com',
-		'stevenngobui@gmail.com',
-		'leon.tan3@gmail.com',
-		'dho8461@gmail.com',
-		'calvinchan90@gmail.com'
+		{ email: 'themeparadise06@gmail.com', owner: 'Simon' },
+		{ email: 'stevenngobui@gmail.com', owner: 'Steven' },
+		{ email: 'leon.tan3@gmail.com', owner: 'Leon' },
+		{ email: 'dho8461@gmail.com', owner: 'Dennis' },
+		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' }
 	];
 
 	function generateToken() {
@@ -161,11 +161,10 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'tags', query );
 		query = formSearchQuery( keyword, 'description', query );
 		query = formSearchQuery( keyword, 'owner', query );
-		if(req.body.owner) {
-			var condition = {};
-			condition['owner'] = new RegExp( ".*" + req.body.owner + ".*", "i" );
-			query['$and'] = [condition];
-		}
+		// owner
+		var condition = {};
+		condition['owner'] = req.session.owner
+		query['$and'] = [condition];
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -262,7 +261,7 @@ var apiController = function( router ) {
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
 			description: req.body.description,
-			owner: req.body.owner,
+			owner: req.session.owner,
 			tags: req.body.tags,
 			status: true,
 			total_hits: req.body.total_hits,
@@ -322,7 +321,8 @@ var apiController = function( router ) {
 			res.render( 'index', { 
 				title: 'Phantom',
 				token: req.session.token,
-				email: req.session.email
+				email: req.session.email,
+				owner: req.session.owner
 			} );
 		} else {
 			res.redirect( 'https://www.google.com' );
@@ -355,11 +355,12 @@ var apiController = function( router ) {
 					return;
 				}
 				var allowed = false;
-				allowedEmails.every( function( email ) {
-					if( email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
+				allowedEmails.every( function( record ) {
+					if( record.email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
 						allowed = true;
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
+						req.session.owner = 'Steven';//record.owner;
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
@@ -389,6 +390,11 @@ var apiController = function( router ) {
 		var pagesize = req.params.pagesize;
 		var keyword = req.params.keyword;
 		var query = formSearchQuery( keyword, 'link_generated' );
+		// owner
+		var condition = {};
+		condition['owner'] = req.session.owner
+		query['$and'] = [condition];
+		// sort
 		var sortField = '-access_time';
 		if( req.params.sort ) {
 			sortField = req.params.sort;
