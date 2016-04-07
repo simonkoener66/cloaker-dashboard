@@ -334,7 +334,7 @@ var apiController = function( router ) {
 	};
 
 	this.loginAdmin = function( req, res, next ) {
-		if( req.get('host') == config.loginUrl ) {
+		if( req.get('host') == config.loginUrl || true ) {
 			res.render( 'login', { 
 				title: 'Login to Phantom', 
 				googleAuthUrl: googleAuthUrl
