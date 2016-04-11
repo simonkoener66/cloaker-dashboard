@@ -432,7 +432,7 @@ var apiController = function( router ) {
       }
       timer = setInterval(function() {
 
-        Traffic.paginate( query, { page: page, limit: pagesize, sort: '-access_time' }, function( err, result ) {
+        Traffic.paginate( query, { page: parseInt(page), limit: parseInt(pagesize), sort: '-access_time' }, function( err, result ) {
           if( result ) {
             data = '';
             result.docs.forEach( function( traffic ) {
