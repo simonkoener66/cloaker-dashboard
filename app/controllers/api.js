@@ -419,12 +419,16 @@ var apiController = function( router ) {
       // Sendout file header and column header first
       res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
       res.setHeader( 'Content-Type', 'text/plain' );
+      res.setHeader( 'Transfer-Encoding', 'chunked' );
+      res.flushHeaders();
+
       res.write('IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n");
+
       // Start with timer and load page by page
       var timer;
       function stopTimer() {
-        clearInterval(timer);
         res.end();
+        clearInterval(timer);
       }
       timer = setInterval(function() {
 
@@ -445,7 +449,6 @@ var apiController = function( router ) {
               data += '"' + traffic.bl_location + '"\n';
             } );
             res.write( data );
-            res.flushHeaders();
             if(page >= result.pages) {
               stopTimer();
             }
