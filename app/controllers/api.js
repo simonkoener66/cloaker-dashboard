@@ -415,7 +415,7 @@ var apiController = function( router ) {
 	this.exportTraffics = function( req, res, next ) {
     if( req.session.token ) {
       var query = formFromToQuery( req.params.from, req.params.to );
-      var page = 1, pagesize = 1000, data = '';
+      var page = 1, pagesize = 5, data = '';
       // Sendout file header and column header first
       res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
       res.setHeader( 'Content-Type', 'text/plain' );
@@ -430,9 +430,9 @@ var apiController = function( router ) {
         res.end();
         clearInterval(timer);
       }
-      timer = setInterval(function() {
 
-        Traffic.paginate( query, { page: parseInt(page), limit: parseInt(pagesize), sort: '-access_time' }, function( err, result ) {
+      function loadCycle() {
+      	Traffic.paginate( query, { page: parseInt(page), limit: parseInt(pagesize), sort: '-access_time' }, function( err, result ) {
           if( result ) {
             data = '';
             result.docs.forEach( function( traffic ) {
@@ -449,16 +449,21 @@ var apiController = function( router ) {
               data += '"' + traffic.bl_location + '"\n';
             } );
             res.write( data );
-            if(page >= result.pages) {
-              stopTimer();
+            if(page < result.pages) {
+              page++;
+              setTimeout( loadCycle, 1000 );
+            } else {
+            	res.end();
             }
-            page++;
-          } else {  // Error occurred or something
-            stopTimer();
+          } else {
+          	res.end();
           }
         } );
+      }
+      
+      // Start timer
+      setTimeout( loadCycle, 20 );
 
-      }, 20);
     } else {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
     }
