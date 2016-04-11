@@ -424,6 +424,7 @@ var apiController = function( router ) {
 			var page = 1, pagesize = 3, data = '';
 			// Sendout file header and column header first
 			res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
+			res.setHeader( 'Content-Type', 'text/plain' );
 			res.write('IP,Generated Link,Allowed Real Link,Real Link,Safe Link,Geolocation,Access Time,Blacklisted IP,Network,Location' + "\n");
 			// Start with timer and load page by page
 			var timer;
@@ -435,26 +436,26 @@ var apiController = function( router ) {
 
 				Traffic.paginate( query, { page: page, limit: pagesize, sort: '-access_time' }, function( err, result ) {
 					if( result ) {
-						if(page > result.pages) {		// All pages loaded
+						data = '';
+						result.docs.forEach( function( traffic ) {
+							data += traffic.ip + ',';
+							data += traffic.link_generated + ',';
+							data += traffic.used_real + ',';
+							data += traffic.link_real + ',';
+							data += traffic.link_safe + ',';
+							data += '"' + traffic.geolocation + '",';
+							var format = 'YYYY-MM-DD HH:mm:ss';
+							data += moment(traffic.access_time).tz('EST').format(format) + ',';
+							data += traffic.blacklisted + ',';
+							data += '"' + traffic.bl_network + '",';
+							data += '"' + traffic.bl_location + '"\n';
+						} );
+						res.write( data );
+						res.flushHeaders();
+						if(page >= result.pages) {
 							stopTimer();
-						} else {		// Data to be read exist
-							data = '';
-							result.docs.forEach( function( traffic ) {
-								data += traffic.ip + ',';
-								data += traffic.link_generated + ',';
-								data += traffic.used_real + ',';
-								data += traffic.link_real + ',';
-								data += traffic.link_safe + ',';
-								data += '"' + traffic.geolocation + '",';
-								var format = 'YYYY-MM-DD HH:mm:ss';
-								data += moment(traffic.access_time).tz('EST').format(format) + ',';
-								data += traffic.blacklisted + ',';
-								data += '"' + traffic.bl_network + '",';
-								data += '"' + traffic.bl_location + '"\n';
-							} );
-							res.write( data );
-							page++;
 						}
+						page++;
 					} else {	// Error occurred or something
 						stopTimer();
 					}
