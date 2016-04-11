@@ -415,7 +415,7 @@ var apiController = function( router ) {
 	this.exportTraffics = function( req, res, next ) {
     if( req.session.token ) {
       var query = formFromToQuery( req.params.from, req.params.to );
-      var page = 1, pagesize = 5, data = '';
+      var page = 1, pagesize = 1000, data = '';
       // Sendout file header and column header first
       res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
       res.setHeader( 'Content-Type', 'text/plain' );
@@ -451,7 +451,7 @@ var apiController = function( router ) {
             res.write( data );
             if(page < result.pages) {
               page++;
-              setTimeout( loadCycle, 1000 );
+              setTimeout( loadCycle, 20 );
             } else {
             	res.end();
             }
@@ -463,7 +463,7 @@ var apiController = function( router ) {
       
       // Start timer
       setTimeout( loadCycle, 20 );
-
+      
     } else {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
     }
