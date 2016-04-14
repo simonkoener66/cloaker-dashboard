@@ -143,6 +143,20 @@ var apiController = function( router ) {
 		});
 	}
 
+	function formOwnerQuery( query, owner ) {
+		var condition = {};
+		if(owner == 'Steven' || owner == 'Dennis') {
+			var condition1 = {}, condition2 = {};
+			condition1['owner'] = 'Steven';
+			condition2['owner'] = 'Dennis';
+			condition['$or'] = [condition1, condition2];
+		} else {
+			condition['owner'] = owner;
+		}
+		query['$and'] = [condition];
+		return query;
+	}
+
 	this.getLinks = function( req, res, next ) {
 		var page = req.body.page;
 		var pagesize = req.body.pagesize;
@@ -162,9 +176,7 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'description', query );
 		query = formSearchQuery( keyword, 'owner', query );
 		// owner
-		var condition = {};
-		condition['owner'] = req.session.owner
-		query['$and'] = [condition];
+		query = formOwnerQuery( query, req.session.owner );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -360,7 +372,7 @@ var apiController = function( router ) {
 						allowed = true;
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
-						req.session.owner = 'Steven';//record.owner;
+						req.session.owner = record.owner;
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
@@ -391,9 +403,7 @@ var apiController = function( router ) {
 		var keyword = req.params.keyword;
 		var query = formSearchQuery( keyword, 'link_generated' );
 		// owner
-		var condition = {};
-		condition['owner'] = req.session.owner
-		query['$and'] = [condition];
+		query = formOwnerQuery( query, req.session.owner );
 		// sort
 		var sortField = '-access_time';
 		if( req.params.sort ) {
