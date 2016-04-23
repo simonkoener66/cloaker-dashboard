@@ -52,7 +52,10 @@ var apiController = function( router ) {
 		{ email: 'stevenngobui@gmail.com', owner: 'Steven' },
 		{ email: 'leon.tan3@gmail.com', owner: 'Leon' },
 		{ email: 'dho8461@gmail.com', owner: 'Dennis' },
-		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' }
+		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' },
+		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen' },
+		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali' },
+		{ email: 'caseylui511@gmail.com', owner: 'Casey' }
 	];
 
 	function generateToken() {
