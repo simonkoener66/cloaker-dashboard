@@ -15,6 +15,9 @@
                                     <label>Generated Link</label>
                                     <input ng-model="link.link_generated">
                                 </md-input-container>
+                                <md-checkbox ng-model="link.use_utm" aria-label="Filter Blacklisted IP">Use UTM</md-checkbox>
+                                <div ng-show="link.utm > 0 && link.use_utm">Generated UTM: <span>{{link.utm}}</span></div>
+                                <div ng-show="!link.utm && link.use_utm">UTM will be generated upon save.</span></div>
                                 <md-input-container class="md-block">
                                     <label>Real Link</label>
                                     <input ng-model="link.link_real">

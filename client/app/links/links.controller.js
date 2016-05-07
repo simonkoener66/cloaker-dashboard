@@ -74,7 +74,6 @@
             ev.stopPropagation();
             ev.preventDefault();
             Links.toggleEnableStatus( link, function( data ) {
-                console.log( data );
                 if( data.result ) {
                     link.status = data.status;
                 } else {
@@ -143,6 +142,8 @@
 
         $scope.link = {
             link_generated: '',
+            use_utm: true,
+            utm: 0,
             link_real: '',
             link_safe: '',
             tags: [],
@@ -172,13 +173,15 @@
 
         function searchedTags(searchText) {
             var tags = [];
-            $scope.allTags.every( function( value ) {
-                var tag = value.tag;
-                if( tag.indexOf( searchText ) >= 0 ) {
-                    tags.push( value.tag );
-                }
-                return true;
-            } );
+            if ($scope.allTags) {
+                $scope.allTags.every( function( value ) {
+                    var tag = value.tag;
+                    if( tag.indexOf( searchText ) >= 0 ) {
+                        tags.push( value.tag );
+                    }
+                    return true;
+                } );
+            }
             return tags;
         }
 
@@ -297,6 +300,8 @@
                     var link = data.link;
                     $scope.link = {
                         _id: link._id,
+                        use_utm: (link.utm > 0) ? true : false,
+                        utm: link.utm,
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
@@ -308,6 +313,7 @@
                         criteria: ( link.criteria ) ? link.criteria : [],
                         criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
                     };
+                    $scope.utm = link.utm;
                     $scope.allTags = data.alltags;
                     updateAllRegions();
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );

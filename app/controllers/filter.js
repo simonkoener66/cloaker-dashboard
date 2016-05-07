@@ -40,6 +40,10 @@ var urlFilterController = function( router ) {
 
 	this.processUrl = function( req, res, next ) {
 		var path = req.originalUrl;
+        var queryPos = path.indexOf('?');
+        if (queryPos >= 0) {
+            path = path.substr(0, queryPos);
+        }
 
         function esc_url( url ) {
             var schema = '';
@@ -104,7 +108,15 @@ var urlFilterController = function( router ) {
             res.redirect( esc_url( url ) );
 		}
 
-		Link.findOne( { 'link_generated': path }, function( err, link ) {
+        var condition = {
+            link_generated: path,
+            utm: 0
+        }
+        if (req.query.utm) {
+            condition.utm = req.query.utm;
+        }
+
+		Link.findOne( condition, function( err, link ) {
 			if( err ) {
 				res.json( { message: 'Error occurred.' } );
 			}

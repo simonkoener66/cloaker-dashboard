@@ -270,9 +270,18 @@ var apiController = function( router ) {
 		return criteria;
 	}
 
+	function generateUTM(prevUtm) {
+		if (prevUtm) {
+			return prevUtm;
+		} else {
+			return parseInt(100000 + (999999 - 100000) * Math.random());
+		}
+	}
+
 	this.newOrUpdateLink = function( req, res, next ) {
 		var updated_link = {
 			link_generated: req.body.link_generated,
+			utm: req.body.use_utm ? generateUTM( req.body.utm ) : 0,
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
 			description: req.body.description,
@@ -292,12 +301,17 @@ var apiController = function( router ) {
     dupCriteria = { 
     	link_generated: updated_link.link_generated
     };
-    if(req.body._id) {
+    if (updated_link.utm) {
+    	dupCriteria.utm = updated_link.utm;
+    } else {
+    	dupCriteria.utm = 0;
+    }
+    if (req.body._id) {
     	dupCriteria._id = { '$ne': req.body._id };
     }
     Link.findOne(dupCriteria, function(err, doc) {
     	if(!err && doc) {
-				res.json( {
+    		res.json( {
 					id: false,
 					duplicated: true
 				} );
