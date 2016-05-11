@@ -204,14 +204,11 @@ var urlFilterController = function( router ) {
                                         console.log( err );
                                         res.json( { message: 'Error occurred.' } );
                                     }
-                                    console.log(geoRecord);
                                     if( geoRecord.length > 0 ) {
                                         use_real_link = false;
                                     } else {
                                         use_real_link = true;
                                     }
-                                    res.json( { passed: use_real_link } );
-                                    return;
                                     processTraffic( ip, use_real_link, link, geolocation );
                                 } );
                             } else {
