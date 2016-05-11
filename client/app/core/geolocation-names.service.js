@@ -10270,6 +10270,7 @@
         }
 
         function getCountry( countryCode, start_index, end_index ) {
+            var cc = countryCode.toLowerCase();
             if( typeof start_index === 'undefined' ) {
                 start_index = 0;
             }
@@ -10279,20 +10280,20 @@
             if( start_index > end_index ) {
               return false;
             } else if( start_index == end_index ) {
-                if( countriesSortedByCode[start_index].code == countryCode ) {
+                if( countriesSortedByCode[start_index].code.toLowerCase() == cc ) {
                     return countriesSortedByCode[start_index];
                 } else {
                     return false;
                 }
             } else {
                 var mid_index = parseInt( ( start_index + end_index ) / 2 );
-                var mid_code = countriesSortedByCode[mid_index].code;
-                if( mid_code == countryCode ) {
+                var mid_code = countriesSortedByCode[mid_index].code.toLowerCase();
+                if( mid_code == cc ) {
                     return countriesSortedByCode[mid_index];
-                } else if( countryCode < mid_code ) {
-                    return getCountry( countryCode, start_index, mid_index - 1 );
+                } else if( cc < mid_code ) {
+                    return getCountry( cc, start_index, mid_index - 1 );
                 } else {
-                    return getCountry( countryCode, mid_index + 1, end_index );
+                    return getCountry( cc, mid_index + 1, end_index );
                 }
             }
         }
