@@ -56,6 +56,9 @@
 
         function regionName(countryCode, regionCode) {
             var regions = GeolocationCodes.getCountry( countryCode ).regions;
+            if( !regions ) {
+                return '';
+            }
             var regionCount = regions.length;
             for(var i = 0; i < regionCount; i++) {
                 if( regions[i].code == regionCode) {
