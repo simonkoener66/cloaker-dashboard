@@ -990,9 +990,9 @@ var apiController = function( router ) {
 
   this.editGeoBlacklistItem = function( req, res, next ) {
     var data = {
-      country: req.body.country,
-      region: req.body.region,
-      city: req.body.city,
+      country: req.body.country.toLowerCase(),
+      region: req.body.region.toLowerCase(),
+      city: req.body.city.toLowerCase(),
       description: req.body.description
     };
     if(req.body._id) {

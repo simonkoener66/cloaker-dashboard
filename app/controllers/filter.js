@@ -192,12 +192,17 @@ var urlFilterController = function( router ) {
 						} else {
                             // Geolocation blacklist filter
                             if( geo ) {
+                                var orCondition = [
+                                    { country: geo.country, region: '', city: '' }
+                                ];
+                                if( geo.region ) {
+                                    orCondition.push( { country: geo.country, region: geo.region, city: '' } );
+                                }
+                                if( geo.city ) {
+                                    orCondition.push( { country: geo.country, region: geo.region, city: geo.city } );
+                                }
                                 var condition = {
-                                    $or: [
-                                        { country: geo.country, region: '', city: '' },
-                                        { country: geo.country, region: geo.region, city: '' },
-                                        { country: geo.country, region: geo.region, city: geo.city }
-                                    ]
+                                    $or: orCondition
                                 };
                                 GeoBlacklist.find( condition, function(err, geoRecord) {
                                     if( err ) {
