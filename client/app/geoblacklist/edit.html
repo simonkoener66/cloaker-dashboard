@@ -1,0 +1,50 @@
+<div class="page" data-ng-controller="GeoBlacklistEditCtrl">
+
+    <div class="row ui-section">
+        <div class="col-lg-8 clearfix">
+            <h2 class="section-header">{{title}}</h2>
+        </div>
+        <div class="col-md-12">
+            <section class="panel panel-default cl-panel-loading">
+                <div class="panel-body padding-xl">
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-1">
+
+                            <form role="form" data-ng-submit="submit( $event )">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Country</label>
+                                        <select class="form-control" ng-model="geo.country" ng-change="updateRegions()">
+                                            <option ng-repeat="country in countries" value="{{country.code}}">{{country.longname}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Region</label>
+                                        <select class="form-control" ng-model="geo.region">
+                                            <option ng-repeat="region in regions" value="{{region.code}}">{{region.longname}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>City</label>
+                                        <input type="text" class="form-control" ng-model="geo.city">
+                                    </div>
+                                </div>
+                                <div class='divider divider-md'></div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea class="form-control" ng-model="geo.description" rows="5">
+                                    </textarea>
+                                </div>
+                                <md-button type="submit" class="md-raised md-primary btn-w-md">{{submitButtonTitle}}</md-button>
+                                <div class="space"></div>
+                                <md-button class="md-raised btn-w-md" data-ng-click="goBack()">Back</md-button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</div>

@@ -143,7 +143,7 @@
         $scope.link = {
             link_generated: '',
             use_utm: true,
-            utm: 0,
+            utm: '',
             link_real: '',
             link_safe: '',
             tags: [],
@@ -300,7 +300,7 @@
                     var link = data.link;
                     $scope.link = {
                         _id: link._id,
-                        use_utm: (link.utm > 0) ? true : false,
+                        use_utm: (link.utm) ? true : false,
                         utm: link.utm,
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
@@ -321,6 +321,10 @@
             } else {
                 if( $state.duplicatingLink ) {
                     $scope.link = $state.duplicatingLink;
+                    if($state.duplicatingLink.utm) {
+                        $scope.link.use_utm = true;
+                        $scope.link.utm = parseInt(100000 + (999999 - 100000) * Math.random());
+                    }
                     $state.duplicatingLink = false;
                     $scope.link._id = '';
                     $scope.title = 'Duplicate Link';

@@ -16,8 +16,12 @@
                                     <input ng-model="link.link_generated">
                                 </md-input-container>
                                 <md-checkbox ng-model="link.use_utm" aria-label="Filter Blacklisted IP">Use UTM</md-checkbox>
-                                <div ng-show="link.utm > 0 && link.use_utm">Generated UTM: <span>{{link.utm}}</span></div>
-                                <div ng-show="!link.utm && link.use_utm">UTM will be generated upon save.</span></div>
+                                <div class="md-block" ng-show="link.use_utm">
+                                    <label>UTM: </label>
+                                    <input class="form-control" ng-model="link.utm" style="display: inline-block; width: 100px;"><br />
+                                    <div class="divider divider-sm"></div>
+                                    <span>UTM will be auto-generated upon save if you leave the field blank.</span>
+                                </div>
                                 <md-input-container class="md-block">
                                     <label>Real Link</label>
                                     <input ng-model="link.link_real">
@@ -46,7 +50,7 @@
                                 </md-chips>
                                 <div class="divider divider-lg"></div>
 
-                                <md-checkbox ng-model="link.use_ip_blacklist" aria-label="Filter Blacklisted IP">Filter blacklisted IP addresses</md-checkbox>
+                                <md-checkbox ng-model="link.use_ip_blacklist" aria-label="Filter blacklisted IP and geolocations">Filter blacklisted IP and geolocations</md-checkbox>
 
                                 <!-- Allowed Locations -->
                                 <div class="divider divider-xl"></div>
