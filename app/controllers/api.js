@@ -861,7 +861,7 @@ var apiController = function( router ) {
 	this.exportGeoBlacklist = function( req, res, next ) {
     if( req.session.token ) {
       GeoBlacklist.find( {}, function( err, docs ) {
-        res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
+        res.setHeader( 'Content-disposition', 'attachment; filename=geoblacklist.csv' );
         var data = 'Country,Region,City,Description' + "\n";
         docs.forEach( function( geo ) {
           data += '"' + escapeUndefined(geo.country) + "\",";
@@ -888,6 +888,9 @@ var apiController = function( router ) {
       var first = true;
       records.forEach( function( record ) {
         var fields = record.split( ',' );
+        if( fields[0] === "Country" || !fields[0] ) {
+        	return;
+        }
         var newRecord = {
           country: removeQuotes(fields[0]),
           region: removeQuotes(fields[1]),
