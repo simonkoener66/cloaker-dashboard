@@ -14,7 +14,6 @@
         $scope.currentPage = 1;
         $scope.total = 0;
         $scope.searchKeyword = '';
-        $scope.ownerFilter = '';
         $scope.searchUpdating = false;
 
         $scope.select = select;
@@ -53,7 +52,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, $scope.ownerFilter, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -75,7 +74,6 @@
             ev.stopPropagation();
             ev.preventDefault();
             Links.toggleEnableStatus( link, function( data ) {
-                console.log( data );
                 if( data.result ) {
                     link.status = data.status;
                 } else {
@@ -144,9 +142,10 @@
 
         $scope.link = {
             link_generated: '',
+            use_utm: true,
+            utm: '',
             link_real: '',
             link_safe: '',
-            owner: '',
             tags: [],
             total_hits: 0,
             real_hits: 0,
@@ -174,13 +173,15 @@
 
         function searchedTags(searchText) {
             var tags = [];
-            $scope.allTags.every( function( value ) {
-                var tag = value.tag;
-                if( tag.indexOf( searchText ) >= 0 ) {
-                    tags.push( value.tag );
-                }
-                return true;
-            } );
+            if ($scope.allTags) {
+                $scope.allTags.every( function( value ) {
+                    var tag = value.tag;
+                    if( tag.indexOf( searchText ) >= 0 ) {
+                        tags.push( value.tag );
+                    }
+                    return true;
+                } );
+            }
             return tags;
         }
 
@@ -299,10 +300,11 @@
                     var link = data.link;
                     $scope.link = {
                         _id: link._id,
+                        use_utm: (link.utm) ? true : false,
+                        utm: link.utm,
                         link_generated: ( link.link_generated ) ? link.link_generated : '',
                         link_real: ( link.link_real ) ? link.link_real : '',
                         link_safe: ( link.link_safe ) ? link.link_safe : '',
-                        owner: ( link.owner ) ? link.owner : '',
                         tags: ( link.tags ) ? link.tags : [],
                         description: ( link.description ) ? link.description : '',
                         total_hits: ( link.total_hits ) ? link.total_hits : 0,
@@ -311,6 +313,7 @@
                         criteria: ( link.criteria ) ? link.criteria : [],
                         criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
                     };
+                    $scope.utm = link.utm;
                     $scope.allTags = data.alltags;
                     updateAllRegions();
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
@@ -318,6 +321,10 @@
             } else {
                 if( $state.duplicatingLink ) {
                     $scope.link = $state.duplicatingLink;
+                    if($state.duplicatingLink.utm) {
+                        $scope.link.use_utm = true;
+                        $scope.link.utm = parseInt(100000 + (999999 - 100000) * Math.random());
+                    }
                     $state.duplicatingLink = false;
                     $scope.link._id = '';
                     $scope.title = 'Duplicate Link';

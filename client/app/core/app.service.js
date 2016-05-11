@@ -8,6 +8,7 @@
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
     .service( 'Networks', [ '$http', '$window', 'appConfig', 'AuthenticationService', NetworksService ] )
+    .service( 'GeoBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', GeolocationBlacklistService ] )
 
     function AuthenticationService( $http, $window, appConfig, Dialog ) {
 
@@ -65,7 +66,7 @@
             } );
         }
 
-        this.getPage = function( page, limit, sort, keyword, owner, callback ) {
+        this.getPage = function( page, limit, sort, keyword, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             var apiPath = '/links/page';
             var data = {
@@ -77,9 +78,6 @@
             }
             if(keyword) {
                 data.keyword = keyword;
-            }
-            if(owner) {
-                data.owner = owner;
             }
             $http
             .post( apiUrl( apiPath ), data )
@@ -301,6 +299,108 @@
 
         this.exportCSV = function() {
             $window.location.href = apiUrl( '/ipblacklist/export' );
+        }
+    }
+
+    function GeolocationBlacklistService( $http, $window, appConfig, AuthenticationService ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.isValid = function( geo ) {
+            return ( geo.country != '' );
+        }
+
+        this.getPage = function( page, limit, sort, keyword, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var data = {
+                page: page,
+                pagesize: limit
+            };
+            if(sort) {
+                data.sort = sort;
+            }
+            if(keyword) {
+                data.keyword = keyword;
+            }
+            $http
+            .post( apiUrl( '/geoblacklist/page' ), data )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.get = function( id, callback ) {
+            if( !id ) {
+                callback( { id: false } );
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/geoblacklist/' + id ) )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.newOrUpdate = function( geolocation, success, error ) {
+            if( !this.isValid( geolocation ) ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .post( apiUrl( '/geoblacklist' ), geolocation )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success(response);
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error(response);
+                }
+            } );
+        }
+
+        this.delete = function( id, success, error ) {
+            if( !id ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http.post( 
+                apiUrl( '/geoblacklist/delete' ),
+                { _id: id }
+            )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
+        }
+
+        this.exportCSV = function() {
+            $window.location.href = apiUrl( '/geoblacklist/export' );
         }
     }
 

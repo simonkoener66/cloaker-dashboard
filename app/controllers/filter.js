@@ -5,6 +5,7 @@ var q = require('q');
 var Link = mongoose.model( 'Link' );
 var Traffic = mongoose.model( 'Traffic' );
 var Blacklist = mongoose.model( 'BlacklistedIP' );
+var GeoBlacklist = mongoose.model( 'GeoBlacklist' );
 
 var urlFilterController = function( router ) {
 
@@ -40,6 +41,10 @@ var urlFilterController = function( router ) {
 
 	this.processUrl = function( req, res, next ) {
 		var path = req.originalUrl;
+        var queryPos = path.indexOf('?');
+        if (queryPos >= 0) {
+            path = path.substr(0, queryPos);
+        }
 
         function esc_url( url ) {
             var schema = '';
@@ -72,7 +77,8 @@ var urlFilterController = function( router ) {
 				access_time: new Date(),
                 blacklisted: false,
                 bl_network: '',
-                bl_location: ''
+                bl_location: '',
+                owner: req.session.owner
 			}
             if(blacklisted) {
                 new_traffic.blacklisted = true;
@@ -103,7 +109,15 @@ var urlFilterController = function( router ) {
             res.redirect( esc_url( url ) );
 		}
 
-		Link.findOne( { 'link_generated': path }, function( err, link ) {
+        var condition = {
+            link_generated: path,
+            utm: ""
+        }
+        if (req.query.utm) {
+            condition.utm = req.query.utm;
+        }
+
+		Link.findOne( condition, function( err, link ) {
 			if( err ) {
 				res.json( { message: 'Error occurred.' } );
 			}
@@ -167,15 +181,43 @@ var urlFilterController = function( router ) {
 
 				// Blacklisted IP filter
 				if( use_real_link && link.use_ip_blacklist ) {
-					Blacklist.find( { ip: ip }, function( err, ip_record ) {
+					Blacklist.find( { ip: ip }, function( err, ipRecord ) {
 						if( err ) {
 							console.log( err );
 							res.json( { message: 'Error occurred.' } );
 						}
-						if( ip_record.length > 0 && ip_record[0].ip ) {
+						if( ipRecord.length > 0 && ipRecord[0].ip && false ) {
 							use_real_link = false;
-						}
-						processTraffic( ip, use_real_link, link, geolocation, ip_record[0] );
+                            processTraffic( ip, use_real_link, link, geolocation, ipRecord[0] );
+						} else {
+                            // Geolocation blacklist filter
+                            if( geo ) {
+                                var condition = {
+                                    $or: [
+                                        { country: geo.country, region: '', city: '' },
+                                        { country: geo.country, region: geo.region, city: '' },
+                                        { country: geo.country, region: geo.region, city: geo.city }
+                                    ]
+                                };
+                                GeoBlacklist.find( condition, function(err, geoRecord) {
+                                    if( err ) {
+                                        console.log( err );
+                                        res.json( { message: 'Error occurred.' } );
+                                    }
+                                    console.log(geoRecord);
+                                    if( geoRecord.length > 0 ) {
+                                        use_real_link = false;
+                                    } else {
+                                        use_real_link = true;
+                                    }
+                                    res.json( { passed: use_real_link } );
+                                    return;
+                                    processTraffic( ip, use_real_link, link, geolocation );
+                                } );
+                            } else {
+                                processTraffic( ip, false, link, geolocation );
+                            }
+                        }
 					} );
 				} else {
 					processTraffic( ip, use_real_link, link, geolocation );

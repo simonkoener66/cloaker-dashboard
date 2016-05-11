@@ -26,6 +26,13 @@ router.get(  '/api/networks/:id',                         apiController.checkApi
 router.post( '/api/networks/delete',                      apiController.checkApiAuth, apiController.deleteNetwork );
 router.post( '/api/networks',                             apiController.checkApiAuth, apiController.newOrUpdateNetwork );
 
+router.get(  '/api/geoblacklist/export',                   apiController.exportGeoBlacklist );
+router.post( '/api/geoblacklist/import',                   apiController.importGeoBlacklist );
+router.post( '/api/geoblacklist/page',                     apiController.checkApiAuth, apiController.getGeoBlacklist );
+router.get(  '/api/geoblacklist/:id',                      apiController.checkApiAuth, apiController.getGeoBlacklistItem );
+router.post( '/api/geoblacklist',                          apiController.checkApiAuth, apiController.editGeoBlacklistItem );
+router.post( '/api/geoblacklist/delete',                   apiController.checkApiAuth, apiController.deleteGeoBlacklistItem );
+
 router.get(  '/admin/login',                              apiController.loginAdmin );
 router.get(  '/admin/googlelogin',                        apiController.loggedInWithGoogle )
 router.get(  '/admin',                                    apiController.checkAdminAuth, apiController.admin );

@@ -13,6 +13,7 @@ var Tag = mongoose.model( 'Tag' );
 var Traffic = mongoose.model( 'Traffic' );
 var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
 var Network = mongoose.model( 'Network' );
+var GeoBlacklist = mongoose.model( 'GeoBlacklist' );
 
 var oauth2Client = new OAuth2Client(
 	config.googleClientID, 
@@ -48,11 +49,14 @@ var apiController = function( router ) {
 		]
 	} );
 	var allowedEmails = [
-		'themeparadise06@gmail.com',
-		'stevenngobui@gmail.com',
-		'leon.tan3@gmail.com',
-		'dho8461@gmail.com',
-		'calvinchan90@gmail.com'
+		{ email: 'themeparadise06@gmail.com', owner: 'Simon' },
+		{ email: 'stevenngobui@gmail.com', owner: 'Steven' },
+		{ email: 'leon.tan3@gmail.com', owner: 'Leon' },
+		{ email: 'dho8461@gmail.com', owner: 'Dennis' },
+		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' },
+		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen' },
+		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali' },
+		{ email: 'caseylui511@gmail.com', owner: 'Casey' }
 	];
 
 	function generateToken() {
@@ -143,6 +147,20 @@ var apiController = function( router ) {
 		});
 	}
 
+	function formOwnerQuery( query, owner ) {
+		var condition = {};
+		if(owner == 'Steven' || owner == 'Dennis') {
+			var condition1 = {}, condition2 = {};
+			condition1['owner'] = 'Steven';
+			condition2['owner'] = 'Dennis';
+			condition['$or'] = [condition1, condition2];
+		} else {
+			condition['owner'] = owner;
+		}
+		query['$and'] = [condition];
+		return query;
+	}
+
 	this.getLinks = function( req, res, next ) {
 		var page = req.body.page;
 		var pagesize = req.body.pagesize;
@@ -161,11 +179,8 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'tags', query );
 		query = formSearchQuery( keyword, 'description', query );
 		query = formSearchQuery( keyword, 'owner', query );
-		if(req.body.owner) {
-			var condition = {};
-			condition['owner'] = new RegExp( ".*" + req.body.owner + ".*", "i" );
-			query['$and'] = [condition];
-		}
+		// owner
+		query = formOwnerQuery( query, req.session.owner );
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -256,13 +271,22 @@ var apiController = function( router ) {
 		return criteria;
 	}
 
+	function generateUTM(prevUtm) {
+		if (prevUtm) {
+			return prevUtm;
+		} else {
+			return (100000 + (999999 - 100000) * Math.random() * Math.random()).toString();
+		}
+	}
+
 	this.newOrUpdateLink = function( req, res, next ) {
 		var updated_link = {
 			link_generated: req.body.link_generated,
+			utm: req.body.use_utm ? generateUTM( req.body.utm ) : "",
 			link_real: req.body.link_real,
 			link_safe: req.body.link_safe,
 			description: req.body.description,
-			owner: req.body.owner,
+			owner: req.session.owner,
 			tags: req.body.tags,
 			status: true,
 			total_hits: req.body.total_hits,
@@ -278,12 +302,17 @@ var apiController = function( router ) {
     dupCriteria = { 
     	link_generated: updated_link.link_generated
     };
-    if(req.body._id) {
+    if (updated_link.utm) {
+    	dupCriteria.utm = updated_link.utm;
+    } else {
+    	dupCriteria.utm = "";
+    }
+    if (req.body._id) {
     	dupCriteria._id = { '$ne': req.body._id };
     }
     Link.findOne(dupCriteria, function(err, doc) {
     	if(!err && doc) {
-				res.json( {
+    		res.json( {
 					id: false,
 					duplicated: true
 				} );
@@ -322,7 +351,8 @@ var apiController = function( router ) {
 			res.render( 'index', { 
 				title: 'Phantom',
 				token: req.session.token,
-				email: req.session.email
+				email: req.session.email,
+				owner: req.session.owner
 			} );
 		} else {
 			res.redirect( 'https://www.google.com' );
@@ -355,11 +385,12 @@ var apiController = function( router ) {
 					return;
 				}
 				var allowed = false;
-				allowedEmails.every( function( email ) {
-					if( email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
+				allowedEmails.every( function( record ) {
+					if( record.email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
 						allowed = true;
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
+						req.session.owner = record.owner;
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
@@ -389,6 +420,9 @@ var apiController = function( router ) {
 		var pagesize = req.params.pagesize;
 		var keyword = req.params.keyword;
 		var query = formSearchQuery( keyword, 'link_generated' );
+		// owner
+		query = formOwnerQuery( query, req.session.owner );
+		// sort
 		var sortField = '-access_time';
 		if( req.params.sort ) {
 			sortField = req.params.sort;
@@ -678,7 +712,6 @@ var apiController = function( router ) {
 	      editingIP.ip = ip;
 				BlacklistedIP.create( editingIP, function( err, doc ) {
 					doneCount++;
-					console.log(doneCount, ipCount);
 					if( err ) {
 						console.log( err );
 					} else {
@@ -824,6 +857,165 @@ var apiController = function( router ) {
 			}
     });
 	};
+
+	this.exportGeoBlacklist = function( req, res, next ) {
+    if( req.session.token ) {
+      GeoBlacklist.find( {}, function( err, docs ) {
+        res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
+        var data = 'Country,Region,City,Description' + "\n";
+        docs.forEach( function( geo ) {
+          data += '"' + escapeUndefined(geo.country) + "\",";
+          data += '"' + escapeUndefined(geo.region) + "\",";
+          data += '"' + escapeUndefined(geo.city) + "\",";
+          data += '"' + escapeUndefined(geo.description) + "\"\n";
+        } );
+        res.write( data );
+        res.end();
+      } );
+    } else {
+      res.status( 404 ).json( { message: 'API access unauthorized' } );
+    }
+  }
+
+  this.importGeoBlacklist = function( req, res, next ) {
+    if( !req.session.token ) {
+      res.status( 404 ).json( { message: 'API access unauthorized' } );
+    }
+    var form = new multiparty.Form();
+    var data = '';
+    form.on( 'close', function() {
+      var records = data.split( "\n" );
+      var first = true;
+      records.forEach( function( record ) {
+        var fields = record.split( ',' );
+        var newRecord = {
+          country: removeQuotes(fields[0]),
+          region: removeQuotes(fields[1]),
+          city: removeQuotes(fields[2]),
+          location: removeQuotes(fields[3])
+        };
+        GeoBlacklist.create( newRecord, function( err, doc ) {} );
+      } );
+      res.status( 200 ).json( { message: 'Done' } );
+    } );
+    form.on( 'part', function( part ){
+      if( part.name !== 'file' ) {
+        return part.resume();
+      }
+      part.on( 'data', function( buf ){
+        data += buf.toString();
+      } );
+    } );
+    form.parse(req);
+  }
+
+  this.getGeoBlacklist = function( req, res, next ) {
+    var page = req.body.page;
+    var pagesize = req.body.pagesize;
+    var params = { 
+      page: parseInt( page ), 
+      limit: parseInt( pagesize )
+    };
+    if( req.body.sort ) {
+      params.sort = req.body.sort;
+    }
+    var query = {};
+    /*var keyword = req.body.keyword;
+    var query = formSearchQuery( keyword, 'country' );
+    query = formSearchQuery( keyword, 'description', query );
+    query = formSearchQuery( keyword, 'network', query );
+    query = formSearchQuery( keyword, 'location', query );*/
+
+    GeoBlacklist.paginate( query, params, function( err, result ) {
+      var return_value = {};
+      if( result ) {
+        return_value.items = result.docs;
+        return_value.total = result.total;
+        return_value.limit = result.limit;
+        return_value.page = result.page;
+        return_value.pages = result.pages;
+      } else {
+        return_value.items = [];
+        return_value.total = 0;
+        return_value.limit = pagesize;
+        return_value.page = 1;
+        return_value.pages = 0;
+      }
+      res.json( return_value );
+    } );
+  }
+
+  this.getGeoBlacklistItem = function( req, res, next ) {
+    var id = req.params.id;
+    GeoBlacklist.findById( id, function( err, doc ) {
+      if( err ) {
+        console.log( err );
+        res.json( { id: false } );
+        return;
+      }
+      res.json( {
+        item: doc
+      } );
+    } );
+  }
+
+  function updateExistingGeoBlacklistItem( res, id, editingIP ) {
+    GeoBlacklist.findByIdAndUpdate( id, editingIP, function( err, doc ) {
+      if( err ) {
+        console.log( err );
+        res.json( { 
+          id: false,
+          result: false
+        } );
+        return;
+      }
+      res.json( {
+        result: true,
+        item: doc
+      } );
+    } );
+  }
+
+  function addGeoBlacklistItem( res, data ) {
+    GeoBlacklist.create( data, function( err, doc ) {
+      if( err ) {
+        res.json({ result: false });
+      }
+      res.json({ result: true });
+    } );
+  }
+
+  this.editGeoBlacklistItem = function( req, res, next ) {
+    var data = {
+      country: req.body.country,
+      region: req.body.region,
+      city: req.body.city,
+      description: req.body.description
+    };
+    if(req.body._id) {
+      updateExistingGeoBlacklistItem( res, req.body._id, data );
+    } else {
+      addGeoBlacklistItem( res, data );
+    }
+  }
+
+  this.deleteGeoBlacklistItem = function( req, res, next ) {
+    var rst = { result: false };
+    if( req.body._id ) {
+      GeoBlacklist.findByIdAndRemove( req.body._id, function( err, link ) {
+        if( err ) {
+          console.log( err );
+          res.json( rst );
+          return;
+        }
+        rst.result = true;
+        res.json( rst );
+      } );
+    } else {
+      res.json( rst );
+    }
+  }
+
 }
 
 module.exports = new apiController();

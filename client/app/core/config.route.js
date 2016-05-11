@@ -58,6 +58,26 @@
                 {
                     url: 'networks/:id/edit',
                     template: 'networks/edit'
+                },
+                {
+                    url: 'geoblacklist/list',
+                    template: 'geoblacklist/list'
+                },
+                {
+                    url: 'geoblacklist/new',
+                    template: 'geoblacklist/edit'
+                },
+                {
+                    url: 'geoblacklist/:id/edit',
+                    template: 'geoblacklist/edit'
+                },
+                {
+                    url: 'geoblacklist/import',
+                    template: 'geoblacklist/import'
+                },
+                {
+                    url: 'geoblacklist/export',
+                    template: 'geoblacklist/export'
                 }
             ];
             setRoutes = function(route) {

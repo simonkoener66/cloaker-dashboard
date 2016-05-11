@@ -2,7 +2,8 @@ var mongoose = require('mongoose');
 var mongoosePaginate = require( 'mongoose-paginate' );
 
 var linkSchema = new mongoose.Schema( {
-	link_generated: { type: String, unique: true },
+	link_generated: String,
+	utm: String,
 	link_real: String,
 	link_safe: String,
 	description: String,

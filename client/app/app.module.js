@@ -10,6 +10,7 @@
         ,'app.traffics'
         ,'app.ipblacklist'
         ,'app.networks'
+        ,'app.geoblacklist'
         
         // 3rd party feature modules
         ,'ui.tree'

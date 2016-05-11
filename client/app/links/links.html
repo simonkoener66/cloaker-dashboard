@@ -27,19 +27,6 @@
 		            <div class="col-md-4 col-xs-2">
                   <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="40" ng-show='searchUpdating'></md-progress-circular>
 	              </div>
-	              <div class="col-md-4 col-xs-12">
-	              	<md-input-container class="md-block">
-			            	<label>Filter by Owner: </label>
-			            	<md-select ng-model="ownerFilter" ng-change="searchKeywordChange()">
-			            		<md-option value="">All</md-option>
-		            			<md-option value="Leon">Leon</md-option>
-	                    <md-option value="Dennis">Dennis</md-option>
-	                    <md-option value="Steven">Steven</md-option>
-	                    <md-option value="Ali">Ali</md-option>
-	                    <md-option value="Calvin">Calvin</md-option>
-	                  </md-select>
-	                </md-input-container>
-	              </div>
             	</div>
 		        </div>
 
@@ -94,15 +81,6 @@
 				                    data-ng-class="{active: row == '-real_hits'}"></span>
 				                </div></th>
 				                <th><div class="th">
-				                Owner
-				                <span class="fa fa-angle-up"
-				                    data-ng-click=" order('owner') "
-				                    data-ng-class="{active: row == 'owner'}"></span>
-				                <span class="fa fa-angle-down"
-				                    data-ng-click=" order('-owner') "
-				                    data-ng-class="{active: row == '-owner'}"></span>
-				                </div></th>
-				                <th><div class="th">
 				                Description
 				                </div></th>
 				                <th></th>
@@ -112,15 +90,13 @@
 			            <tbody>
 				            <tr data-ng-repeat="link in links">
 				            		<td class='with-button'>
-				            			<!--<md-button class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></md-button>-->
 				            			<a href='#/links/{{link._id}}/edit' class="md-icon-button md-primary" aria-label="Edit Link" data-ng-click="editLink(link._id)" tooltip-placement="top" uib-tooltip="Edit" tooltip-append-to-body="true"><span class="logo-icon zmdi zmdi-view-dashboard"></span></a>
 				            		</td>
-				                <td>{{link.link_generated}}</td>
+				                <td>{{link.link_generated}}<span ng-if="link.utm">?utm={{link.utm}}</span></td>
 				                <td>{{link.link_real}}</td>
 				                <td>{{link.link_safe}}</td>
 				                <td>{{link.total_hits}}</td>
 				                <td>{{link.real_hits}}</td>
-				                <td>{{link.owner}}</td>
 				                <td>{{link.description}}</td>
 				                <td>
 				                </td>
