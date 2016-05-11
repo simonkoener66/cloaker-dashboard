@@ -192,6 +192,8 @@ var urlFilterController = function( router ) {
 						} else {
                             // Geolocation blacklist filter
                             if( geo ) {
+                                geo.country = geo.country.toUpperCase();
+                                geo.region = geo.region.toUpperCase();
                                 var orCondition = [
                                     { country: geo.country, region: '', city: '' }
                                 ];
