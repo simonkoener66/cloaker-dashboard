@@ -56,7 +56,8 @@ var apiController = function( router ) {
 		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' },
 		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen' },
 		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali' },
-		{ email: 'caseylui511@gmail.com', owner: 'Casey' }
+		{ email: 'caseylui511@gmail.com', owner: 'Casey' },
+		{ email: 'neil.bnfaw@gmail.com', owner: 'Neil' }
 	];
 
 	function generateToken() {
