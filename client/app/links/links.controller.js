@@ -323,7 +323,7 @@
                     $scope.link = $state.duplicatingLink;
                     if($state.duplicatingLink.utm) {
                         $scope.link.use_utm = true;
-                        $scope.link.utm = parseInt(100000 + (999999 - 100000) * Math.random());
+                        $scope.link.utm = parseInt(10000000 + (99999999 - 10000000) * Math.random()).toString();
                     }
                     $state.duplicatingLink = false;
                     $scope.link._id = '';

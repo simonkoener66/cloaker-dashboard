@@ -276,7 +276,7 @@ var apiController = function( router ) {
 		if (prevUtm) {
 			return prevUtm;
 		} else {
-			return (100000 + (999999 - 100000) * Math.random() * Math.random()).toString();
+			return parseInt(10000000 + (99999999 - 10000000) * Math.random()).toString();
 		}
 	}
 
