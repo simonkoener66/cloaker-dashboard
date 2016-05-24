@@ -151,7 +151,7 @@ var apiController = function( router ) {
 	function formOwnerQuery( query, owner ) {
 		var condition = {};
 		if(owner == 'Steven' || owner == 'Dennis') {
-			var condition1 = {}, condition2 = {};
+			var condition1 = {}, condition2 = {}, condition3 = {};
 			condition1['owner'] = 'Steven';
 			condition2['owner'] = 'Dennis';
 			condition3['owner'] = { '$exists': false };
