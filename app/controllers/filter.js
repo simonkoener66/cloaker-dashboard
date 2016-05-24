@@ -78,7 +78,7 @@ var urlFilterController = function( router ) {
                 blacklisted: false,
                 bl_network: '',
                 bl_location: '',
-                owner: req.session.owner
+                owner: link.owner
 			}
             if(blacklisted) {
                 new_traffic.blacklisted = true;
