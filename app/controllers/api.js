@@ -154,8 +154,8 @@ var apiController = function( router ) {
 			var condition1 = {}, condition2 = {};
 			condition1['owner'] = 'Steven';
 			condition2['owner'] = 'Dennis';
-			// condition3['owner'] = '';
-			condition['$or'] = [condition1, condition2/*, condition3*/];
+			condition3['owner'] = { '$exists': false };
+			condition['$or'] = [condition1, condition2, condition3];
 		} else {
 			condition['owner'] = owner;
 		}
