@@ -459,7 +459,10 @@ var apiController = function( router ) {
 
 	this.exportTraffics = function( req, res, next ) {
     if( req.session.token ) {
+      // from/to date query
       var query = formFromToQuery( req.params.from, req.params.to );
+      // owner
+      query = formOwnerQuery( query, req.session.owner );
       var page = 1, pagesize = 1000, data = '';
       // Sendout file header and column header first
       res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
