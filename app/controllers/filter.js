@@ -66,10 +66,14 @@ var urlFilterController = function( router ) {
             if( !link.status ) {
                 use_real_link = false;
             }
+            var link_generated_path = link.link_generated;
+            if( link.utm ) {
+                link_generated_path += ("?utm=" + link.utm);
+            }
             // Traffic record
 			var new_traffic = {
 				ip: ip,
-				link_generated: link.link_generated,
+				link_generated: link_generated_path,
 				used_real: use_real_link,
 				link_real: link.link_real,
 				link_safe: link.link_safe,
@@ -78,7 +82,7 @@ var urlFilterController = function( router ) {
                 blacklisted: false,
                 bl_network: '',
                 bl_location: '',
-                owner: req.session.owner
+                owner: link.owner
 			}
             if(blacklisted) {
                 new_traffic.blacklisted = true;

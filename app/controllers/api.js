@@ -49,15 +49,15 @@ var apiController = function( router ) {
 		]
 	} );
 	var allowedEmails = [
-		{ email: 'themeparadise06@gmail.com', owner: 'Simon' },
-		{ email: 'stevenngobui@gmail.com', owner: 'Steven' },
-		{ email: 'leon.tan3@gmail.com', owner: 'Leon' },
-		{ email: 'dho8461@gmail.com', owner: 'Dennis' },
-		{ email: 'calvinchan90@gmail.com', owner: 'Calvin' },
-		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen' },
-		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali' },
-		{ email: 'caseylui511@gmail.com', owner: 'Casey' },
-		{ email: 'neil.bnfaw@gmail.com', owner: 'Neil' }
+		{ email: 'themeparadise06@gmail.com', owner: 'Simon', role: 'admin' },
+		{ email: 'stevenngobui@gmail.com', owner: 'Steven', role: 'admin' },
+		{ email: 'dho8461@gmail.com', owner: 'Dennis', role: 'admin' },
+		{ email: 'leon.tan3@gmail.com', owner: 'Leon', role: 'user' },
+		{ email: 'calvinchan90@gmail.com', owner: 'Calvin', role: 'user' },
+		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen', role: 'user' },
+		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali', role: 'user' },
+		{ email: 'caseylui511@gmail.com', owner: 'Casey', role: 'user' },
+		{ email: 'neil.bnfaw@gmail.com', owner: 'Neil', role: 'user' }
 	];
 
 	function generateToken() {
@@ -392,6 +392,7 @@ var apiController = function( router ) {
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
 						req.session.owner = record.owner;
+						req.session.role = record.role;
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
