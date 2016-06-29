@@ -16,7 +16,7 @@
 	            </div>
 	            <div class='divider divider-md'></div>
 	            <div class="row">
-		            <div class="col-md-4 col-xs-10">
+		            <div class="col-md-3 col-xs-10">
 	                <input type="text"
 	                     placeholder="Search..."
 	                     class="form-control"
@@ -24,7 +24,18 @@
 	                     data-ng-model-options='{ debounce: 1000 }'
 	                     data-ng-change="searchKeywordChange()">
 		            </div>
-		            <div class="col-md-4 col-xs-2">
+		            <div class="col-md-3 col-xs-10" ng-show="admin" ng-cloak>
+		            	<span class="ui-select" style="display: block">
+		                <select
+		                		data-ng-model="ownerFilter"
+		                    data-ng-model-options='{ debounce: 1000 }'
+		                    data-ng-change="ownerFilterChange()">
+		                  <option value=''>All</option>
+	                    <option data-ng-repeat="user in users" value="{{user}}">{{user}}</option>
+	                  </select>
+	                </span>
+		            </div>
+		            <div class="col-md-2 col-xs-2">
                   <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="40" ng-show='searchUpdating'></md-progress-circular>
 	              </div>
             	</div>
@@ -62,6 +73,15 @@
 				                    data-ng-click=" order('-link_safe') "
 				                    data-ng-class="{active: row == '-link_safe'}"></span>
 				                </div></th>
+				                <th ng-show="admin"><div class="th">
+				                Owner
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('owner') "
+				                    data-ng-class="{active: row == 'owner'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-owner') "
+				                    data-ng-class="{active: row == '-owner'}"></span>
+				                </div></th>
 				                <th><div class="th">
 				                Total Hits
 				                <span class="fa fa-angle-up"
@@ -95,6 +115,7 @@
 				                <td>{{link.link_generated}}<span ng-if="link.utm">?utm={{link.utm}}</span></td>
 				                <td>{{link.link_real}}</td>
 				                <td>{{link.link_safe}}</td>
+				                <td ng-show="admin">{{link.owner}}</td>
 				                <td>{{link.total_hits}}</td>
 				                <td>{{link.real_hits}}</td>
 				                <td>{{link.description}}</td>

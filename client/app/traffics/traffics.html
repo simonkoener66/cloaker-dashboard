@@ -14,6 +14,23 @@
                   <md-button class="md-raised btn-w-lg md-primary" data-ng-click="addToBlacklist()" ng-disabled="!selectedItemExists()">Add To Blacklist</md-button>
                 </div>
               </div>
+              <br/>
+              <div class="row" ng-show="admin" ng-cloak>
+                <div class="col-md-3 col-xs-10">
+                  <span class="ui-select" style="display: block; margin: 0">
+                    <select
+                        data-ng-model="ownerFilter"
+                        data-ng-model-options='{ debounce: 1000 }'
+                        data-ng-change="ownerFilterChange()">
+                      <option value=''>All</option>
+                      <option data-ng-repeat="user in users" value="{{user}}">{{user}}</option>
+                    </select>
+                  </span>
+                </div>
+                <div class="col-md-2 col-xs-2">
+                  <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="40" ng-show="searchUpdating"></md-progress-circular>
+                </div>
+              </div>
             </div>
 		        <div class="table-responsive">
 			        <table class="table cl-table-with-buttons">
@@ -38,6 +55,15 @@
 			                    data-ng-click=" order('-link_generated') "
 			                    data-ng-class="{active: row == '-link_generated'}"></span>
 			                </div></th>
+                      <th ng-show="admin"><div class="th">
+                      Owner
+                      <span class="fa fa-angle-up"
+                          data-ng-click=" order('owner') "
+                          data-ng-class="{active: row == 'owner'}"></span>
+                      <span class="fa fa-angle-down"
+                          data-ng-click=" order('-owner') "
+                          data-ng-class="{active: row == '-owner'}"></span>
+                      </div></th>
                       <th><div class="th">
                       Passed Filter?
                       <span class="fa fa-angle-up"
@@ -108,6 +134,7 @@
                     <td class='with-checkbox'><md-checkbox ng-model="selected[$index]" aria-label="Select"></md-checkbox></td>
 			            	<td>{{traffic.ip}}</td>
 		                <td>{{traffic.link_generated}}</td>
+                    <td ng-show="admin">{{traffic.owner}}</td>
                     <td>{{traffic.used_real}}</td>
 		                <td>{{traffic.link_real}}</td>
 		                <td>{{traffic.link_safe}}</td>

@@ -4,6 +4,8 @@ var router = express.Router();
 var apiController = require( '../app/controllers/api' );
 var filterController = require( '../app/controllers/filter' );
 
+router.get(  '/api/users',                                 apiController.checkApiAuth, apiController.getUsers );
+
 router.post( '/api/links/page',                           apiController.checkApiAuth, apiController.getLinks );
 router.get(  '/api/links/:id',                            apiController.checkApiAuth, apiController.getLink );
 router.post( '/api/links/toggle',                         apiController.checkApiAuth, apiController.toggleLink );

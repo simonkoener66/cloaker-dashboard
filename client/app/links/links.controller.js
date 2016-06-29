@@ -2,11 +2,13 @@
     'use strict';
 
     angular.module( 'app.links' )
-        .controller( 'LinksCtrl', ['$scope', '$state', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Dialog', LinksCtrl] )
+        .controller( 'LinksCtrl', ['$scope', '$state', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Users', 'Dialog', LinksCtrl] )
         .controller( 'EditLinkCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
 
-    function LinksCtrl( $scope, $state, $window, $filter, $location, $mdDialog, Links, Dialog ) {
+    function LinksCtrl( $scope, $state, $window, $filter, $location, $mdDialog, Links, Users, Dialog ) {
 
+        $scope.admin = false;
+        $scope.users = [];
         $scope.links = [];
         $scope.orderCol = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
@@ -14,12 +16,14 @@
         $scope.currentPage = 1;
         $scope.total = 0;
         $scope.searchKeyword = '';
+        $scope.ownerFilter = '';
         $scope.searchUpdating = false;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
         $scope.order = order;
         $scope.searchKeywordChange = searchKeywordChange;
+        $scope.ownerFilterChange = ownerFilterChange;
 
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.editLink = editLink;
@@ -48,11 +52,16 @@
             select(1);
         }
 
+        function ownerFilterChange() {
+            $scope.searchUpdating = true;
+            select(1);
+        }
+
         function refresh( page ) {
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
+            Links.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, $scope.ownerFilter, function( result ) {
                 $scope.links = result.links;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -131,6 +140,10 @@
 
         function _init() {
             refresh();
+            Users.get( function( data ) {
+                $scope.admin = data.admin;
+                $scope.users = data.users;
+            } );
         }
 
         _init();

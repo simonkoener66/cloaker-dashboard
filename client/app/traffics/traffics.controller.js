@@ -2,11 +2,13 @@
     'use strict';
 
     angular.module( 'app.traffics' )
-        .controller( 'TrafficsCtrl', ['$scope', '$state', '$filter', '$location', 'Traffics', TrafficsCtrl] )
+        .controller( 'TrafficsCtrl', ['$scope', '$state', '$filter', '$location', 'Traffics', 'Users', TrafficsCtrl] )
         .controller( 'TrafficsExportCtrl', ['$scope', 'Traffics', TrafficsExportCtrl] )
 
-    function TrafficsCtrl( $scope, $state, $filter, $location, Traffics ) {
+    function TrafficsCtrl( $scope, $state, $filter, $location, Traffics, Users ) {
 
+        $scope.admin = false;
+        $scope.users = [];
         $scope.traffics = [];
         $scope.orderCol = '';
         $scope.numPerPageOpt = [3, 5, 10, 20];
@@ -15,9 +17,12 @@
         $scope.total = 0;
         $scope.selected = [];
         $scope.headerCheckbox = false;
+        $scope.ownerFilter = '';
+        $scope.searchUpdating = false;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
+        $scope.ownerFilterChange = ownerFilterChange;
         $scope.order = order;
         $scope.toggleAllCheckboxes = toggleAllCheckboxes;
         $scope.selectedItemExists = selectedItemExists;
@@ -36,6 +41,11 @@
 
         function onNumPerPageChange() {
             $scope.select( 1 );
+        }
+
+        function ownerFilterChange() {
+            $scope.searchUpdating = true;
+            select(1);
         }
 
         function order(colName) {
@@ -95,11 +105,12 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            Traffics.getPage( page, $scope.numPerPage, $scope.orderCol, function( result ) {
+            Traffics.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.ownerFilter, function( result ) {
                 $scope.traffics = result.traffics;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
                 $scope.pages = ( result.pages ) ? result.pages : 0;
+                $scope.searchUpdating = false;
 
                 $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
             } );
@@ -107,6 +118,10 @@
 
         function _init() {
             refresh();
+            Users.get( function( data ) {
+                $scope.admin = data.admin;
+                $scope.users = data.users;
+            } );
         }
 
         _init();

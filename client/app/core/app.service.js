@@ -4,6 +4,7 @@
     angular.module('app')
     .service( 'Dialog', [ '$mdDialog', DialogService ] )
     .service( 'AuthenticationService', [ '$http', '$window', 'appConfig', 'Dialog', AuthenticationService ] )
+    .service( 'Users', [ '$http', '$window', 'appConfig', UsersService ] )
     .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
@@ -38,6 +39,29 @@
             }
         }
     }
+
+    function UsersService( $http, $window, appConfig ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.get = function( success, error ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/users' ) )
+            .then( function( response ) {
+                if( typeof success != 'undefined' ) {
+                    success( response.data );
+                }
+            } )
+            .catch( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error( response );
+                }
+            } );
+        }
+    }
     
     function LinksService( $http, $window, appConfig, AuthenticationService ) {
 
@@ -66,7 +90,7 @@
             } );
         }
 
-        this.getPage = function( page, limit, sort, keyword, callback ) {
+        this.getPage = function( page, limit, sort, keyword, ownerFilter, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             var apiPath = '/links/page';
             var data = {
@@ -78,6 +102,9 @@
             }
             if(keyword) {
                 data.keyword = keyword;
+            }
+            if(ownerFilter) {
+                data.ownerFilter = ownerFilter;
             }
             $http
             .post( apiUrl( apiPath ), data )
@@ -178,12 +205,15 @@
     		return appConfig.server + '/api' + path;
     	}
 
-    	this.getPage = function( page, limit, sort, callback ) {
+    	this.getPage = function( page, limit, sort, ownerFilter, callback ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             var apiPath = '/traffics/page/';
             apiPath += page + '/' + limit;
-            if( sort) {
+            if( sort ) {
                 apiPath += '/' + sort;
+            }
+            if( ownerFilter ) {
+                apiPath += ('?ownerFilter=' + ownerFilter.replace( ' ', '+' ) );
             }
     		$http
     		.get( apiUrl( apiPath ) )

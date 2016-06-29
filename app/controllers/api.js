@@ -148,18 +148,15 @@ var apiController = function( router ) {
 		});
 	}
 
-	function formOwnerQuery( query, owner ) {
-		var condition = {};
-		if(owner == 'Steven' || owner == 'Dennis') {
-			var condition1 = {}, condition2 = {};
-			condition1['owner'] = 'Steven';
-			condition2['owner'] = 'Dennis';
-			condition['$or'] = [condition1, condition2];
-		} else {
-			condition['owner'] = owner;
-		}
-		query['$and'] = [condition];
-		return query;
+	this.getUsers = function( req, res, next ) {
+		var users = [];
+		allowedEmails.forEach( function( user ) {
+			users.push( user.owner );
+		} );
+		res.json( {
+			admin: ( req.session.role == 'admin' ),
+			users: users
+		} );
 	}
 
 	this.getLinks = function( req, res, next ) {
@@ -181,7 +178,13 @@ var apiController = function( router ) {
 		query = formSearchQuery( keyword, 'description', query );
 		query = formSearchQuery( keyword, 'owner', query );
 		// owner
-		query = formOwnerQuery( query, req.session.owner );
+		if( req.session.role == 'admin' ) {
+			if(req.body.ownerFilter && !keyword) {
+				query = formSearchQuery( req.body.ownerFilter, 'owner', query );
+			}
+		} else {
+			query = formSearchQuery( req.session.owner, 'owner', query );
+		}
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
 			if( result ) {
@@ -423,7 +426,13 @@ var apiController = function( router ) {
 		var keyword = req.params.keyword;
 		var query = formSearchQuery( keyword, 'link_generated' );
 		// owner
-		query = formOwnerQuery( query, req.session.owner );
+		if( req.session.role == 'admin' ) {
+			if(req.query.ownerFilter && !keyword) {
+				query = formSearchQuery( req.query.ownerFilter, 'owner', query );
+			}
+		} else {
+			query = formSearchQuery( req.session.owner, 'owner', query );
+		}
 		// sort
 		var sortField = '-access_time';
 		if( req.params.sort ) {
