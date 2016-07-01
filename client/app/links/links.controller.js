@@ -140,7 +140,7 @@
 
         function _init() {
             refresh();
-            Users.get( function( data ) {
+            Users.getAll( function( data ) {
                 $scope.admin = data.admin;
                 $scope.users = data.users;
             } );

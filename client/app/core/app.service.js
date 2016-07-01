@@ -52,7 +52,7 @@
                 ( user.role != '' );
         }
 
-        this.get = function( success, error ) {
+        this.getAll = function( success, error ) {
             $http.defaults.headers.common.token = $window.sessionStorage.token;
             $http
             .get( apiUrl( '/users' ) )
@@ -65,6 +65,21 @@
                 if( typeof error != 'undefined' ) {
                     error( response );
                 }
+            } );
+        }
+
+        this.get = function( id, callback ) {
+            if( !id ) {
+                callback( { id: false } );
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/users/' + id ) )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
             } );
         }
 

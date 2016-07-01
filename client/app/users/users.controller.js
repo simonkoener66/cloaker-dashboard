@@ -71,7 +71,7 @@
                 'Yes, I\'m sure',
                 'No, I\'m not',
                 function() {
-                    User.delete( id, function() {
+                    Users.delete( id, function() {
                         refresh();
                     }, function() {
                         Dialog.showAlert( 
@@ -97,8 +97,8 @@
 
         $scope.user = {
             email: '',
-            owner: true,
-            role: ''
+            owner: '',
+            role: 'user'
         };
         $scope.title = 'Create New User';
         $scope.submitButtonTitle = 'Create';
