@@ -14,6 +14,7 @@ var Traffic = mongoose.model( 'Traffic' );
 var BlacklistedIP = mongoose.model( 'BlacklistedIP' );
 var Network = mongoose.model( 'Network' );
 var GeoBlacklist = mongoose.model( 'GeoBlacklist' );
+var User = mongoose.model( 'User' );
 
 var oauth2Client = new OAuth2Client(
 	config.googleClientID, 
@@ -29,11 +30,11 @@ function getToken(code) {
 	var deferred = q.defer();
 
 	oauth2Client.getToken( code, function( err, tokens ) {
-	if (err) {
-		deferred.reject(err);
-		return;
-	}
-	deferred.resolve(tokens);
+		if (err) {
+			deferred.reject(err);
+			return;
+		}
+		deferred.resolve(tokens);
   } );
 
   return deferred.promise;
@@ -57,7 +58,8 @@ var apiController = function( router ) {
 		{ email: 'xjunanguyen@gmail.com', owner: 'Juna Nguyen', role: 'user' },
 		{ email: 'abdulmalekali17@gmail.com', owner: 'Ali', role: 'user' },
 		{ email: 'caseylui511@gmail.com', owner: 'Casey', role: 'user' },
-		{ email: 'neil.bnfaw@gmail.com', owner: 'Neil', role: 'user' }
+		{ email: 'neil.bnfaw@gmail.com', owner: 'Neil', role: 'user' },
+		{ email: 'viccyran@gmail.com', owner: 'Viccyran', role: 'user' }
 	];
 
 	function generateToken() {
@@ -1032,6 +1034,126 @@ var apiController = function( router ) {
       res.json( rst );
     }
   }
+
+  this.getUsersByPage = function( req, res, next ) {
+    // only admins can access this api
+    if( req.session.role != 'admin' ) {
+      res.abort(404);
+    }
+    var page = req.query.page;
+    var pagesize = req.query.pagesize;
+    var params = { 
+      page: parseInt( page ), 
+      limit: parseInt( pagesize ),
+      sort: 'role'
+    };
+    if( req.query.sort ) {
+      params.sort = req.query.sort;
+    }
+    /* // Search not needed yet
+    var keyword = req.query.keyword;
+    var query = formSearchQuery( keyword, 'owner' );
+    */
+    User.find({}, function( err, users ) {
+    	if( users.length == 0 ) {
+    		allowedEmails.forEach( function(user) {
+    			User.create( user, function( err, doc ) {} );
+    		} );
+    	}
+    });
+    var query = {};
+    User.paginate( query, params, function( err, result ) {
+      var return_value = {};
+      if( result ) {
+        return_value.docs = result.docs;
+        return_value.total = result.total;
+        return_value.limit = result.limit;
+        return_value.page = result.page;
+        return_value.pages = result.pages;
+      } else {
+        return_value.docs = [];
+        return_value.total = 0;
+        return_value.limit = pagesize;
+        return_value.page = 1;
+        return_value.pages = 0;
+      }
+      res.json( return_value );
+    } );
+  }
+
+  this.getUser = function( req, res, next ) {
+    var id = req.params.id;
+    User.findById( id, function( err, user ) {
+      if( err ) {
+        console.log( err );
+        res.json( { id: false } );
+        return;
+      }
+      res.json( user );
+    });
+  };
+
+  this.deleteUser = function( req, res, next ) {
+    var rst = { result: false };
+    if( req.body._id ) {
+      User.findByIdAndRemove( req.body._id, function( err, user ) {
+        if( err ) {
+          console.log( err );
+          res.json( rst );
+          return;
+        }
+        rst.result = true;
+        res.json( rst );
+      } );
+    } else {
+      res.json( rst );
+    }
+  };
+
+  this.newOrUpdateUser = function( req, res, next ) {
+    var updated_user = {
+      email: req.body.email,
+      owner: req.body.owner,
+      role: req.body.role,
+    };
+    // Duplication check is added
+    dupCriteria = { 
+      email: updated_user.email,
+      owner: updated_user.owner
+    };
+    if (req.body._id) {
+      dupCriteria._id = { '$ne': req.body._id };
+    }
+    User.findOne(dupCriteria, function(err, doc) {
+      if(!err && doc) {
+        res.json( {
+          id: false,
+          duplicated: true
+        } );
+        return;
+      }
+      // Update or create
+      if( req.body._id ) {
+        User.findByIdAndUpdate( req.body._id, updated_user, function( err, user ) {
+          if( err ) {
+            console.log( err );
+            res.json( { id: false } );
+            return;
+          }
+          res.json( user );
+        } );
+      } else {
+        User.create( updated_user, function( err, user ) {
+          if( err ) {
+            console.log( err );
+            res.json( { id: false } );
+            return;
+          }
+          res.json( user );
+        } );
+      }
+    });
+  };
 
 }
 

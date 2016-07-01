@@ -4,7 +4,7 @@
     angular.module('app')
     .service( 'Dialog', [ '$mdDialog', DialogService ] )
     .service( 'AuthenticationService', [ '$http', '$window', 'appConfig', 'Dialog', AuthenticationService ] )
-    .service( 'Users', [ '$http', '$window', 'appConfig', UsersService ] )
+    .service( 'Users', [ '$http', '$window', 'appConfig', 'AuthenticationService', UsersService ] )
     .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
@@ -40,10 +40,16 @@
         }
     }
 
-    function UsersService( $http, $window, appConfig ) {
+    function UsersService( $http, $window, appConfig, AuthenticationService ) {
 
         function apiUrl( path ) {
             return appConfig.server + '/api' + path;
+        }
+
+        this.isValid = function( user ) {
+            return ( user.email != '' ) && 
+                ( user.owner != '' ) && 
+                ( user.role != '' );
         }
 
         this.get = function( success, error ) {
@@ -58,6 +64,76 @@
             .catch( function( response ) {
                 if( typeof error != 'undefined' ) {
                     error( response );
+                }
+            } );
+        }
+
+        this.getPage = function( page, limit, sort, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var apiPath = '/users/page';
+            var query = '?';
+            query += 'page=' + page;
+            query += '&pagesize=' + limit;
+            if(sort) {
+                query += '&sort=' + sort;
+            }
+            $http
+            .get( apiUrl( apiPath ) + query )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.newOrUpdate = function( user, success, error ) {
+          if( !this.isValid( user ) ) {
+            if( typeof error != 'undefined' ) {
+              error();
+            }
+            return;
+          }
+          $http.defaults.headers.common.token = $window.sessionStorage.token;
+          $http
+            .post( apiUrl( '/users' ), user )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success(response);
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error(response);
+                }
+            } );
+        }
+
+        this.delete = function( id, success, error ) {
+          if( !id ) {
+            if( typeof error != 'undefined' ) {
+              error();
+            }
+            return;
+          }
+          $http.defaults.headers.common.token = $window.sessionStorage.token;
+          $http
+            .post( 
+            apiUrl( '/users/delete' ),
+            { _id: id }
+          )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
                 }
             } );
         }

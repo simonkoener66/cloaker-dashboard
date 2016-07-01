@@ -78,6 +78,18 @@
                 {
                     url: 'geoblacklist/export',
                     template: 'geoblacklist/export'
+                },
+                {
+                    url: 'users/list',
+                    template: 'users/list'
+                },
+                {
+                    url: 'users/new',
+                    template: 'users/edit'
+                },
+                {
+                    url: 'users/:id/edit',
+                    template: 'users/edit'
                 }
             ];
             setRoutes = function(route) {

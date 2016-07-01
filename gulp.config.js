@@ -81,7 +81,9 @@ module.exports = function() {
             client + "/app/networks/networks.module.js",
             client + "/app/networks/networks.controller.js",
             client + "/app/geoblacklist/geoblacklist.module.js",
-            client + "/app/geoblacklist/geoblacklist.controller.js"
+            client + "/app/geoblacklist/geoblacklist.controller.js",
+            client + "/app/users/users.module.js",
+            client + "/app/users/users.controller.js"
         ],
         allToClean: [
             tmp,

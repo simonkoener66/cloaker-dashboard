@@ -11,6 +11,7 @@
         ,'app.ipblacklist'
         ,'app.networks'
         ,'app.geoblacklist'
+        ,'app.users'
         
         // 3rd party feature modules
         ,'ui.tree'
