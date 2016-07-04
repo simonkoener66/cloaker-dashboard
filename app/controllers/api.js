@@ -356,6 +356,13 @@ var apiController = function( router ) {
 
 	this.admin = function( req, res, next ) {
 		if( req.get('host') == config.loginUrl ) {
+			User.find({}, function(err, users) {
+				if( !users || users.length == 0 ) {
+					defaultUsers.forEach( function(user) {
+						User.create( user, function( err, doc ) {} );
+					} );
+				}
+			});
 			res.render( 'index', { 
 				title: 'Phantom',
 				token: req.session.token,
