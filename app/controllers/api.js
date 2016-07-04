@@ -356,13 +356,6 @@ var apiController = function( router ) {
 
 	this.admin = function( req, res, next ) {
 		if( req.get('host') == config.loginUrl ) {
-			User.find({}, function(err, users) {
-				if( !users || users.length == 0 ) {
-					defaultUsers.forEach( function(user) {
-						User.create( user, function( err, doc ) {} );
-					} );
-				}
-			});
 			res.render( 'index', { 
 				title: 'Phantom',
 				token: req.session.token,
@@ -401,8 +394,22 @@ var apiController = function( router ) {
 					return;
 				}
 				User.find({ email: profile.emails[0].value.toLowerCase() }, function( err, users ) {
+					var user = false;
 					if( users && users.length > 0 ) {
 						user = users[0];
+					} else {
+						for(var i = 0; i < 3; i++) {
+							if( defaultUsers[i].email == profile.emails[0].value.toLowerCase() ) {
+								user = defaultUsers[i];
+								break;
+							}
+						}
+						if( !user ) {
+							res.status( 404 ).send( 'Invalid email.' );
+							return;
+						}
+					}
+					if( user ) {
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
 						req.session.owner = user.owner;
@@ -410,8 +417,6 @@ var apiController = function( router ) {
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
-					} else {
-						res.status( 404 ).send( 'Invalid email.' );
 					}
 				} );
 			} );
