@@ -38,8 +38,8 @@
                 <li><a md-button aria-label="menu" href="#/geoblacklist/export">Export</a></li>
             </ul>
         </li>
-        <li>
-            <a md-button aria-label="menu" href="#/users"><i class="zmdi zmdi-directions"></i>Users</a>
+        <li ng-show="userRole == 'admin'">
+            <a md-button aria-label="menu" href="#/users"><i class="zmdi zmdi-accounts"></i>Users</a>
             <ul>
                 <li><a md-button aria-label="menu" href="#/users/list">All Users</a></li>
                 <li><a md-button aria-label="menu" href="#/users/new">New User</a></li>

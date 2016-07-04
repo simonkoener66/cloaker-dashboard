@@ -38,6 +38,7 @@ router.post( '/api/geoblacklist/delete',                  apiController.checkApi
 router.get(  '/api/users/page',                           apiController.checkApiAuth, apiController.getUsersByPage );
 router.get(  '/api/users/:id',                            apiController.checkApiAuth, apiController.getUser );
 router.post( '/api/users/delete',                         apiController.checkApiAuth, apiController.deleteUser );
+router.post( '/api/users/default',                        apiController.checkApiAuth, apiController.loadDefaultUsers );
 router.post( '/api/users',                                apiController.checkApiAuth, apiController.newOrUpdateUser );
 
 router.get(  '/admin/login',                              apiController.loginAdmin );

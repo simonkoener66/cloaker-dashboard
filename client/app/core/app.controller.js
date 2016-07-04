@@ -16,6 +16,7 @@
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
         $scope.color = appConfig.color;
+        $scope.userRole = authData.role;
 
         $scope.$watch('main', function(newVal, oldVal) {
             // if (newVal.menu !== oldVal.menu || newVal.layout !== oldVal.layout) {

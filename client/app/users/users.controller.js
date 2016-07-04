@@ -21,6 +21,7 @@
         $scope.gotoCreatePage = gotoCreatePage;
         $scope.editUser = editUser;
         $scope.deleteUser = deleteUser;
+        $scope.loadDefaultUsers = loadDefaultUsers;
 
         function select( page ) {
             refresh( page );
@@ -79,6 +80,30 @@
                             'Failed to Delete User',
                             'Request to delete user has failed. Please retry or contact administrator.',
                             'Failed to Delete User',
+                            'OK'
+                        );
+                    } );
+                }
+            );
+        }
+
+        function loadDefaultUsers( ev ) {
+            Dialog.showConfirm(
+                ev,
+                'Confirm to Reset to Defaults',
+                'Are you sure to reset and load default users?',
+                'Confirm to Reset to Defaults',
+                'Yes, I\'m sure',
+                'No, I\'m not',
+                function() {
+                    Users.loadDefaults( function() {
+                        refresh();
+                    }, function() {
+                        Dialog.showAlert( 
+                            ev,
+                            'Failed to Reset to Defaults',
+                            'Request to reset to defaults has failed. Please retry or contact administrator.',
+                            'Failed to Reset to Defaults',
                             'OK'
                         );
                     } );

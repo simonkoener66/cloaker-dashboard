@@ -10,8 +10,10 @@
 	        <div class="panel-body">
 		        <div class="table-filters">
 	            <div class="row">
-		            <div class="col-sm-6 col-xs-12 text-left">
+		            <div class="col-sm-12 col-xs-12 text-left">
 		            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="gotoCreatePage()">Create New User</md-button>
+		            	&nbsp;
+		            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="loadDefaultUsers()">Reset to Default Users</md-button>
 		            </div>
 	            </div>
 		        </div>
@@ -60,7 +62,17 @@
 				                <td>{{user.owner}}</td>
 				                <td>{{user.role}}</td>
 				                <td class='buttons text-center'>
-				                	<md-button class="md-icon-button md-warn" aria-label="Delete User" data-ng-click="deleteUser($event, user._id)" tooltip-placement="top" uib-tooltip="Delete" tooltip-append-to-body="true"><span class="fa fa-remove"></span></md-button>
+				                	<md-button 
+				                			class="md-icon-button md-warn" 
+				                			aria-label="Delete User" 
+				                			data-ng-click="deleteUser($event, user._id)" 
+				                			tooltip-placement="top" 
+				                			uib-tooltip="Delete" 
+				                			tooltip-append-to-body="true"
+				                			ng-disabled="user.owner == 'Steven' || user.owner == 'Dennis'"
+				                			>
+				                			<span class="fa fa-remove"></span>
+			                		</md-button>
 				                </td>
 				            </tr>
 			            </tbody>

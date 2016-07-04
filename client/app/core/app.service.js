@@ -152,6 +152,26 @@
                 }
             } );
         }
+
+        this.loadDefaults = function( success, error ) {
+          $http.defaults.headers.common.token = $window.sessionStorage.token;
+          $http
+            .post( 
+            apiUrl( '/users/default' )
+          )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
+        }
     }
     
     function LinksService( $http, $window, appConfig, AuthenticationService ) {

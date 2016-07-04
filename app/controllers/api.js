@@ -49,7 +49,7 @@ var apiController = function( router ) {
 			'https://www.googleapis.com/auth/userinfo.email'
 		]
 	} );
-	var allowedEmails = [
+	var defaultUsers = [
 		{ email: 'themeparadise06@gmail.com', owner: 'Simon', role: 'admin' },
 		{ email: 'stevenngobui@gmail.com', owner: 'Steven', role: 'admin' },
 		{ email: 'dho8461@gmail.com', owner: 'Dennis', role: 'admin' },
@@ -151,13 +151,15 @@ var apiController = function( router ) {
 	}
 
 	this.getUsers = function( req, res, next ) {
-		var users = [];
-		allowedEmails.forEach( function( user ) {
-			users.push( user.owner );
-		} );
-		res.json( {
-			admin: ( req.session.role == 'admin' ),
-			users: users
+		User.find({}, function( err, docs ) {
+			var users = [];
+			docs.forEach( function ( user ) {
+				users.push( user.owner );
+			} );
+			res.json( {
+				admin: ( req.session.role == 'admin' ),
+				users: users
+			} );
 		} );
 	}
 
@@ -358,7 +360,8 @@ var apiController = function( router ) {
 				title: 'Phantom',
 				token: req.session.token,
 				email: req.session.email,
-				owner: req.session.owner
+				owner: req.session.owner,
+				role: req.session.role
 			} );
 		} else {
 			res.redirect( 'https://www.google.com' );
@@ -390,24 +393,20 @@ var apiController = function( router ) {
 					res.redirect( '/admin/login' );
 					return;
 				}
-				var allowed = false;
-				allowedEmails.every( function( record ) {
-					if( record.email.toLowerCase() == profile.emails[0].value.toLowerCase() ) {
-						allowed = true;
+				User.find({ email: profile.emails[0].value.toLowerCase() }, function( err, users ) {
+					if( users && users.length > 0 ) {
+						user = users[0];
 						req.session.token = generateToken();
 						req.session.email = profile.emails[0].value;
-						req.session.owner = record.owner;
-						req.session.role = record.role;
+						req.session.owner = user.owner;
+						req.session.role = user.role;
 						setTimeout( function() {
 							res.redirect( '/admin' );
 						}, 100 );
-						return false;
+					} else {
+						res.status( 404 ).send( 'Invalid email.' );
 					}
-					return true;
 				} );
-				if( !allowed ) {
-					res.status( 404 ).send( 'Invalid credential.' );
-				}
 			} );
 		}, function(err) {
 			res.send( err );
@@ -578,6 +577,7 @@ var apiController = function( router ) {
 	this.importBlacklist = function( req, res, next ) {
 		if( !req.session.token ) {
 			res.status( 404 ).json( { message: 'API access unauthorized' } );
+			return;
 		}
 		var form = new multiparty.Form();
 		var data = '';
@@ -896,6 +896,7 @@ var apiController = function( router ) {
   this.importGeoBlacklist = function( req, res, next ) {
     if( !req.session.token ) {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
+      return;
     }
     var form = new multiparty.Form();
     var data = '';
@@ -1038,7 +1039,8 @@ var apiController = function( router ) {
   this.getUsersByPage = function( req, res, next ) {
     // only admins can access this api
     if( req.session.role != 'admin' ) {
-      res.abort(404);
+      res.status( 404 ).send( 'Invalid request.' );
+      return;
     }
     var page = req.query.page;
     var pagesize = req.query.pagesize;
@@ -1054,13 +1056,6 @@ var apiController = function( router ) {
     var keyword = req.query.keyword;
     var query = formSearchQuery( keyword, 'owner' );
     */
-    User.find({}, function( err, users ) {
-    	if( users.length == 0 ) {
-    		allowedEmails.forEach( function(user) {
-    			User.create( user, function( err, doc ) {} );
-    		} );
-    	}
-    });
     var query = {};
     User.paginate( query, params, function( err, result ) {
       var return_value = {};
@@ -1082,6 +1077,11 @@ var apiController = function( router ) {
   }
 
   this.getUser = function( req, res, next ) {
+  	// only admins can access this api
+    if( req.session.role != 'admin' ) {
+      res.status( 404 ).send( 'Invalid request.' );
+      return;
+    }
     var id = req.params.id;
     User.findById( id, function( err, user ) {
       if( err ) {
@@ -1094,6 +1094,11 @@ var apiController = function( router ) {
   };
 
   this.deleteUser = function( req, res, next ) {
+  	// only admins can access this api
+    if( req.session.role != 'admin' ) {
+      res.status( 404 ).send( 'Invalid request.' );
+      return;
+    }
     var rst = { result: false };
     if( req.body._id ) {
       User.findByIdAndRemove( req.body._id, function( err, user ) {
@@ -1111,8 +1116,13 @@ var apiController = function( router ) {
   };
 
   this.newOrUpdateUser = function( req, res, next ) {
+  	// only admins can access this api
+    if( req.session.role != 'admin' ) {
+      res.status( 404 ).send( 'Invalid request.' );
+      return;
+    }
     var updated_user = {
-      email: req.body.email,
+      email: req.body.email.toLowerCase(),
       owner: req.body.owner,
       role: req.body.role,
     };
@@ -1154,6 +1164,19 @@ var apiController = function( router ) {
       }
     });
   };
+
+  this.loadDefaultUsers = function( req, res, next ) {
+  	// only admins can access this api
+    if( req.session.role != 'admin' ) {
+      res.status( 404 ).send( 'Invalid request.' );
+      return;
+    }
+    User.remove().exec();
+    defaultUsers.forEach( function(user) {
+			User.create( user, function( err, doc ) {} );
+		} );
+   	res.json({ result: true });
+  }
 
 }
 
