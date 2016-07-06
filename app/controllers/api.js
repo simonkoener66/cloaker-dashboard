@@ -186,7 +186,7 @@ var apiController = function( router ) {
 				query = formSearchQuery( req.body.ownerFilter, 'owner', query );
 			}
 		} else {
-			query['$and'] = { owner: req.session.owner };
+			query['$and'] = [ { owner: req.session.owner } ];
 		}
 		Link.paginate( query, params, function( err, result ) {
 			var return_value = {};
@@ -443,7 +443,7 @@ var apiController = function( router ) {
 				query = formSearchQuery( req.query.ownerFilter, 'owner', query );
 			}
 		} else {
-			query['$and'] = { owner: req.session.owner };
+			query['$and'] = [ { owner: req.session.owner } ];
 		}
 		// sort
 		var sortField = '-access_time';
