@@ -474,7 +474,13 @@ var apiController = function( router ) {
       // from/to date query
       var query = formFromToQuery( req.params.from, req.params.to );
       // owner
-      query = formOwnerQuery( query, req.session.owner );
+      if( req.session.role == 'admin' ) {
+      	if(req.query.ownerFilter && !keyword) {
+            query = formSearchQuery( req.query.ownerFilter, 'owner', query );
+        }
+      } else {
+        query['$and'] = [ { owner: req.session.owner } ];
+      }
       var page = 1, pagesize = 1000, data = '';
       // Sendout file header and column header first
       res.setHeader( 'Content-disposition', 'attachment; filename=traffics.csv' );
