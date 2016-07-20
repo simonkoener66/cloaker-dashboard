@@ -1,0 +1,121 @@
+<div class="page page-table" data-ng-controller="IPBlacklistListCtrl">
+
+    <div class="row ui-section">
+    <div class="col-lg-8 clearfix">
+        <h2 class="section-header">Manage IP Blacklist</h2>
+    </div>
+    <div class="col-md-12">
+        <section class="panel panel-default table-dynamic cl-panel-loading">
+
+        	<div class="panel-body">
+		        <div class="table-filters">
+	            <div class="row">
+		            <div class="col-sm-4 col-xs-12">
+		            	<md-button class="md-raised btn-w-lg md-primary" data-ng-click="gotoCreatePage()">Add IP to Blacklist</md-button>
+		            </div>
+	            </div>
+	            <div class='divider divider-md'></div>
+	            <div class="row">
+		            <div class="col-md-4 col-xs-10">
+	                <input type="text"
+	                     placeholder="Search..."
+	                     class="form-control"
+	                     data-ng-model="searchKeyword"
+	                     data-ng-model-options='{ debounce: 1000 }'
+	                     data-ng-change="searchKeywordChange()">
+		            </div>
+		            <div class="col-md-4 col-xs-2">
+                  <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="40" ng-show='searchUpdating'></md-progress-circular>
+	              </div>
+            	</div>
+		        </div>
+
+		        <div class="table-responsive">
+			        <table class="table table-hover cl-table-with-buttons">
+			            <thead>
+				            <tr>
+				                <th><div class="th">
+				                IP Address
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('ip') "
+				                    data-ng-class="{active: row == 'ip'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-ip') "
+				                    data-ng-class="{active: row == '-ip'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Description
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('description') "
+				                    data-ng-class="{active: row == 'description'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-description') "
+				                    data-ng-class="{active: row == '-description'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Network
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('network') "
+				                    data-ng-class="{active: row == 'network'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-network') "
+				                    data-ng-class="{active: row == '-network'}"></span>
+				                </div></th>
+				                <th><div class="th">
+				                Location
+				                <span class="fa fa-angle-up"
+				                    data-ng-click=" order('location') "
+				                    data-ng-class="{active: row == 'location'}"></span>
+				                <span class="fa fa-angle-down"
+				                    data-ng-click=" order('-location') "
+				                    data-ng-class="{active: row == '-location'}"></span>
+				                </div></th>
+				                <th></th>
+				            </tr>
+			            </thead>
+			            <tbody>
+				            <tr data-ng-repeat="ip in ips" data-ng-click="editIP(ip._id)">
+				                <td>{{ip.ip}}</td>
+				                <td>{{ip.description}}</td>
+				                <td>{{ip.network}}</td>
+				                <td>{{ip.location}}</td>
+				                <td class='buttons text-center'>
+				                	<md-button class="md-icon-button md-warn" aria-label="Delete IP" data-ng-click="deleteIP($event, ip._id)"><span class="fa fa-remove"></span></md-button>
+				                </td>
+				            </tr>
+			            </tbody>
+			        </table>
+			    </div>
+			</div>
+
+	        <footer class="table-footer">
+	            <div class="row">
+	            <div class="col-md-6 page-num-info">
+	                <span>
+	                Show 
+	                <select data-ng-model="numPerPage"
+	                    data-ng-options="num for num in numPerPageOpt"
+	                    data-ng-change="onNumPerPageChange()">
+	                </select> 
+	                entries per page
+	                </span>
+	            </div>
+	            <div class="col-md-6 text-right pagination-container">
+	                <uib-pagination class="pagination-sm"
+	                    ng-model="currentPage"
+	                    total-items="total"
+	                    max-size="4"
+	                    ng-change="select(currentPage)"
+	                    items-per-page="numPerPage"
+	                    rotate="false"
+	                    previous-text="&lsaquo;" next-text="&rsaquo;"
+	                    boundary-links="true"></uib-pagination>
+	            </div>
+	            </div>
+	        </footer>
+
+        </section>
+    </div>
+    </div>
+    
+</div>
