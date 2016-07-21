@@ -87,7 +87,12 @@ app.use(function(err, req, res, next) {
 });
 
 console.log('App will listen at port ' + port);
-var server = app.listen( port ); // Normal
-//var server = app.listen( port, '127.0.0.1' ); // Local dev env
+if (process.env.ENVIRONMENT == 'development') {
+  console.log('dev environment');
+  var server = app.listen( port, '127.0.0.1' );
+} else {
+  console.log('prod environment');
+  var server = app.listen( port );
+}
 
 module.exports = app;
