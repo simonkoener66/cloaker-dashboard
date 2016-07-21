@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-	port: process.env.PORT,
+	port: process.env.APP_PORT,
 	loginUrl: process.env.LOGINURL,
 	googleClientID: process.env.GOOGLE_CLIENT_ID,
 	googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
