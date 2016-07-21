@@ -9,6 +9,8 @@ var moment = require('moment-timezone');
 
 var helpers = require( './helpers' );
 
+var oauth2Client = helpers.oauth2Client;
+
 var mongoose = require('mongoose');
 var User = mongoose.model( 'User' );
 
@@ -81,6 +83,7 @@ var adminController = function( router ) {
         } );
       } );
     }, function(err) {
+      res.send( 'Failed to get token' );
       res.send( err );
     } );
   }

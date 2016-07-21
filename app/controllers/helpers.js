@@ -16,11 +16,6 @@ var Network = mongoose.model( 'Network' );
 var GeoBlacklist = mongoose.model( 'GeoBlacklist' );
 var User = mongoose.model( 'User' );
 
-var oauth2Client = new OAuth2Client(
-	config.googleClientID, 
-	config.googleClientSecret, 
-	config.googleLoginRedirectUrl
-);
 var q = require('q');
 
 
@@ -52,6 +47,13 @@ function dateFromMmddyyyy( mdy, endtime ) {
 /**
  * Exported functions and variables
  */
+var oauth2Client = new OAuth2Client(
+	config.googleClientID, 
+	config.googleClientSecret, 
+	config.googleLoginRedirectUrl
+);
+
+module.exports.oauth2Client = oauth2Client;
 
 module.exports.googleAuthUrl = oauth2Client.generateAuthUrl( {
 	access_type: 'offline',
