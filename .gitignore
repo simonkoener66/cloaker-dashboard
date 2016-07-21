@@ -36,6 +36,6 @@ admin_template
 
 .idea
 .tmp
+.env
 
-config/config.js
-public
+/public
