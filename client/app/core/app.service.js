@@ -5,6 +5,7 @@
     .service( 'Dialog', [ '$mdDialog', DialogService ] )
     .service( 'AuthenticationService', [ '$http', '$window', 'appConfig', 'Dialog', AuthenticationService ] )
     .service( 'Users', [ '$http', '$window', 'appConfig', 'AuthenticationService', UsersService ] )
+    .service( 'Tags', [ '$http', '$window', 'appConfig', 'AuthenticationService', TagsService ] )
     .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
@@ -305,6 +306,30 @@
             .error( function( response ) {
                 if( typeof error != 'undefined' ) {
                     error();
+                }
+            } );
+        }
+
+    }
+
+    function TagsService( $http, $window, appConfig, AuthenticationService ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.getAll = function( callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/tags' ) )
+            .then( function( response ) {
+                if( typeof callback != 'undefined' ) {
+                    callback( response.data );
+                }
+            } )
+            .catch( function( response ) {
+                if( typeof callback != 'undefined' ) {
+                    callback( [] );
                 }
             } );
         }

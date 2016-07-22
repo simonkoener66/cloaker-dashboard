@@ -3,6 +3,7 @@ var router = express.Router();
 
 var helpers = require( '../app/controllers/helpers' );
 var linksController = require( '../app/controllers/links' );
+var tagsController = require( '../app/controllers/tags' );
 var trafficsController = require( '../app/controllers/traffics' );
 var adminController = require( '../app/controllers/admin' );
 var ipBlacklistController = require( '../app/controllers/ipblacklist' );
@@ -23,6 +24,8 @@ router.get(  '/api/links/:id',                            helpers.checkApiAuth, 
 router.post( '/api/links/toggle',                         helpers.checkApiAuth, linksController.toggleLink );
 router.post( '/api/links/delete',                         helpers.checkApiAuth, linksController.deleteLink );
 router.post( '/api/links',                                helpers.checkApiAuth, linksController.newOrUpdateLink );
+
+router.get(  '/api/tags/',                                helpers.checkApiAuth, tagsController.getTags );
 
 router.get(  '/api/traffics/export/:from/:to',            trafficsController.exportTraffics );
 router.get(  '/api/traffics/page/:page/:pagesize',        helpers.checkApiAuth, trafficsController.getTraffics );

@@ -3,7 +3,7 @@
 
     angular.module( 'app.links' )
         .controller( 'LinksCtrl', ['$scope', '$state', '$window', '$filter', '$location', '$mdDialog', 'Links', 'Users', 'Dialog', LinksCtrl] )
-        .controller( 'EditLinkCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'Links', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
+        .controller( 'EditLinkCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'Links', 'Tags', 'Dialog', 'GeolocationCodes', EditLinkCtrl] )
 
     function LinksCtrl( $scope, $state, $window, $filter, $location, $mdDialog, Links, Users, Dialog ) {
 
@@ -149,7 +149,7 @@
         _init();
     }
 
-    function EditLinkCtrl( $scope, $state, $location, $mdDialog, $stateParams, Links, Dialog, GeolocationCodes ) {
+    function EditLinkCtrl( $scope, $state, $location, $mdDialog, $stateParams, Links, Tags, Dialog, GeolocationCodes ) {
 
         var empty_regions = [ [ { code: '', longname: 'All Regions' } ] ];
 
@@ -343,7 +343,10 @@
                     $scope.title = 'Duplicate Link';
                 }
                 updateAllRegions();
-                $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
+                Tags.getAll( function( tags ) {
+                    $scope.allTags = tags;
+                    $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
+                } );
             }
         }
 
