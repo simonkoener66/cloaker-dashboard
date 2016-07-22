@@ -1,13 +1,13 @@
 (function () {
     'use strict';
 
-    angular.module( 'app.ipblacklist' )
-        .controller( 'IPBlacklistListCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'IPBlacklist', 'Dialog', IPBlacklistListCtrl] )
-        .controller( 'IPBlacklistEditCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'IPBlacklist', 'Networks', 'Dialog', IPBlacklistEditCtrl] )
-        .controller( 'IPBlacklistImportCtrl', ['$scope', '$timeout', 'appConfig', 'IPBlacklist', 'Upload', IPBlacklistImportCtrl] )
-        .controller( 'IPBlacklistExportCtrl', ['$scope', '$window', 'IPBlacklist', IPBlacklistExportCtrl] )
+    angular.module( 'app.ipwhitelist' )
+        .controller( 'IPWhitelistListCtrl', ['$scope', '$filter', '$location', '$mdDialog', 'IPWhitelist', 'Dialog', IPWhitelistListCtrl] )
+        .controller( 'IPWhitelistEditCtrl', ['$scope', '$state', '$location', '$mdDialog', '$stateParams', 'IPWhitelist', 'Networks', 'Dialog', IPWhitelistEditCtrl] )
+        .controller( 'IPWhitelistImportCtrl', ['$scope', '$timeout', 'appConfig', 'IPWhitelist', 'Upload', IPWhitelistImportCtrl] )
+        .controller( 'IPWhitelistExportCtrl', ['$scope', '$window', 'IPWhitelist', IPWhitelistExportCtrl] )
 
-    function IPBlacklistListCtrl( $scope, $filter, $location, $mdDialog, IPBlacklist, Dialog ) {
+    function IPWhitelistListCtrl( $scope, $filter, $location, $mdDialog, IPWhitelist, Dialog ) {
 
         $scope.ips = [];
         $scope.orderCol = '';
@@ -49,11 +49,11 @@
         }
 
         function gotoCreatePage() {
-            $location.path( '/ipblacklist/new' );
+            $location.path( '/ipwhitelist/new' );
         }
 
         function editIP( id ) {
-            $location.path( '/ipblacklist/' + id + '/edit' );
+            $location.path( '/ipwhitelist/' + id + '/edit' );
         }
 
         function deleteIP( ev, id ) {
@@ -62,18 +62,18 @@
             Dialog.showConfirm(
                 ev,
                 'Confirm to Remove IP',
-                'Are you sure to remove this IP from blacklist?',
+                'Are you sure to remove this IP from whitelist?',
                 'Confirm to Remove IP',
                 'Yes, I\'m sure',
                 'No, I\'m not',
                 function() {
-                    IPBlacklist.delete( id, function() {
+                    IPWhitelist.delete( id, function() {
                         refresh();
                     }, function() {
                         Dialog.showAlert( 
                             ev,
                             'Failed to Remove IP',
-                            'Request to remove IP from blacklist has failed. Please retry or contact administrator.',
+                            'Request to remove IP from whitelist has failed. Please retry or contact administrator.',
                             'Failed to Remove IP',
                             'OK'
                         );
@@ -86,7 +86,7 @@
             if( !page ) {
                 page = $scope.currentPage;
             }
-            IPBlacklist.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
+            IPWhitelist.getPage( page, $scope.numPerPage, $scope.orderCol, $scope.searchKeyword, function( result ) {
                 $scope.ips = result.ips;
                 $scope.currentPage = ( result.page ) ? result.page : 1;
                 $scope.total = ( result.total ) ? result.total : 0;
@@ -103,9 +103,9 @@
         _init();
     }
 
-    function IPBlacklistEditCtrl( $scope, $state, $location, $mdDialog, $stateParams, IPBlacklist, Networks, Dialog ) {
+    function IPWhitelistEditCtrl( $scope, $state, $location, $mdDialog, $stateParams, IPWhitelist, Networks, Dialog ) {
 
-        $scope.title = 'Add an IP Address to Blacklist';
+        $scope.title = 'Add an IP Address to Whitelist';
         $scope.submitButtonTitle = 'Create';
         $scope.networks = [''];
         $scope.ip = {};
@@ -125,7 +125,7 @@
         function submit( ev ) {
             ev.stopPropagation();
             ev.preventDefault();
-            if( !IPBlacklist.isValid( $scope.ip ) ) {
+            if( !IPWhitelist.isValid( $scope.ip ) ) {
                 Dialog.showAlert(
                     ev,
                     'Invalid Parameters',
@@ -134,32 +134,32 @@
                     'OK' );
                 return;
             }
-            IPBlacklist.newOrUpdate( $scope.ip, function(response) {
+            IPWhitelist.newOrUpdate( $scope.ip, function(response) {
                 if(response.result) {
                     if(response.duplicated) {
                         Dialog.showAlert( 
                             ev,
                             'Duplicated Link',
-                            'One or more of entered IPs already exist in blacklist, and are not added.',
+                            'One or more of entered IPs already exist in whitelist, and are not added.',
                             false,
                             'OK'
                         );
                     }
-                    $location.path( '/ipblacklist/list' );
+                    $location.path( '/ipwhitelist/list' );
                 } else {
                     if(response.duplicated) {
                         Dialog.showAlert( 
                             ev,
                             'Duplicated IP(s)',
-                            'Duplicated IP(s): such IP(s) already exist in blacklist.',
+                            'Duplicated IP(s): such IP(s) already exist in whitelist.',
                             false,
                             'OK'
                         );
                     } else {
                         Dialog.showAlert( 
                             ev,
-                            'Failed to Update Blacklisted IP',
-                            'Request to update blacklisted IP has failed. Please retry or contact administrator.',
+                            'Failed to Update Whitelisted IP',
+                            'Request to update whitelisted IP has failed. Please retry or contact administrator.',
                             false,
                             'OK'
                         );
@@ -169,16 +169,16 @@
                 if( $scope.ip._id ) {
                     Dialog.showAlert( 
                         ev,
-                        'Failed to Update Blacklisted IP',
-                        'Request to update blacklisted IP has failed. Please retry or contact administrator.',
+                        'Failed to Update Whitelisted IP',
+                        'Request to update whitelisted IP has failed. Please retry or contact administrator.',
                         false,
                         'OK'
                     );
                 } else {
                     Dialog.showAlert( 
                         ev,
-                        'Failed to Add IP to Blacklist',
-                        'Request to add an IP to blacklist has failed. Please retry or contact administrator.',
+                        'Failed to Add IP to Whitelist',
+                        'Request to add an IP to whitelist has failed. Please retry or contact administrator.',
                         false,
                         'OK'
                     );
@@ -187,15 +187,15 @@
         }
 
         function goBack() {
-            $location.path( '/ipblacklist/list' );
+            $location.path( '/ipwhitelist/list' );
         }
 
         function _init() {
             if( $stateParams.id ) {
-                $scope.title = 'Edit Blacklisted IP';
+                $scope.title = 'Edit Whitelisted IP';
                 $scope.submitButtonTitle = 'Update';
-                IPBlacklist.get( $stateParams.id, function( data ) {
-                    $scope.ip = data.blacklisted;
+                IPWhitelist.get( $stateParams.id, function( data ) {
+                    $scope.ip = data.whitelisted;
                     $scope.networks = $scope.networks.concat(data.networks);
                     $( '.cl-panel-loading' ).removeClass( 'cl-panel-loading' );
                 } );
@@ -215,7 +215,7 @@
         _init();
     }
 
-    function IPBlacklistImportCtrl( $scope, $timeout, appConfig, IPBlacklist, Upload ) {
+    function IPWhitelistImportCtrl( $scope, $timeout, appConfig, IPWhitelist, Upload ) {
 
         var input = document.getElementById( 'fileinput' );
         $scope.filename = '';
@@ -233,7 +233,7 @@
             $scope.started = true;
 
             file.upload = Upload.upload( {
-                url: appConfig.server + '/api/ipblacklist/import',
+                url: appConfig.server + '/api/ipwhitelist/import',
                 data: { file: file }
             } );
 
@@ -272,10 +272,10 @@
         _init();
     }
 
-    function IPBlacklistExportCtrl( $scope, $window, IPBlacklist ) {
+    function IPWhitelistExportCtrl( $scope, $window, IPWhitelist ) {
 
         $scope.exportCSV = function() {
-            IPBlacklist.exportCSV();
+            IPWhitelist.exportCSV();
         }
     }
 

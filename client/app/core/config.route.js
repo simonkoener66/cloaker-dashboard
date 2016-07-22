@@ -48,6 +48,26 @@
                     template: 'ipblacklist/export'
                 },
                 {
+                    url: 'ipwhitelist/list',
+                    template: 'ipwhitelist/list'
+                },
+                {
+                    url: 'ipwhitelist/new',
+                    template: 'ipwhitelist/edit'
+                },
+                {
+                    url: 'ipwhitelist/:id/edit',
+                    template: 'ipwhitelist/edit'
+                },
+                {
+                    url: 'ipwhitelist/import',
+                    template: 'ipwhitelist/import'
+                },
+                {
+                    url: 'ipwhitelist/export',
+                    template: 'ipwhitelist/export'
+                },
+                {
                     url: 'networks/list',
                     template: 'networks/list'
                 },

@@ -8,6 +8,7 @@
     .service( 'Links', [ '$http', '$window', 'appConfig', 'AuthenticationService', LinksService ] )
     .service( 'Traffics', [ '$http', '$window', 'appConfig', 'AuthenticationService', TrafficsService ] )
     .service( 'IPBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPBlacklistService ] )
+    .service( 'IPWhitelist', [ '$http', '$window', 'appConfig', 'AuthenticationService', IPWhitelistService ] )
     .service( 'Networks', [ '$http', '$window', 'appConfig', 'AuthenticationService', NetworksService ] )
     .service( 'GeoBlacklist', [ '$http', '$window', 'appConfig', 'AuthenticationService', GeolocationBlacklistService ] )
 
@@ -440,6 +441,108 @@
 
         this.exportCSV = function() {
             $window.location.href = apiUrl( '/ipblacklist/export' );
+        }
+    }
+
+    function IPWhitelistService( $http, $window, appConfig, AuthenticationService ) {
+
+        function apiUrl( path ) {
+            return appConfig.server + '/api' + path;
+        }
+
+        this.isValid = function( ip ) {
+            return ( ip.ip != '' ) && ( ip.description != '' );
+        }
+
+        this.getPage = function( page, limit, sort, keyword, callback ) {
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            var data = {
+                page: page,
+                pagesize: limit
+            };
+            if(sort) {
+                data.sort = sort;
+            }
+            if(keyword) {
+                data.keyword = keyword;
+            }
+            $http
+            .post( apiUrl( '/ipwhitelist/page' ), data )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.get = function( id, callback ) {
+            if( !id ) {
+                callback( { id: false } );
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .get( apiUrl( '/ipwhitelist/' + id ) )
+            .then( function( response ) {
+                callback( response.data );
+            } )
+            .catch( function( response ) {
+                AuthenticationService.checkAuth( response );
+            } );
+        }
+
+        this.newOrUpdate = function( ip, success, error ) {
+            if( !this.isValid( ip ) ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http
+            .post( apiUrl( '/ipwhitelist' ), ip )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success(response);
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error(response);
+                }
+            } );
+        }
+
+        this.delete = function( id, success, error ) {
+            if( !id ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+                return;
+            }
+            $http.defaults.headers.common.token = $window.sessionStorage.token;
+            $http.post( 
+                apiUrl( '/ipwhitelist/delete' ),
+                { _id: id }
+            )
+            .success( function( response ) {
+                if( AuthenticationService.checkAuth( response ) ) {
+                    if( typeof success != 'undefined' ) {
+                        success();
+                    }
+                }
+            } )
+            .error( function( response ) {
+                if( typeof error != 'undefined' ) {
+                    error();
+                }
+            } );
+        }
+
+        this.exportCSV = function() {
+            $window.location.href = apiUrl( '/ipwhitelist/export' );
         }
     }
 

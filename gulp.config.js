@@ -78,6 +78,8 @@ module.exports = function() {
             client + "/app/traffics/traffics.controller.js",
             client + "/app/ipblacklist/ipblacklist.module.js",
             client + "/app/ipblacklist/ipblacklist.controller.js",
+            client + "/app/ipwhitelist/ipwhitelist.module.js",
+            client + "/app/ipwhitelist/ipwhitelist.controller.js",
             client + "/app/networks/networks.module.js",
             client + "/app/networks/networks.controller.js",
             client + "/app/geoblacklist/geoblacklist.module.js",

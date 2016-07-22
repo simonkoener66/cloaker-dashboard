@@ -5,6 +5,7 @@ var q = require('q');
 var Link = mongoose.model( 'Link' );
 var Traffic = mongoose.model( 'Traffic' );
 var Blacklist = mongoose.model( 'BlacklistedIP' );
+var Whitelist = mongoose.model( 'WhitelistedIP' );
 var GeoBlacklist = mongoose.model( 'GeoBlacklist' );
 
 var urlFilterController = function( router ) {
@@ -138,98 +139,108 @@ var urlFilterController = function( router ) {
                 }
 				var geo = geoip.lookup( ip );
 				var geolocation = '(Unavailable)';
-
-				// Geolocation filter
-                if(!link.criteria || link.criteria.length == 0) {
-                    use_real_link = true;
-                } else {
-    				var country;
-    				if( geo ) {
-    					country = getCountry( geo.country );
-    				}
-    				if( geo && country ) {
-    					geolocation = '';
-    					if( geo.city ) {
-    						geolocation += geo.city + ', ';
-    					}
-    					if( geo.region ) {
-    						var region_num = parseInt( geo.region );
-    						if( region_num < country.regions.length ) {
-    							geolocation += country.regions[region_num].longname + ', ';
-    						}
-    					}
-    					geolocation += country.longname;
-                        geo.city = geo.city.toLowerCase();
-                        geo.region = geo.region.toLowerCase();
-                        geo.country = geo.country.toLowerCase();
-    					link.criteria.every( function( criterion ) {
-    						if( ( criterion.city && criterion.city.toLowerCase() != geo.city )
-    							|| ( criterion.region && criterion.region.toLowerCase() != geo.region )
-    							|| ( criterion.country && criterion.country.toLowerCase() != geo.country ) ) {
-    							return true;
-    						}
-    						use_real_link = true;
-                            return false;
-    					} );
-                        link.criteria_disallow.every( function( criterion ) {
-                            if( ( !criterion.city || criterion.city.toLowerCase() == geo.city )
-                                && ( !criterion.region || criterion.region.toLowerCase() == geo.region )
-                                && ( criterion.country && criterion.country.toLowerCase() == geo.country ) ) {
-                                use_real_link = false;
-                                return false;
-                            }
-                            return true;
-                        } );
-    				}
+                var country;
+                if( geo ) {
+                    country = getCountry( geo.country );
+                }
+                if( geo && country ) {
+                    geolocation = '';
+                    if( geo.city ) {
+                        geolocation += geo.city + ', ';
+                    }
+                    if( geo.region ) {
+                        var region_num = parseInt( geo.region );
+                        if( region_num < country.regions.length ) {
+                            geolocation += country.regions[region_num].longname + ', ';
+                        }
+                    }
+                    geolocation += country.longname;
                 }
 
-				// Blacklisted IP filter
-				if( use_real_link && link.use_ip_blacklist ) {
-					Blacklist.find( { ip: ip }, function( err, ipRecord ) {
-						if( err ) {
-							console.log( err );
-							res.json( { message: 'Error occurred.' } );
-						}
-						if( ipRecord.length > 0 && ipRecord[0].ip && false ) {
-							use_real_link = false;
-                            processTraffic( ip, use_real_link, link, geolocation, ipRecord[0] );
-						} else {
-                            // Geolocation blacklist filter
-                            if( geo ) {
-                                geo.country = geo.country.toUpperCase();
-                                geo.region = geo.region.toUpperCase();
-                                var orCondition = [
-                                    { country: geo.country, region: '', city: '' }
-                                ];
-                                if( geo.region ) {
-                                    orCondition.push( { country: geo.country, region: geo.region, city: '' } );
-                                }
-                                if( geo.city ) {
-                                    orCondition.push( { country: geo.country, region: geo.region, city: geo.city } );
-                                }
-                                var condition = {
-                                    $or: orCondition
-                                };
-                                GeoBlacklist.find( condition, function(err, geoRecord) {
-                                    if( err ) {
-                                        console.log( err );
-                                        res.json( { message: 'Error occurred.' } );
-                                    }
-                                    if( geoRecord.length > 0 ) {
+                // IP Whitelist check first
+                Whitelist.find( { ip: ip }, function( err, ipRecord_white ) {
+                    if( !err && ipRecord_white.length > 0 && ipRecord_white[0].ip ) {
+                        use_real_link = true;
+                        processTraffic( ip, use_real_link, link, geolocation, false );
+                    } else {
+        				// Geolocation filter
+                        if(!link.criteria || link.criteria.length == 0) {
+                            use_real_link = true;
+                        } else {
+            				if( geo && country ) {
+                                geo.city = geo.city.toLowerCase();
+                                geo.region = geo.region.toLowerCase();
+                                geo.country = geo.country.toLowerCase();
+            					link.criteria.every( function( criterion ) {
+            						if( ( criterion.city && criterion.city.toLowerCase() != geo.city )
+            							|| ( criterion.region && criterion.region.toLowerCase() != geo.region )
+            							|| ( criterion.country && criterion.country.toLowerCase() != geo.country ) ) {
+            							return true;
+            						}
+            						use_real_link = true;
+                                    return false;
+            					} );
+                                link.criteria_disallow.every( function( criterion ) {
+                                    if( ( !criterion.city || criterion.city.toLowerCase() == geo.city )
+                                        && ( !criterion.region || criterion.region.toLowerCase() == geo.region )
+                                        && ( criterion.country && criterion.country.toLowerCase() == geo.country ) ) {
                                         use_real_link = false;
-                                    } else {
-                                        use_real_link = true;
+                                        return false;
                                     }
-                                    processTraffic( ip, use_real_link, link, geolocation );
+                                    return true;
                                 } );
-                            } else {
-                                processTraffic( ip, false, link, geolocation );
-                            }
+            				}
                         }
-					} );
-				} else {
-					processTraffic( ip, use_real_link, link, geolocation );
-				}
+
+        				// Blacklisted IP filter
+        				if( use_real_link && link.use_ip_blacklist ) {
+        					Blacklist.find( { ip: ip }, function( err, ipRecord ) {
+        						if( err ) {
+        							console.log( err );
+        							res.json( { message: 'Error occurred.' } );
+        						}
+        						if( ipRecord.length > 0 && ipRecord[0].ip ) {
+        							use_real_link = false;
+                                    processTraffic( ip, use_real_link, link, geolocation, ipRecord[0] );
+        						} else {
+                                    // Geolocation blacklist filter
+                                    if( geo ) {
+                                        geo.country = geo.country.toUpperCase();
+                                        geo.region = geo.region.toUpperCase();
+                                        var orCondition = [
+                                            { country: geo.country, region: '', city: '' }
+                                        ];
+                                        if( geo.region ) {
+                                            orCondition.push( { country: geo.country, region: geo.region, city: '' } );
+                                        }
+                                        if( geo.city ) {
+                                            orCondition.push( { country: geo.country, region: geo.region, city: geo.city } );
+                                        }
+                                        var condition = {
+                                            $or: orCondition
+                                        };
+                                        GeoBlacklist.find( condition, function(err, geoRecord) {
+                                            if( err ) {
+                                                console.log( err );
+                                                res.json( { message: 'Error occurred.' } );
+                                            }
+                                            if( geoRecord.length > 0 ) {
+                                                use_real_link = false;
+                                            } else {
+                                                use_real_link = true;
+                                            }
+                                            processTraffic( ip, use_real_link, link, geolocation );
+                                        } );
+                                    } else {
+                                        processTraffic( ip, false, link, geolocation );
+                                    }
+                                }
+        					} );
+        				} else {
+        					processTraffic( ip, use_real_link, link, geolocation );
+        				}
+                    }
+                });
 			} else {
 				res.json( { message: 'Link not found.' } );
 			}

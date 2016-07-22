@@ -9,6 +9,7 @@
         ,'app.links'
         ,'app.traffics'
         ,'app.ipblacklist'
+        ,'app.ipwhitelist'
         ,'app.networks'
         ,'app.geoblacklist'
         ,'app.users'
