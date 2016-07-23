@@ -15,6 +15,8 @@ var linkSchema = new mongoose.Schema( {
 	criteria_disallow: [ {} ],
 	total_hits: { type: Number, min: 0 },
 	real_hits: { type: Number, min: 0 },
+	ip_count_to_auto_blacklist: Number,
+	ip_auto_blacklisted: [String],
 	created_time: Date
 } );
 linkSchema.plugin( mongoosePaginate );

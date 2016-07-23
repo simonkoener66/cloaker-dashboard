@@ -71,6 +71,7 @@ var linksController = function( router ) {
           res.json( { id: false } );
           return;
         }
+        link.ip_count_to_auto_blacklist = link.ip_count_to_auto_blacklist ? link.ip_count_to_auto_blacklist : 0;
         res.json( {
           link: link,
           alltags: tags
@@ -126,11 +127,12 @@ var linksController = function( router ) {
       owner: req.session.owner,
       tags: req.body.tags,
       status: true,
-      total_hits: req.body.total_hits,
-      real_hits: req.body.real_hits,
+      // total_hits: req.body.total_hits,
+      // real_hits: req.body.real_hits,
       use_ip_blacklist: req.body.use_ip_blacklist,
       criteria: helpers.copyLinkRegions( req.body.criteria ),
-      criteria_disallow: helpers.copyLinkRegions( req.body.criteria_disallow )
+      criteria_disallow: helpers.copyLinkRegions( req.body.criteria_disallow ),
+      ip_count_to_auto_blacklist: req.body.ip_count_to_auto_blacklist,
     };
     if( updated_link.link_generated.substr( 0, 1 ) != '/' ) {
       updated_link.link_generated = '/' + updated_link.link_generated;
@@ -170,6 +172,7 @@ var linksController = function( router ) {
         updated_link.created_time = new Date();
         updated_link.total_hits = 0;
         updated_link.real_hits = 0;
+        updated_link.ip_auto_blacklisted = [];
         Link.create( updated_link, function( err, link ) {
           if( err ) {
             console.log( err );

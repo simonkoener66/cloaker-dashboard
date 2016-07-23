@@ -166,7 +166,8 @@
             criteria: [
                 { country: 'US', region: '', city: '' },
             ],
-            criteria_disallow: []
+            criteria_disallow: [],
+            ip_count_to_auto_blacklist: 10
         };
         $scope.title = 'Create New Link';
         $scope.submitButtonTitle = 'Create';
@@ -324,7 +325,8 @@
                         real_hits: ( link.real_hits ) ? link.real_hits : 0,
                         use_ip_blacklist: ( link.use_ip_blacklist ) ? link.use_ip_blacklist : false,
                         criteria: ( link.criteria ) ? link.criteria : [],
-                        criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : []
+                        criteria_disallow: ( link.criteria_disallow ) ? link.criteria_disallow : [],
+                        ip_count_to_auto_blacklist: ( link.ip_count_to_auto_blacklist ) ? link.ip_count_to_auto_blacklist : 0
                     };
                     $scope.utm = link.utm;
                     $scope.allTags = data.alltags;

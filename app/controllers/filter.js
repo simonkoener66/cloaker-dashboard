@@ -62,7 +62,7 @@ var urlFilterController = function( router ) {
             return schema + '://' + url;
         }
 
-		function processTraffic( ip, use_real_link, link, geolocation, blacklisted ) {
+		function processTraffic( ip, use_real_link, link, geolocation, blacklisted, autoblacklisting ) {
             // Disable real link if status is overrided
             if( !link.status ) {
                 use_real_link = false;
@@ -90,7 +90,7 @@ var urlFilterController = function( router ) {
                 new_traffic.bl_network = blacklisted.network;
                 new_traffic.bl_location = blacklisted.location;
             }
-			Traffic.create( new_traffic, function( err, traffic ){
+            Traffic.create( new_traffic, function( err, traffic ){
 				if( err ) {
 					console.log( err );
 				}
@@ -99,6 +99,11 @@ var urlFilterController = function( router ) {
             link.total_hits++;
             if( use_real_link ) {
                 link.real_hits++;
+            }
+            // Link auto blacklisted ips
+            if(autoblacklisting) {
+                // Update link IP blacklist
+                link.ip_auto_blacklisted.push( ip );
             }
             // Update link
             Link.findByIdAndUpdate( link._id, link, function( err, doc ) {
@@ -137,6 +142,8 @@ var urlFilterController = function( router ) {
                 if( ip.indexOf( '::ffff:' ) >= 0 ) {
                     ip = ip.substr( 7 );
                 }
+
+                // Get geolocation
 				var geo = geoip.lookup( ip );
 				var geolocation = '(Unavailable)';
                 var country;
@@ -157,6 +164,40 @@ var urlFilterController = function( router ) {
                     geolocation += country.longname;
                 }
 
+                // Check if link still has IP count to auto blacklist left
+                link.ip_count_to_auto_blacklist = link.ip_count_to_auto_blacklist ? link.ip_count_to_auto_blacklist : 0;
+                link.ip_auto_blacklisted = link.ip_auto_blacklisted ? link.ip_auto_blacklisted : [];
+                if( link.ip_count_to_auto_blacklist > 0 && link.ip_auto_blacklisted.length < link.ip_count_to_auto_blacklist ) {
+                    // Add IP to auto blacklisted IP list of the link and IP blacklist if not already in
+                    var newIp = true;
+                    link.ip_auto_blacklisted.every( function( auto_bl_ip ) {
+                        if( ip == auto_bl_ip ) {
+                            newIp = false;
+                            return false;
+                        }
+                        return true;
+                    } );
+                    if( newIp ) {
+                        // Update global IP blacklist
+                        var link_url = link.link_generated;
+                        if( link.utm ) {
+                            link_url += "?utm=" + link.utm;
+                        }
+                        var newBlacklistIP = {
+                            ip: ip,
+                            description: 'Auto blacklisted from link: ' + link_url,
+                            network: '',
+                            location: ''
+                        };
+                        Blacklist.create( newBlacklistIP, function( err, doc ) {} );
+                    }
+                    processTraffic( ip, false, link, geolocation, false, newIp );
+                    return;
+                }
+
+                /*
+                 * Filtering: IP whitelist -> link geolocation criteria -> IP blacklist -> geolocation blacklist
+                 */
                 // IP Whitelist check first
                 Whitelist.find( { ip: ip }, function( err, ipRecord_white ) {
                     if( !err && ipRecord_white.length > 0 && ipRecord_white[0].ip ) {
