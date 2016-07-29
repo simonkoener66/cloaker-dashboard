@@ -70,7 +70,7 @@
 				                    data-ng-click=" order('-location') "
 				                    data-ng-class="{active: row == '-location'}"></span>
 				                </div></th>
-				                <th></th>
+				                <th ng-show="userRole == 'admin'"></th>
 				            </tr>
 			            </thead>
 			            <tbody>
@@ -79,7 +79,7 @@
 				                <td>{{ip.description}}</td>
 				                <td>{{ip.network}}</td>
 				                <td>{{ip.location}}</td>
-				                <td class='buttons text-center'>
+				                <td ng-show="userRole == 'admin'" class='buttons text-center'>
 				                	<md-button class="md-icon-button md-warn" aria-label="Delete IP" data-ng-click="deleteIP($event, ip._id)"><span class="fa fa-remove"></span></md-button>
 				                </td>
 				            </tr>

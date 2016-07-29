@@ -58,6 +58,10 @@ var networksController = function( router ) {
 
   this.deleteNetwork = function( req, res, next ) {
     var rst = { result: false };
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      return;
+    }
     if( req.body._id ) {
       Network.findByIdAndRemove( req.body._id, function( err, doc ) {
         if( err ) {
@@ -95,14 +99,19 @@ var networksController = function( router ) {
       }
       // Update or create
       if( req.body._id ) {
-        Network.findByIdAndUpdate( req.body._id, updated_network, function( err, doc ) {
-          if( err ) {
-            console.log( err );
-            res.json( { id: false } );
-            return;
-          }
-          res.json( doc );
-        } );
+        if(req.session.role == 'admin') {
+          Network.findByIdAndUpdate( req.body._id, updated_network, function( err, doc ) {
+            if( err ) {
+              console.log( err );
+              res.json( { id: false } );
+              return;
+            }
+            res.json( doc );
+          } );
+        } else {
+          res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+          return;
+        }
       } else {
         Network.create( updated_network, function( err, doc ) {
           if( err ) {

@@ -207,7 +207,11 @@ var ipWhitelistController = function( router ) {
       location: req.body.location
     };
     if(req.body._id) {
-      updateExistingWhitelistedIP( res, req.body._id, editingIP );
+      if(req.session.role == 'admin') {
+        updateExistingWhitelistedIP( res, req.body._id, editingIP );
+      } else {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
     } else {
       addIPtoWhitelist( res, editingIP );
     }
@@ -215,6 +219,10 @@ var ipWhitelistController = function( router ) {
 
   this.deleteWhitelistIP = function( req, res, next ) {
     var rst = { result: false };
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      return;
+    }
     if( req.body._id ) {
       WhitelistedIP.findByIdAndRemove( req.body._id, function( err, link ) {
         if( err ) {

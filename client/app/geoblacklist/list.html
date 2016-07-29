@@ -61,7 +61,7 @@
 				                    data-ng-click=" order('-city') "
 				                    data-ng-class="{active: row == '-city'}"></span>
 				                </div></th>
-				                <th></th>
+				                <th ng-show="userRole == 'admin'"></th>
 				            </tr>
 			            </thead>
 			            <tbody>
@@ -69,7 +69,7 @@
 				                <td>{{ countryName(item.country) }}</td>
 				                <td>{{ regionName(item.country, item.region) }}</td>
 				                <td>{{ item.city }}</td>
-				                <td class='buttons text-center'>
+				                <td ng-show="userRole == 'admin'" class='buttons text-center'>
 				                	<md-button class="md-icon-button md-warn" aria-label="Delete" data-ng-click="deleteGeolocation($event, item._id)"><span class="fa fa-remove"></span></md-button>
 				                </td>
 				            </tr>

@@ -153,7 +153,11 @@ var geoBlacklistController = function( router ) {
       description: req.body.description
     };
     if(req.body._id) {
-      updateExistingGeoBlacklistItem( res, req.body._id, data );
+      if(req.session.role == 'admin') {
+        updateExistingGeoBlacklistItem( res, req.body._id, data );
+      } else {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
     } else {
       addGeoBlacklistItem( res, data );
     }
@@ -161,6 +165,10 @@ var geoBlacklistController = function( router ) {
 
   this.deleteGeoBlacklistItem = function( req, res, next ) {
     var rst = { result: false };
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      return;
+    }
     if( req.body._id ) {
       GeoBlacklist.findByIdAndRemove( req.body._id, function( err, link ) {
         if( err ) {
