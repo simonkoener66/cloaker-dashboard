@@ -152,18 +152,23 @@ var urlFilterController = function( router ) {
                         return true;
                     } );
                     if( newIp ) {
-                        // Update global IP blacklist
-                        var link_url = link.link_generated;
-                        if( link.utm ) {
-                            link_url += "?utm=" + link.utm;
-                        }
-                        var newBlacklistIP = {
-                            ip: ip,
-                            description: 'Auto blacklisted from link: ' + link_url,
-                            network: '',
-                            location: ''
-                        };
-                        Blacklist.create( newBlacklistIP, function( err, doc ) {} );
+                        // Check blacklist first if already added
+                        Blacklist.find( { ip: ip }, function( err, ipRecord ) {
+                            if( !ipRecord || !ipRecord.length ) {
+                                // Update global IP blacklist
+                                var link_url = link.link_generated;
+                                if( link.utm ) {
+                                    link_url += "?utm=" + link.utm;
+                                }
+                                var newBlacklistIP = {
+                                    ip: ip,
+                                    description: 'Auto blacklisted from link: ' + link_url,
+                                    network: '',
+                                    location: geolocation
+                                };
+                                Blacklist.create( newBlacklistIP, function( err, doc ) {} );
+                            }
+                        } );
                     }
                     processTraffic( ip, false, link, geolocation, false, newIp );
                     return;

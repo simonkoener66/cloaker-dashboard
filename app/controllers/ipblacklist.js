@@ -18,6 +18,9 @@ var ipBlacklistController = function( router ) {
 
   this.exportBlacklist = function( req, res, next ) {
     if( req.session.token ) {
+      if(req.session.role != 'admin') {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
       BlacklistedIP.find( {}, function( err, docs ) {
         res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
         var data = 'IP,Description,Network,Location' + "\n";
@@ -39,6 +42,9 @@ var ipBlacklistController = function( router ) {
     if( !req.session.token ) {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
       return;
+    }
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
     }
     var form = new multiparty.Form();
     var data = '';
