@@ -6,6 +6,7 @@ var plus = google.plus('v1');
 var config = require('../../config/config');
 var multiparty = require('multiparty');
 var moment = require('moment-timezone');
+var geoip = require('geoip-lite');
 
 var helpers = require( './helpers' );
 
@@ -17,6 +18,9 @@ var ipBlacklistController = function( router ) {
 
   this.exportBlacklist = function( req, res, next ) {
     if( req.session.token ) {
+      if(req.session.role != 'admin') {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
       BlacklistedIP.find( {}, function( err, docs ) {
         res.setHeader( 'Content-disposition', 'attachment; filename=ipblacklist.csv' );
         var data = 'IP,Description,Network,Location' + "\n";
@@ -38,6 +42,9 @@ var ipBlacklistController = function( router ) {
     if( !req.session.token ) {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
       return;
+    }
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
     }
     var form = new multiparty.Form();
     var data = '';
@@ -167,6 +174,28 @@ var ipBlacklistController = function( router ) {
     });
   }
 
+  function getLocationFromIP( ip ) {
+    var geo = geoip.lookup( ip );
+    var geolocation = '';
+    var country;
+    if( geo ) {
+      country = helpers.getCountry( geo.country );
+      if( country ) {
+        if( geo.city ) {
+          geolocation += geo.city + ', ';
+        }
+        if( geo.region ) {
+          var region_num = parseInt( geo.region );
+          if( region_num < country.regions.length ) {
+            geolocation += country.regions[region_num].longname + ', ';
+          }
+        }
+        geolocation += country.longname;
+      }
+    }
+    return geolocation;
+  }
+
   function addIPtoBlacklist( res, editingIP ) {
     var ips = editingIP.ip.split(',');
     var dup = false, result = false;
@@ -186,6 +215,9 @@ var ipBlacklistController = function( router ) {
           return;
         }
         editingIP.ip = ip;
+        if( !editingIP.location ) {
+          editingIP.location = getLocationFromIP( ip );
+        }
         BlacklistedIP.create( editingIP, function( err, doc ) {
           doneCount++;
           if( err ) {
@@ -209,7 +241,11 @@ var ipBlacklistController = function( router ) {
       location: req.body.location
     };
     if(req.body._id) {
-      updateExistingBlacklistedIP( res, req.body._id, editingIP );
+      if(req.session.role == 'admin') {
+        updateExistingBlacklistedIP( res, req.body._id, editingIP );
+      } else {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
     } else {
       addIPtoBlacklist( res, editingIP );
     }
@@ -217,6 +253,10 @@ var ipBlacklistController = function( router ) {
 
   this.deleteBlacklistIP = function( req, res, next ) {
     var rst = { result: false };
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      return;
+    }
     if( req.body._id ) {
       BlacklistedIP.findByIdAndRemove( req.body._id, function( err, link ) {
         if( err ) {

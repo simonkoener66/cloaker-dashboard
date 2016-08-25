@@ -17,6 +17,7 @@
         $scope.total = 0;
         $scope.searchKeyword = '';
         $scope.searchUpdating = false;
+        $scope.userRole = authData.role;
 
         $scope.select = select;
         $scope.onNumPerPageChange = onNumPerPageChange;
@@ -73,6 +74,9 @@
         }
 
         function editGeolocation( id ) {
+            if( $scope.userRole != 'admin' ) {
+                return;
+            }
             $location.path( '/geoblacklist/' + id + '/edit' );
         }
 

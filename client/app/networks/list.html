@@ -38,14 +38,14 @@
 				                    data-ng-click=" order('-description') "
 				                    data-ng-class="{active: row == '-description'}"></span>
 				                </div></th>
-				                <th></th>
+				                <th ng-show="userRole == 'admin'"></th>
 				            </tr>
 			            </thead>
 			            <tbody>
 				            <tr data-ng-repeat="network in networks" data-ng-click="editNetwork(network._id)">
 				                <td>{{network.network}}</td>
 				                <td>{{network.description}}</td>
-				                <td class='buttons text-center'>
+				                <td ng-show="userRole == 'admin'" class='buttons text-center'>
 				                	<md-button class="md-icon-button md-warn" aria-label="Delete Network" data-ng-click="deleteNetwork($event, network._id)"><span class="fa fa-remove"></span></md-button>
 				                </td>
 				            </tr>

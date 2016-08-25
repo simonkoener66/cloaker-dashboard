@@ -17,6 +17,9 @@ var ipWhitelistController = function( router ) {
 
   this.exportWhitelist = function( req, res, next ) {
     if( req.session.token ) {
+      if(req.session.role != 'admin') {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
       WhitelistedIP.find( {}, function( err, docs ) {
         res.setHeader( 'Content-disposition', 'attachment; filename=ipwhitelist.csv' );
         var data = 'IP,Description,Network,Location' + "\n";
@@ -38,6 +41,9 @@ var ipWhitelistController = function( router ) {
     if( !req.session.token ) {
       res.status( 404 ).json( { message: 'API access unauthorized' } );
       return;
+    }
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
     }
     var form = new multiparty.Form();
     var data = '';
@@ -207,7 +213,11 @@ var ipWhitelistController = function( router ) {
       location: req.body.location
     };
     if(req.body._id) {
-      updateExistingWhitelistedIP( res, req.body._id, editingIP );
+      if(req.session.role == 'admin') {
+        updateExistingWhitelistedIP( res, req.body._id, editingIP );
+      } else {
+        res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      }
     } else {
       addIPtoWhitelist( res, editingIP );
     }
@@ -215,6 +225,10 @@ var ipWhitelistController = function( router ) {
 
   this.deleteWhitelistIP = function( req, res, next ) {
     var rst = { result: false };
+    if(req.session.role != 'admin') {
+      res.status( 401 ).json( { 'message': 'API access unauthorized' } );
+      return;
+    }
     if( req.body._id ) {
       WhitelistedIP.findByIdAndRemove( req.body._id, function( err, link ) {
         if( err ) {
