@@ -2,6 +2,7 @@
   "name": "phantom",
   "version": "0.0.0",
   "private": true,
+  "author": "Simon Koener",
   "scripts": {
     "start": "node app.js",
     "postinstall": "bash ./post_install.sh"
